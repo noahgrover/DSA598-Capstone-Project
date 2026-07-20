@@ -262,11 +262,15 @@ if df is not None:
                 lon="Longitude",
                 hover_name="Hover Title",
                 hover_data=["Surface Text", "Cohort", "Member Of", "Participant In", "Description"],
-                color="Visual Group",
+                color="NER Class",                      # 1. Switched from 'Visual Group' to 'NER Class'
+                color_discrete_map=IBM_LABEL_COLOR_MAP, # 2. Enforced the global color blind safe palette
                 zoom=2,
                 height=600
             )
-            fig_map.update_layout(mapbox_style="open-street-map")
+            fig_map.update_layout(
+                mapbox_style="open-street-map",
+                margin=dict(l=0, r=0, t=20, b=0) # Tightens up margins for a cleaner UI
+            )
             st.plotly_chart(fig_map, use_container_width=True)
         else:
             st.info("No geospatial data coordinates found in filtered dataset.")
