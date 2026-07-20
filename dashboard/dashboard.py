@@ -19,23 +19,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown(
-    """
-    <style>
-    /* Change the background of the selected items in the multiselect dropdown */
-    div[data-baseweb="tag"] {
-        background-color: #785EF0 !important; /* IBM Colorblind-Safe Vivid Purple */
-        border-radius: 4px !important;
-    }
-    /* Change the text color inside the selected chips to crisp white for contrast */
-    div[data-baseweb="tag"] span {
-        color: #FFFFFF !important; 
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 st.title("🕸️ Archival Entity Linking & Semantic Graph Dashboard")
 st.markdown("""
 This dashboard visualizes the structural and qualitative improvements introduced by our advanced NER,
