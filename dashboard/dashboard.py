@@ -1,5 +1,5 @@
 # =========================================================================================================================================
-# Streamlit Archival Knowledge Graph Dashboard (FULLY MAPPED VER.)
+# Streamlit Archival Knowledge Graph Dashboard
 # =========================================================================================================================================
 
 import json
@@ -98,10 +98,9 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             religion = extract_labels(ent.get("religion"))
             country = extract_labels(ent.get("country"))
             
-            # Newly Mapped Rich Properties
+            # Newly Mapped Rich Properties (Convicted Of Removed)
             ideology = extract_labels(ent.get("politicalIdeology"))
             member = extract_labels(ent.get("memberOf"))
-            convictions = extract_labels(ent.get("convictedOf"))
             participant = extract_labels(ent.get("participant"))
             
             # Extract and format VIAF Link
@@ -154,7 +153,6 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "Country": country,
                 "Political Ideology": ideology,
                 "Member Of": member,
-                "Convicted Of": convictions,
                 "Participant In": participant,
                 "VIAF Link": viaf_url,
                 
@@ -165,7 +163,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
     # Join list attributes into simple display strings
     list_fields = [
         "Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", 
-        "Political Ideology", "Member Of", "Convicted Of", "Participant In"
+        "Political Ideology", "Member Of", "Participant In"
     ]
     
     for item in flat_entities:
@@ -202,7 +200,7 @@ if df is not None:
                 viaf_links = df_filtered["VIAF Link"].notna().sum()
                 st.metric("VIAF Authority Links", viaf_links)
             with m5:
-                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "Political Ideology", "Member Of", "Convicted Of", "Participant In"]
+                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "Political Ideology", "Member Of", "Participant In"]
                 populated_count = df_filtered[relational_columns].notna().sum().sum()
                 avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
                 st.metric("Metadata / Mention", f"{avg_demo:.2f}x")
@@ -247,10 +245,10 @@ if df is not None:
             
             # --- Row 1: Dynamic Profiles ---
             st.markdown("### 📊 Dynamic Metadata Profiler")
-            # Added new properties to the dropdown
+            # Removed Convicted Of
             demo_options = [
                 "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
-                "Political Ideology", "Member Of", "Convicted Of", "Participant In"
+                "Political Ideology", "Member Of", "Participant In"
             ]
             selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
             
@@ -388,7 +386,7 @@ if df is not None:
                 df_display = df_display[df_display["Surface Text"].str.contains(search_query, case=False, na=False)]
             
             # Configure data columns to make VIAF URL a clickable link
-            cols_to_show = ["Icon", "Official Name", "Surface Text", "NER Class", "Political Ideology", "Member Of", "Convicted Of", "VIAF Link", "Resolution Type"]
+            cols_to_show = ["Icon", "Official Name", "Surface Text", "NER Class", "Political Ideology", "Member Of", "VIAF Link", "Resolution Type"]
             
             st.dataframe(
                 df_display[cols_to_show], 
@@ -435,8 +433,8 @@ if df is not None:
                 
             with d_col4:
                 st.markdown("#### Metadata Completeness (Fill Rate)")
-                # Updated to include the new metadata properties
-                attributes = ["Occupation", "Political Ideology", "Member Of", "Participant In", "Convicted Of", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "VIAF Link"]
+                # Removed Convicted Of
+                attributes = ["Occupation", "Political Ideology", "Member Of", "Participant In", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "VIAF Link"]
                 completeness = [(df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 for col in attributes]
                 
                 df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
