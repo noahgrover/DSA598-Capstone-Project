@@ -468,6 +468,114 @@ if df is not None:
             )
             st.plotly_chart(fig_pulse, use_container_width=True)
 
+    # --- Tab 4: Interactive Entity Explorer ---
+    with tab4:
+        st.subheader("🔍 Interactive Entity Explorer & Profile Graph")
+        st.markdown("""
+        Search, filter, and inspect specific semantic nodes within your graph. Selecting an entity 
+        will pull its full relational dossier, authority records, and multi-layered attributes.
+        """)
+
+        if df_filtered.empty:
+            st.info("No entities match your active cohort filters to explore.")
+        else:
+            # 1. Top Search and Filter Bar
+            exp_col1, exp_col2, exp_col3 = st.columns([2, 1, 1])
+            with exp_col1:
+                search_query = st.text_input("🔍 Search by Entity Name or Surface Text:", value="")
+            with exp_col2:
+                class_options = ["All Categories"] + list(df_filtered["NER Class"].dropna().unique())
+                selected_class = st.selectbox("Filter Explorer by Class:", options=class_options)
+            with exp_col3:
+                res_options = ["All Resolutions"] + list(df_filtered["Resolution Type"].dropna().unique())
+                selected_res = st.selectbox("Filter Explorer by Resolution:", options=res_options)
+
+            # Apply Explorer Filters
+            df_exp = df_filtered.copy()
+            if search_query:
+                df_exp = df_exp[
+                    df_exp["Official Name"].str.contains(search_query, case=False, na=False) |
+                    df_exp["Surface Text"].str.contains(search_query, case=False, na=False)
+                ]
+            if selected_class != "All Categories":
+                df_exp = df_exp[df_exp["NER Class"] == selected_class]
+            if selected_res != "All Resolutions":
+                df_exp = df_exp[df_exp["Resolution Type"] == selected_res]
+
+            if df_exp.empty:
+                st.warning("No records match your specific search criteria.")
+            else:
+                # 2. Split Master-Detail Layout
+                master_col, detail_col = st.columns([3, 2])
+
+                with master_col:
+                    st.markdown(f"**Matching Entity Nodes ({len(df_exp)})**")
+                    # Clean up view for the selection table
+                    df_table_view = df_exp[["Icon", "Official Name", "NER Class", "Cohort", "Resolution Type"]].copy()
+                    
+                    # Create a quick selection mechanism
+                    entity_names = (df_exp["Icon"] + " " + df_exp["Official Name"]).tolist()
+                    selected_entity_str = st.selectbox(
+                        "Click below to select an active entity dossier:", 
+                        options=entity_names,
+                        label_visibility="collapsed"
+                    )
+                    
+                    # Display table below selector for fast general browsing
+                    st.dataframe(
+                        df_table_view, 
+                        use_container_width=True, 
+                        height=400,
+                        hide_index=True
+                    )
+
+                with detail_col:
+                    # Parse selected entity out of the dataframe
+                    selected_name_clean = selected_entity_str.split(" ", 1)[1] if " " in selected_entity_str else selected_entity_str
+                    entity_row = df_exp[df_exp["Official Name"] == selected_name_clean].iloc[0]
+
+                    # 3. Render the Selected Entity Profile Card
+                    with st.container(border=True):
+                        # Title Header Block
+                        st.markdown(f"### {entity_row['Icon']} {entity_row['Official Name']}")
+                        st.caption(f"**ID:** `{entity_row['Entity ID']}` | **Class:** {entity_row['NER Class']} | **Cohort:** {entity_row['Cohort']}")
+                        
+                        # Handle Image rendering if present
+                        if pd.notna(entity_row["Image URL"]) and str(entity_row["Image URL"]).strip():
+                            st.image(entity_row["Image URL"], use_container_width=True)
+
+                        # Description
+                        st.markdown(f"**Description:** \n> {entity_row['Description']}")
+                        
+                        st.markdown("---")
+                        st.markdown("**Graph Attributes & Linked Assertions:**")
+
+                        # Build a clean data grid for metadata attributes
+                        metadata_fields = {
+                            "Mention Text": entity_row["Surface Text"],
+                            "Timeline Active Bounds": f"{entity_row['Target Year'] or '???'} – {entity_row['End Year'] or '???'}",
+                            "Resolution Link Status": entity_row["Resolution Type"],
+                            "Occupation/Role": entity_row["Occupation"],
+                            "Affiliated Country": entity_row["Country"],
+                            "Member Of": entity_row["Member Of"],
+                            "Participant In": entity_row["Participant In"],
+                            "Political Ideology": entity_row["Political Ideology"],
+                            "Ethnic Group/Tribe": entity_row["Ethnic Group/Tribe"],
+                            "Stated Religion": entity_row["Religion"],
+                            "Gender Identity": entity_row["Gender Identity"],
+                        }
+
+                        # Display non-null items beautifully
+                        for label, val in metadata_fields.items():
+                            if pd.notna(val) and str(val).strip() and val != "??? – ???":
+                                st.markdown(f"**{label}:** {val}")
+
+                        # Include Authority URL Button
+                        if pd.notna(entity_row["VIAF Link"]):
+                            st.link_button("🌐 Open VIAF Authority File", entity_row["VIAF Link"], use_container_width=True)
+                        elif "wd:" in entity_row["Entity ID"]:
+                            wd_url = f"https://www.wikidata.org/wiki/{entity_row['Entity ID'].replace('wd:', '')}"
+                            st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
     # --- Tab 5: Pipeline Quality Diagnostics ---
     with tab5:
         st.subheader("Pipeline Quality & Resolution Diagnostics")
