@@ -19,6 +19,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Inject custom CSS to style the multiselect chips in the sidebar using the IBM colorblind-safe purple
+st.markdown(
+    """
+    <style>
+    div[data-baseweb="tag"] {
+        background-color: #785EF0 !important;
+        border-radius: 4px !important;
+    }
+    div[data-baseweb="tag"] span {
+        color: #FFFFFF !important; 
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("🕸️ Archival Entity Linking & Semantic Graph Dashboard")
 st.markdown("""
 This dashboard visualizes the structural and qualitative improvements introduced by our advanced NER,
@@ -98,7 +114,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             religion = extract_labels(ent.get("religion"))
             country = extract_labels(ent.get("country"))
             
-            # Newly Mapped Rich Properties (Convicted Of Removed)
+            # Newly Mapped Rich Properties
             ideology = extract_labels(ent.get("politicalIdeology"))
             member = extract_labels(ent.get("memberOf"))
             participant = extract_labels(ent.get("participant"))
@@ -176,7 +192,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 df, records_per_cohort = load_and_parse_jsonld()
 
 if df is not None:
-    # cohort palette
+    # --- GLOBAL SYSTEM PALETTES (IBM Colorblind-Safe Framework) ---
     unique_cohorts = sorted(list(df["Cohort"].unique()))
     HIGH_CONTRAST_COHORT_COLORS = ["#005AB5", "#DC3220", "#FFC20A"] 
     COHORT_COLOR_MAP = {
@@ -184,7 +200,6 @@ if df is not None:
         for i, cohort in enumerate(unique_cohorts)
     }
 
-    # label palette
     IBM_LABEL_COLOR_MAP = {
         "Person": "#648FFF",        # Cornflower Blue
         "Organization": "#785EF0",  # Indigo/Purple
@@ -194,7 +209,7 @@ if df is not None:
         "Thing": "#A3A8B8"          # Fallback Slate Gray
     }
 
-    # sidebar filters
+    # Sidebar Filters
     st.sidebar.header("📊 Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
         "Select Historical Cohorts",
@@ -204,308 +219,304 @@ if df is not None:
 
     # Apply your sidebar filter mask to the main dataset
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
+    
+    # Safely derive total documents matching active cohort filter selections
+    filtered_records_count = sum(records_per_cohort[c] for c in selected_cohorts)
         
     # Metrics Row
-        with st.container(border=True):
-            m1, m2, m3, m4, m5, m6 = st.columns(6)
-            with m1: st.metric("Total Records", filtered_records_count)
-            with m2: st.metric("Entity Mentions", len(df_filtered))
-            with m3: st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
-            with m4:
-                viaf_links = df_filtered["VIAF Link"].notna().sum()
-                st.metric("VIAF Authority Links", viaf_links)
-            with m5:
-                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "Political Ideology", "Member Of", "Participant In"]
-                populated_count = df_filtered[relational_columns].notna().sum().sum()
-                avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
-                st.metric("Metadata / Mention", f"{avg_demo:.2f}x")
-            with m6:
-                avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
-                st.metric("Paths / Record", f"{avg_paths:.2f}x")
+    with st.container(border=True):
+        m1, m2, m3, m4, m5, m6 = st.columns(6)
+        with m1: st.metric("Total Records", filtered_records_count)
+        with m2: st.metric("Entity Mentions", len(df_filtered))
+        with m3: st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
+        with m4:
+            viaf_links = df_filtered["VIAF Link"].notna().sum()
+            st.metric("VIAF Authority Links", viaf_links)
+        with m5:
+            relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "Political Ideology", "Member Of", "Participant In"]
+            populated_count = df_filtered[relational_columns].notna().sum().sum()
+            avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
+            st.metric("Metadata / Mention", f"{avg_demo:.2f}x")
+        with m6:
+            avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
+            st.metric("Paths / Record", f"{avg_paths:.2f}x")
 
-        tab1, tab2, tab3, tab4, tab5 = st.tabs([
-            "🗺️ Archival Geospatial Map",
-            "📊 Demographic & Crossover Insights",
-            "⏳ Archival Calendar Timeline",
-            "🔍 Interactive Entity Explorer",
-            "📈 Pipeline Quality Diagnostics"
-        ])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🗺️ Archival Geospatial Map",
+        "📊 Demographic & Crossover Insights",
+        "⏳ Archival Calendar Timeline",
+        "🔍 Interactive Entity Explorer",
+        "📈 Pipeline Quality Diagnostics"
+    ])
+    
+    # --- GIS Map ---
+    with tab1:
+        st.subheader("Geospatial Entity Distribution")
+        df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
+        if len(df_geo) > 0:
+            df_geo["Hover Title"] = df_geo["Icon"] + " " + df_geo["Official Name"]
+            
+            fig_map = px.scatter_mapbox(
+                df_geo,
+                lat="Latitude",
+                lon="Longitude",
+                hover_name="Hover Title",
+                hover_data=["Surface Text", "Cohort", "Member Of", "Participant In", "Description"],
+                color="Visual Group",
+                zoom=2,
+                height=600
+            )
+            fig_map.update_layout(mapbox_style="open-street-map")
+            st.plotly_chart(fig_map, use_container_width=True)
+        else:
+            st.info("No geospatial data coordinates found in filtered dataset.")
+
+    # --- Tab 2: Enhanced Demographic Analysis ---
+    with tab2:
+        st.subheader("Archival Intersectionality & Metadata Distributions")
         
-        # --- GIS Map ---
-        with tab1:
-            st.subheader("Geospatial Entity Distribution")
-            df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
-            if len(df_geo) > 0:
-                # Add Icon to hover title
-                df_geo["Hover Title"] = df_geo["Icon"] + " " + df_geo["Official Name"]
-                
-                fig_map = px.scatter_mapbox(
-                    df_geo,
-                    lat="Latitude",
-                    lon="Longitude",
-                    hover_name="Hover Title",
-                    hover_data=["Surface Text", "Cohort", "Member Of", "Participant In", "Description"],
-                    color="Visual Group",
-                    zoom=2,
-                    height=600
-                )
-                fig_map.update_layout(mapbox_style="open-street-map")
-                st.plotly_chart(fig_map, use_container_width=True)
-            else:
-                st.info("No geospatial data coordinates found in filtered dataset.")
-
-        # --- Tab 2: Enhanced Demographic Analysis ---
-        with tab2:
-            st.subheader("Archival Intersectionality & Metadata Distributions")
-            
-            # --- Row 1: Dynamic Profiles ---
-            st.markdown("### 📊 Dynamic Metadata Profiler")
-            # Removed Convicted Of
-            demo_options = [
-                "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
-                "Political Ideology", "Member Of", "Participant In"
-            ]
-            selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
-            
-            df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
-            
-            if not df_demo.empty:
-                df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
-                df_demo = df_demo.explode(selected_demo)
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
-                    top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
-                    fig_demo = px.bar(top_10, x="count", y=selected_demo, orientation='h', color_discrete_sequence=["#2ECC71"])
-                    fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
-                    st.plotly_chart(fig_demo, use_container_width=True)
-                    
-                with col2:
-                    st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
-                    cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
-                    cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
-                    fig_cohort = px.bar(
-                        cohort_counts, 
-                        x="count", 
-                        y=selected_demo, 
-                        color="Cohort", 
-                        orientation='h', 
-                        barmode="stack",
-                        color_discrete_map=COHORT_COLOR_MAP
-                    )
-                    fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
-                    st.plotly_chart(fig_cohort, use_container_width=True)
-            else:
-                st.info(f"No extracted data found for '{selected_demo}' within the selected filters.")
-                
-            st.markdown("---")
-            
-            # --- Row 2: Matrix Intersections ---
-            st.markdown("### 🔀 Intersectionality Matrix")
-            st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
-            
-            cx_col1, cx_col2 = st.columns(2)
-            with cx_col1:
-                attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
-            with cx_col2:
-                # Default to Political Ideology if available for an interesting default cross-reference
-                attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
-                
-            if attr_x == attr_y:
-                st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
-            else:
-                df_cross = df_filtered[[attr_x, attr_y]].dropna()
-                if not df_cross.empty:
-                    df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
-                    df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
-                    
-                    top_x_items = df_cross[attr_x].value_counts().head(8).index
-                    top_y_items = df_cross[attr_y].value_counts().head(8).index
-                    df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
-                    
-                    if not df_cross_filtered.empty:
-                        cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
-                        fig_heatmap = px.density_heatmap(
-                            cross_matrix, 
-                            x=attr_x, 
-                            y=attr_y, 
-                            z="Co-occurrences",
-                            text_auto=True,
-                            color_continuous_scale="Viridis"
-                        )
-                        fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
-                        st.plotly_chart(fig_heatmap, use_container_width=True)
-                    else:
-                        st.info("No explicit intersections found for the top elements of these attributes.")
-                else:
-                    st.info("No co-occurring data coordinates available for this configuration.")
+        st.markdown("### 📊 Dynamic Metadata Profiler")
+        demo_options = [
+            "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
+            "Political Ideology", "Member Of", "Participant In"
+        ]
+        selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
         
-        # --- Tab 3: Quantitative Temporal Analytics (Unified IBM Colors) ---
-        with tab3:
-            st.subheader("⏳ Chronological Distribution & Historical Velocity")
-            st.markdown("""
-            This layout pairs your high-level category swimlanes with macro temporal metrics 
-            and velocity tracking to show exactly where your archive aggregates in time.
-            """)
-
-            # Filter out records without a timestamp
-            df_time = df_filtered[df_filtered["Target Year"].notna()].copy()
-
-            if df_time.empty:
-                st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
-            else:
-                # Force uniform types for chronological calculations
-                df_time["Target Year"] = df_time["Target Year"].astype(int)
-                df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
+        df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
+        
+        if not df_demo.empty:
+            df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
+            df_demo = df_demo.explode(selected_demo)
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
+                top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
+                fig_demo = px.bar(top_10, x="count", y=selected_demo, orientation='h', color_discrete_sequence=["#2ECC71"])
+                fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_demo, use_container_width=True)
                 
-                # ==========================================
-                # QUANTITATIVE TEMPORAL METRICS
-                # ==========================================
-                with st.container(border=True):
-                    t_col1, t_col2, t_col3, t_col4 = st.columns(4)
-                    
-                    # 1. Total absolute era coverage
-                    start_era = int(df_time["Target Year"].min())
-                    end_era = int(df_time["Target Year"].max())
-                    t_col1.metric("Chronological Span", f"{start_era} – {end_era}")
-                    
-                    # 2. Average lifespan of historical actors (excluding events)
-                    df_lifespan = df_time[df_time["End Year"].notna() & (~df_time["NER Class"].str.contains("Event", na=False))].copy()
-                    if not df_lifespan.empty:
-                        avg_life = int((df_lifespan["End Year"].astype(int) - df_lifespan["Target Year"]).mean())
-                        t_col2.metric("Avg. Entity Lifespan", f"{avg_life} Years")
-                    else:
-                        t_col2.metric("Avg. Entity Lifespan", "Static / N/A")
-                    
-                    # 3. Mode calculation for historical density concentration
-                    df_time["Decade"] = (df_time["Target Year"] // 10) * 10
-                    peak_decade = df_time["Decade"].mode()
-                    if not peak_decade.empty:
-                        t_col3.metric("Peak Active Decade", f"{int(peak_decade.iloc[0])}s")
-                    else:
-                        t_col3.metric("Peak Active Decade", "N/A")
-                        
-                    # 4. Total count of milestone incidents
-                    total_events = df_time["NER Class"].str.contains("Event", na=False).sum()
-                    t_col4.metric("Point-in-Time Events", f"{total_events} Milestones")
-
-                st.markdown("---")
-
-                # ==========================================
-                # VIEW 1: MACRO SWIMLANES (Enforcing Master Palette)
-                # ==========================================
-                st.markdown("### 🗺️ Macro Density Swimlanes")
-                st.markdown("_Look for vertical alignments across tracks to identify cross-category historical triggers._")
-
-                fig_macro = go.Figure()
-                categories = df_time["NER Class"].unique()
-                
-                for cat in categories:
-                    df_cat = df_time[df_time["NER Class"] == cat]
-                    hover_texts = [
-                        f"<b>{row['Timeline Label']}</b><br>Cohort: {row['Cohort']}<br>Start: {row['Target Year']}<br>Desc: {row['Description']}"
-                        for _, row in df_cat.iterrows()
-                    ]
-
-                    # Grab the locked color from our global master dictionary
-                    assigned_color = IBM_LABEL_COLOR_MAP.get(cat, IBM_LABEL_COLOR_MAP["Thing"])
-
-                    fig_macro.add_trace(go.Scatter(
-                        x=df_cat["Target Year"],
-                        y=[cat] * len(df_cat),
-                        mode="markers",
-                        marker=dict(
-                            size=16, 
-                            symbol="diamond" if "Event" in cat else "circle", 
-                            color=assigned_color,  # Enforced matching color
-                            line=dict(width=1, color="white")
-                        ),
-                        text=hover_texts,
-                        hoverinfo="text",
-                        name=cat
-                    ))
-
-                fig_macro.update_layout(
-                    xaxis_title="Calendar Year (Absolute Axis)",
-                    yaxis_title="Semantic Swimlanes",
-                    height=280,
-                    margin=dict(l=150, r=20, t=20, b=40),
-                    showlegend=True,
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-                )
-                st.plotly_chart(fig_macro, use_container_width=True)
-
-                st.markdown("---")
-
-                # ==========================================
-                # VIEW 2: HISTORICAL PULSE (Enforcing Master Palette)
-                # ==========================================
-                st.markdown("### 📈 Historical Velocity (Decadal Node Density)")
-                st.markdown("_Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges._")
-                
-                # Group by decade and type to showcase stacked composition over time
-                decade_counts = df_time.groupby(["Decade", "NER Class"]).size().reset_index(name="Node Count")
-                decade_counts["Decade Display"] = decade_counts["Decade"].astype(str) + "s"
-                decade_counts = decade_counts.sort_values("Decade")
-
-                fig_pulse = px.bar(
-                    decade_counts,
-                    x="Decade Display",
-                    y="Node Count",
-                    color="NER Class",
+            with col2:
+                st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
+                cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
+                cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
+                fig_cohort = px.bar(
+                    cohort_counts, 
+                    x="count", 
+                    y=selected_demo, 
+                    color="Cohort", 
+                    orientation='h', 
                     barmode="stack",
-                    # Pass the exact same master dictionary to Plotly Express
-                    color_discrete_map=IBM_LABEL_COLOR_MAP, 
-                    height=350
+                    color_discrete_map=COHORT_COLOR_MAP
                 )
+                fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_cohort, use_container_width=True)
+        else:
+            st.info(f"No extracted data found for '{selected_demo}' within the selected filters.")
+            
+        st.markdown("---")
+        
+        st.markdown("### 🔀 Intersectionality Matrix")
+        st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
+        
+        cx_col1, cx_col2 = st.columns(2)
+        with cx_col1:
+            attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
+        with cx_col2:
+            attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
+            
+        if attr_x == attr_y:
+            st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
+        else:
+            df_cross = df_filtered[[attr_x, attr_y]].dropna()
+            if not df_cross.empty:
+                df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
+                df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
                 
-                fig_pulse.update_layout(
-                    xaxis_title="Historical Decades",
-                    yaxis_title="Entities Introduced",
-                    legend_title_text="Entity Class",
-                    margin=dict(l=40, r=20, t=20, b=40)
-                )
-                st.plotly_chart(fig_pulse, use_container_width=True)
+                top_x_items = df_cross[attr_x].value_counts().head(8).index
+                top_y_items = df_cross[attr_y].value_counts().head(8).index
+                df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
+                
+                if not df_cross_filtered.empty:
+                    cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
+                    fig_heatmap = px.density_heatmap(
+                        cross_matrix, 
+                        x=attr_x, 
+                        y=attr_y, 
+                        z="Co-occurrences",
+                        text_auto=True,
+                        color_continuous_scale="Viridis"
+                    )
+                    fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
+                    st.plotly_chart(fig_heatmap, use_container_width=True)
+                else:
+                    st.info("No explicit intersections found for the top elements of these attributes.")
+            else:
+                st.info("No co-occurring data coordinates available for this configuration.")
+        
+    # --- Tab 3: Quantitative Temporal Analytics (Unified IBM Colors) ---
+    with tab3:
+        st.subheader("⏳ Chronological Distribution & Historical Velocity")
+        st.markdown("""
+        This layout pairs your high-level category swimlanes with macro temporal metrics 
+        and velocity tracking to show exactly where your archive aggregates in time.
+        """)
 
-        # --- Tab 5: Pipeline Quality Diagnostics ---
-        with tab5:
-            st.subheader("Pipeline Quality & Resolution Diagnostics")
+        # Filter out records without a timestamp
+        df_time = df_filtered[df_filtered["Target Year"].notna()].copy()
+
+        if df_time.empty:
+            st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
+        else:
+            # Force uniform types for chronological calculations
+            df_time["Target Year"] = df_time["Target Year"].astype(int)
+            df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
             
-            # Top Row: Resolution & Confidence
-            d_col1, d_col2 = st.columns(2)
-            
-            with d_col1:
-                st.markdown("#### Entity Resolution Types")
-                res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
-                fig_res = px.pie(res_counts, values="count", names="Resolution Type", color_discrete_map={"Wikidata Resolved": "#2ECC71", "NIL Clustered": "#3498DB", "Unlinked Entity": "#E74C3C"})
-                st.plotly_chart(fig_res, use_container_width=True)
+            # ==========================================
+            # QUANTITATIVE TEMPORAL METRICS
+            # ==========================================
+            with st.container(border=True):
+                t_col1, t_col2, t_col3, t_col4 = st.columns(4)
                 
-            with d_col2:
-                st.markdown("#### NER Confidence Scores")
-                fig_conf = px.histogram(df_filtered, x="Confidence", nbins=20, color_discrete_sequence=["#3498DB"])
-                fig_conf.update_layout(yaxis_title="Entity Count", xaxis_title="Confidence Score")
-                st.plotly_chart(fig_conf, use_container_width=True)
+                # 1. Total absolute era coverage
+                start_era = int(df_time["Target Year"].min())
+                end_era = int(df_time["Target Year"].max())
+                t_col1.metric("Chronological Span", f"{start_era} – {end_era}")
+                
+                # 2. Average lifespan of historical actors (excluding events)
+                df_lifespan = df_time[df_time["End Year"].notna() & (~df_time["NER Class"].str.contains("Event", na=False))].copy()
+                if not df_lifespan.empty:
+                    avg_life = int((df_lifespan["End Year"].astype(int) - df_lifespan["Target Year"]).mean())
+                    t_col2.metric("Avg. Entity Lifespan", f"{avg_life} Years")
+                else:
+                    t_col2.metric("Avg. Entity Lifespan", "Static / N/A")
+                
+                # 3. Mode calculation for historical density concentration
+                df_time["Decade"] = (df_time["Target Year"] // 10) * 10
+                peak_decade = df_time["Decade"].mode()
+                if not peak_decade.empty:
+                    t_col3.metric("Peak Active Decade", f"{int(peak_decade.iloc[0])}s")
+                else:
+                    t_col3.metric("Peak Active Decade", "N/A")
+                    
+                # 4. Total count of milestone incidents
+                total_events = df_time["NER Class"].str.contains("Event", na=False).sum()
+                t_col4.metric("Point-in-Time Events", f"{total_events} Milestones")
 
             st.markdown("---")
+
+            # ==========================================
+            # VIEW 1: MACRO SWIMLANES (Enforcing Master Palette)
+            # ==========================================
+            st.markdown("### 🗺️ Macro Density Swimlanes")
+            st.markdown("_Look for vertical alignments across tracks to identify cross-category historical triggers._")
+
+            fig_macro = go.Figure()
+            categories = df_time["NER Class"].unique()
             
-            # Bottom Row: Classes & Completeness
-            d_col3, d_col4 = st.columns(2)
+            for cat in categories:
+                df_cat = df_time[df_time["NER Class"] == cat]
+                hover_texts = [
+                    f"<b>{row['Timeline Label']}</b><br>Cohort: {row['Cohort']}<br>Start: {row['Target Year']}<br>Desc: {row['Description']}"
+                    for _, row in df_cat.iterrows()
+                ]
+
+                # Grab the locked color from our global master dictionary
+                assigned_color = IBM_LABEL_COLOR_MAP.get(cat, IBM_LABEL_COLOR_MAP["Thing"])
+
+                fig_macro.add_trace(go.Scatter(
+                    x=df_cat["Target Year"],
+                    y=[cat] * len(df_cat),
+                    mode="markers",
+                    marker=dict(
+                        size=16, 
+                        symbol="diamond" if "Event" in cat else "circle", 
+                        color=assigned_color,
+                        line=dict(width=1, color="white")
+                    ),
+                    text=hover_texts,
+                    hoverinfo="text",
+                    name=cat
+                ))
+
+            fig_macro.update_layout(
+                xaxis_title="Calendar Year (Absolute Axis)",
+                yaxis_title="Semantic Swimlanes",
+                height=280,
+                margin=dict(l=150, r=20, t=20, b=40),
+                showlegend=True,
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            )
+            st.plotly_chart(fig_macro, use_container_width=True)
+
+            st.markdown("---")
+
+            # ==========================================
+            # VIEW 2: HISTORICAL PULSE (Enforcing Master Palette)
+            # ==========================================
+            st.markdown("### 📈 Historical Velocity (Decadal Node Density)")
+            st.markdown("_Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges._")
             
-            with d_col3:
-                st.markdown("#### Extracted NER Classes")
-                class_counts = df_filtered["NER Class"].value_counts().reset_index()
-                fig_class = px.bar(class_counts, x="count", y="NER Class", orientation='h', color_discrete_sequence=["#F1C40F"])
-                st.plotly_chart(fig_class, use_container_width=True)
-                
-            with d_col4:
-                st.markdown("#### Metadata Completeness (Fill Rate)")
-                # Removed Convicted Of
-                attributes = ["Occupation", "Political Ideology", "Member Of", "Participant In", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "VIAF Link"]
-                completeness = [(df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 for col in attributes]
-                
-                df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
-                fig_comp = px.bar(df_comp, x="Fill Rate (%)", y="Attribute", orientation='h', color_discrete_sequence=["#9B59B6"])
-                fig_comp.update_xaxes(range=[0, 100])
-                fig_comp.update_layout(yaxis={'categoryorder':'total ascending'})
-                st.plotly_chart(fig_comp, use_container_width=True)
+            # Group by decade and type to showcase stacked composition over time
+            decade_counts = df_time.groupby(["Decade", "NER Class"]).size().reset_index(name="Node Count")
+            decade_counts["Decade Display"] = decade_counts["Decade"].astype(str) + "s"
+            decade_counts = decade_counts.sort_values("Decade")
+
+            fig_pulse = px.bar(
+                decade_counts,
+                x="Decade Display",
+                y="Node Count",
+                color="NER Class",
+                barmode="stack",
+                color_discrete_map=IBM_LABEL_COLOR_MAP, 
+                height=350
+            )
+            
+            fig_pulse.update_layout(
+                xaxis_title="Historical Decades",
+                yaxis_title="Entities Introduced",
+                legend_title_text="Entity Class",
+                margin=dict(l=40, r=20, t=20, b=40)
+            )
+            st.plotly_chart(fig_pulse, use_container_width=True)
+
+    # --- Tab 5: Pipeline Quality Diagnostics ---
+    with tab5:
+        st.subheader("Pipeline Quality & Resolution Diagnostics")
+        
+        # Top Row: Resolution & Confidence
+        d_col1, d_col2 = st.columns(2)
+        
+        with d_col1:
+            st.markdown("#### Entity Resolution Types")
+            res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
+            fig_res = px.pie(res_counts, values="count", names="Resolution Type", color_discrete_map={"Wikidata Resolved": "#2ECC71", "NIL Clustered": "#3498DB", "Unlinked Entity": "#E74C3C"})
+            st.plotly_chart(fig_res, use_container_width=True)
+            
+        with d_col2:
+            st.markdown("#### NER Confidence Scores")
+            fig_conf = px.histogram(df_filtered, x="Confidence", nbins=20, color_discrete_sequence=["#3498DB"])
+            fig_conf.update_layout(yaxis_title="Entity Count", xaxis_title="Confidence Score")
+            st.plotly_chart(fig_conf, use_container_width=True)
+
+        st.markdown("---")
+        
+        # Bottom Row: Classes & Completeness
+        d_col3, d_col4 = st.columns(2)
+        
+        with d_col3:
+            st.markdown("#### Extracted NER Classes")
+            class_counts = df_filtered["NER Class"].value_counts().reset_index()
+            fig_class = px.bar(class_counts, x="count", y="NER Class", orientation='h', color_discrete_sequence=["#F1C40F"])
+            st.plotly_chart(fig_class, use_container_width=True)
+            
+        with d_col4:
+            st.markdown("#### Metadata Completeness (Fill Rate)")
+            attributes = ["Occupation", "Political Ideology", "Member Of", "Participant In", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "VIAF Link"]
+            completeness = [(df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 for col in attributes]
+            
+            df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
+            fig_comp = px.bar(df_comp, x="Fill Rate (%)", y="Attribute", orientation='h', color_discrete_sequence=["#9B59B6"])
+            fig_comp.update_xaxes(range=[0, 100])
+            fig_comp.update_layout(yaxis={'categoryorder':'total ascending'})
+            st.plotly_chart(fig_comp, use_container_width=True)
