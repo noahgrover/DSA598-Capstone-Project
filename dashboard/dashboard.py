@@ -318,64 +318,140 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: True Linear Calendar Timeline (UNLIMITED) ---
+       # --- Tab 3: Reimagined Temporal Analytics (Macro + Micro) ---
         with tab3:
-            st.subheader("⏳ Calendar-Year Narrative Timeline")
+            st.subheader("⏳ Temporal Patterns & Narrative Chronology")
             st.markdown("""
-            This view charts historical actors, events, and organizations across an absolute horizontal calendar time axis.
-            * **People / Organizations** display as timeline tracks extending from their start year to their end year.
-            * **Events** plot as diamond point-milestones.
+            To help you spot trends instantly, this timeline splits your data into two views:
+            1. **Macro Swimlanes:** Flattens entities into broad categories to reveal historical density and clustering.
+            2. **Chronological Waterfall:** Orders individual actors sequentially by their appearance in history.
             """)
 
+            # Filter out records without a timestamp
             df_time = df_filtered[df_filtered["Target Year"].notna()].copy()
 
             if df_time.empty:
                 st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
             else:
-                df_time = df_time.sort_values(by="Target Year")
-                fig_timeline = go.Figure()
+                # Core processing: Ensure numeric types for proper time axis tracking
+                df_time["Target Year"] = df_time["Target Year"].astype(int)
+                
+                # Create a clean presentation label for the charts
+                df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
 
-                for idx, row in df_time.iterrows():
-                    name = row["Official Name"]
-                    start = int(row["Target Year"])
-                    icon = row["Icon"]
+                # ==========================================
+                # VIEW 1: MACRO TEMPORAL SWIMLANES
+                # ==========================================
+                st.markdown("### 🗺️ Macro Density & Historical Clusters")
+                st.markdown("_Look for vertical alignments across swimlanes to find cause-and-effect patterns._")
+
+                fig_macro = go.Figure()
+
+                # Group by NER Class to create clean horizontal swimlanes
+                categories = df_time["NER Class"].unique()
+                
+                for cat in categories:
+                    df_cat = df_time[df_time["NER Class"] == cat]
                     
-                    color = "#3498DB" if "Person" in row["NER Class"] else ("#2ECC71" if "Organization" in row["NER Class"] else "#E67E22")
-                    hover = f"<b>{icon} {name}</b><br>Type: {row['NER Class']}<br>Cohort: {row['Cohort']}<br>Desc: {row['Description']}"
+                    # Construct smart hover text
+                    hover_texts = [
+                        f"<b>{row['Timeline Label']}</b><br>Cohort: {row['Cohort']}<br>Start: {row['Target Year']}<br>Desc: {row['Description']}"
+                        for _, row in df_cat.iterrows()
+                    ]
 
+                    # Map uniform markers per category
+                    fig_macro.add_trace(go.Scatter(
+                        x=df_cat["Target Year"],
+                        y=[cat] * len(df_cat),
+                        mode="markers",
+                        marker=dict(
+                            size=16,
+                            symbol="diamond" if "Event" in cat else "circle",
+                            line=dict(width=1, color="white")
+                        ),
+                        text=hover_texts,
+                        hoverinfo="text",
+                        name=cat
+                    ))
+
+                fig_macro.update_layout(
+                    xaxis_title="Calendar Year (Absolute Axis)",
+                    yaxis_title="Semantic Swimlanes",
+                    height=300,
+                    margin=dict(l=150, r=20, t=20, b=40),
+                    showlegend=True,
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                )
+                st.plotly_chart(fig_macro, use_container_width=True)
+
+                st.markdown("---")
+
+                # ==========================================
+                # VIEW 2: CHRONOLOGICAL WATERFALL GANTT
+                # ==========================================
+                st.markdown("### 🌊 Chronological Waterfall (Lifespans & Milestones)")
+                st.markdown("_Sorted strictly by chronological appearance to visualize generational overlaps._")
+
+                # THE FIX: Sort strictly by Target Year to create the waterfall cascade
+                df_waterfall = df_time.sort_values(by="Target Year", ascending=True)
+
+                fig_micro = go.Figure()
+
+                for idx, row in df_waterfall.iterrows():
+                    name_label = row["Timeline Label"]
+                    start = row["Target Year"]
+                    
+                    # Dynamic color mapping based on class strings
+                    color = "#3498DB" if "Person" in row["NER Class"] else ("#2ECC71" if "Organization" in row["NER Class"] else "#E67E22")
+                    hover = f"<b>{name_label}</b><br>Type: {row['NER Class']}<br>Cohort: {row['Cohort']}<br>Description: {row['Description']}"
+
+                    # If it's a structural entity with a lifespan, draw a clean Gantt bar
                     if pd.notna(row["End Year"]) and "Event" not in row["NER Class"]:
                         end = int(row["End Year"])
-                        hover += f"<br>Lifespan: {start} – {end}"
-                        fig_timeline.add_trace(go.Scatter(
-                            x=[start, end], y=[name, name],
+                        hover += f"<br>Duration: {start} – {end} ({end - start} years)"
+                        
+                        fig_micro.add_trace(go.Scatter(
+                            x=[start, end], 
+                            y=[name_label, name_label],
                             mode="lines+markers",
-                            line=dict(color=color, width=4),
-                            marker=dict(size=10, symbol="circle", color=[color, color]),
-                            hovertext=hover, hoverinfo="text", showlegend=False
+                            line=dict(color=color, width=5),
+                            marker=dict(size=8, color=color),
+                            hovertext=hover, 
+                            hoverinfo="text", 
+                            showlegend=False
                         ))
                     else:
+                        # Point-in-time milestone
                         hover += f"<br>Year: {start}"
-                        fig_timeline.add_trace(go.Scatter(
-                            x=[start], y=[name, name],
+                        fig_micro.add_trace(go.Scatter(
+                            x=[start], 
+                            y=[name_label, name_label],
                             mode="markers",
-                            marker=dict(size=14, symbol="diamond", color=color),
-                            hovertext=hover, hoverinfo="text", showlegend=False
+                            marker=dict(size=12, symbol="diamond", color=color),
+                            hovertext=hover, 
+                            hoverinfo="text", 
+                            showlegend=False
                         ))
 
-                # Custom clean legends
-                fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
-                fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#2ECC71"), name="Organization Lifespan"))
-                fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Event Milestone"))
+                # Add explicit pseudo-traces just to build a clean legend framework
+                fig_micro.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
+                fig_micro.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#2ECC71"), name="Organization Lifespan"))
+                fig_micro.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Point Event"))
 
-                fig_timeline.update_layout(
-                    xaxis_title="Linear Calendar Axis (Years)",
-                    yaxis=dict(autorange="reversed", title="", tickmode='linear'),
-                    height=200 + (len(df_time) * 32),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
-                    margin=dict(l=220)
+                fig_micro.update_layout(
+                    xaxis_title="Historical Timeline Axis (Years)",
+                    yaxis=dict(
+                        autorange="reversed", # Forces oldest entities to sit at the top left corner
+                        tickmode='linear',
+                        automargin=True
+                    ),
+                    # Scales dynamically so you never get tiny or giant tracks
+                    height=150 + (len(df_waterfall) * 25), 
+                    legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="center", x=0.5),
+                    margin=dict(l=250, r=20, t=40, b=40)
                 )
                 
-                st.plotly_chart(fig_timeline, use_container_width=True)
+                st.plotly_chart(fig_micro, use_container_width=True)
         
         # --- Tab 4: Search and Explore Directory ---
         with tab4:
