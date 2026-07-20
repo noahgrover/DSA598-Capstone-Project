@@ -19,22 +19,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Inject custom CSS to style the multiselect chips in the sidebar using the IBM colorblind-safe purple
-st.markdown(
-    """
-    <style>
-    div[data-baseweb="tag"] {
-        background-color: #785EF0 !important;
-        border-radius: 4px !important;
-    }
-    div[data-baseweb="tag"] span {
-        color: #FFFFFF !important; 
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 st.title("🕸️ Archival Entity Linking & Semantic Graph Dashboard")
 st.markdown("""
 This dashboard visualizes the structural and qualitative improvements introduced by our advanced NER,
