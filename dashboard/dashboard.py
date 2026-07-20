@@ -6,6 +6,7 @@ import json
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from pathlib import Path
 
 # Set page configurations
 st.set_page_config(
@@ -31,8 +32,6 @@ VISUAL_CONFIG = {
     "schema:Event": {"group": "Historical Event", "color": "#F1C40F"},
     "schema:Thing": {"group": "Other", "color": "#95A5A6"}
 }
-
-from pathlib import Path  # Add this import at the top of your file if it isn't there
 
 @st.cache_data
 def load_and_parse_jsonld(filename="enriched.jsonld"):
