@@ -1,5 +1,5 @@
 # =========================================================================================================================================
-# Streamlit Archival Knowledge Graph Dashboard (FIXED DATALOADER)
+# Streamlit Archival Knowledge Graph Dashboard (PURE READER VER.)
 # =========================================================================================================================================
 
 import json
@@ -10,7 +10,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import requests 
 
 # Set page configurations
 st.set_page_config(
@@ -35,24 +34,6 @@ def extract_year_from_text(text):
         return int(match.group(1))
     return None
 
-def extract_wikidata_year(claims, property_id):
-    """Helper utility to safely step into Wikidata claims arrays and extract calendar years."""
-    try:
-        prop_claims = claims.get(property_id, [])
-        if prop_claims:
-            snak = prop_claims[0].get("mainsnak", {})
-            datavalue = snak.get("datavalue", {})
-            value = datavalue.get("value", {})
-            time_str = value.get("time")
-            if time_str:
-                is_bc = time_str.startswith('-')
-                clean_str = time_str.lstrip('+-')
-                year_part = clean_str.split('-')[0]
-                return -int(year_part) if is_bc else int(year_part)
-    except Exception:
-        pass
-    return None
-
 @st.cache_data
 def load_and_parse_jsonld(filename="enriched.jsonld"):
     script_dir = Path(__file__).parent
@@ -68,13 +49,15 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
     records = data.get("@graph", [])
     flat_entities = []
     records_per_cohort = Counter()
-    all_qids = set()
 
-    def extract_qids(val):
+    def extract_labels(val):
+        """Extracts human-readable names from rich JSON-LD objects."""
         if isinstance(val, list):
-            return [str(v).replace("wd:", "").strip() for v in val if v]
-        if val:
-            return [str(val).replace("wd:", "").strip()]
+            return [v.get("schema:name", v.get("@id", "").replace("wd:", "")) if isinstance(v, dict) else str(v) for v in val]
+        elif isinstance(val, dict):
+            return [val.get("schema:name", val.get("@id", "").replace("wd:", ""))]
+        elif val:
+            return [str(val).replace("wd:", "")]
         return []
 
     for r in records:
@@ -83,10 +66,6 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
         
         for ent in r.get("entities", []):
             ent_id = ent.get("@id", "")
-
-            # FIX 1: Explicitly add the entity's own QID to the fetch queue!
-            if ent_id.startswith("wd:"):
-                all_qids.add(ent_id.replace("wd:", "").strip())
 
             if ent_id.startswith("wd:"):
                 resolution_type = "Wikidata Resolved"
@@ -102,15 +81,13 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             lat = geo_data.get("latitude") if isinstance(geo_data, dict) else None
             lon = geo_data.get("longitude") if isinstance(geo_data, dict) else None
 
-            occ = extract_qids(ent.get("occupation"))
-            gender = extract_qids(ent.get("genderIdentity"))
-            ethnic = extract_qids(ent.get("ethnicGroup"))
-            religion = extract_qids(ent.get("religion"))
-            country = extract_qids(ent.get("country"))
-
-            all_qids.update(occ + gender + ethnic + religion + country)
+            occ = extract_labels(ent.get("occupation"))
+            gender = extract_labels(ent.get("genderIdentity"))
+            ethnic = extract_labels(ent.get("ethnicGroup"))
+            religion = extract_labels(ent.get("religion"))
+            country = extract_labels(ent.get("country"))
             
-            # FIX 2: Handle messy or namespaced keys locally (e.g., schema:birthDate vs birth_date)
+            # FIX: Handle exact script keys (dateOfBirth, dateOfDeath) alongside fallback schema keys
             start_keys = ["dateOfBirth", "birthDate", "birth_date", "schema:birthDate", "startDate", "start_date", "schema:startDate", "date", "schema:date"]
             end_keys = ["dateOfDeath", "deathDate", "death_date", "schema:deathDate", "endDate", "end_date", "schema:endDate"]
             
@@ -148,50 +125,10 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "End Year": local_end
             })
 
-    # Fetch labels AND core historical claims from Wikidata
-    valid_qids = [q for q in all_qids if q.startswith("Q") and q[1:].isdigit()]
-    labels_map = {}
-    wikidata_dates = {}
-    
-    if valid_qids:
-        for i in range(0, len(valid_qids), 50):
-            chunk = valid_qids[i:i+50]
-            ids_str = "|".join(chunk)
-            url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={ids_str}&props=labels|claims&languages=en&format=json"
-            try:
-                headers = {"User-Agent": "ArchivalKG-Dashboard/1.0 (https://share.streamlit.io; contact@example.com)"}
-                response = requests.get(url, headers=headers, timeout=10).json()
-                entities = response.get("entities", {})
-                
-                for qid, entity_data in entities.items():
-                    label = entity_data.get("labels", {}).get("en", {}).get("value", qid)
-                    labels_map[qid] = label
-                    
-                    claims = entity_data.get("claims", {})
-                    b_year = extract_wikidata_year(claims, "P569")  # Birth Date
-                    d_year = extract_wikidata_year(claims, "P570")  # Death Date
-                    e_year = extract_wikidata_year(claims, "P585") or extract_wikidata_year(claims, "P571") or extract_wikidata_year(claims, "P580") # Point in time/Inception
-                    
-                    wikidata_dates[qid] = {"birth": b_year, "death": d_year, "event": e_year}
-            except Exception:
-                pass 
-
-    # Backfill calendar targets onto entities
+    # Join list attributes into simple display strings
     for item in flat_entities:
-        ent_clean_id = item["Entity ID"].replace("wd:", "").strip()
-        
-        if ent_clean_id in wikidata_dates:
-            w_dates = wikidata_dates[ent_clean_id]
-            if "Person" in item["NER Class"]:
-                if w_dates["birth"]: item["Target Year"] = w_dates["birth"]
-                if w_dates["death"]: item["End Year"] = w_dates["death"]
-            else:
-                if w_dates["event"]: item["Target Year"] = w_dates["event"]
-
         for field in ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]:
-            raw_ids = item[field]
-            mapped_names = [labels_map.get(qid, qid) for qid in raw_ids]
-            item[field] = ", ".join(mapped_names) if mapped_names else None
+            item[field] = ", ".join(item[field]) if item[field] else None
 
     df_entities = pd.DataFrame(flat_entities)
     return df_entities, records_per_cohort
@@ -238,6 +175,7 @@ if df is not None:
             "🔍 Interactive Entity Explorer",
             "📈 Pipeline Quality Diagnostics"
         ])
+        
         # --- GIS Map ---
         with tab1:
             st.subheader("Geospatial Entity Distribution")
@@ -351,7 +289,6 @@ if df is not None:
             if df_time.empty:
                 st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
             else:
-                # Completely removed truncation / limit caps to render the full subset
                 df_time = df_time.sort_values(by="Target Year")
                 
                 fig_timeline = go.Figure()
