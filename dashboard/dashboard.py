@@ -1,5 +1,5 @@
 # =========================================================================================================================================
-# Streamlit Archival Knowledge Graph Dashboard (PURE READER VER.)
+# Streamlit Archival Knowledge Graph Dashboard (FULLY MAPPED VER.)
 # =========================================================================================================================================
 
 import json
@@ -60,6 +60,16 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             return [str(val).replace("wd:", "")]
         return []
 
+    # Map your string icon labels into rendering emojis for Streamlit/Plotly
+    icon_mapping = {
+        "person": "👤",
+        "group": "🏛️",
+        "demographics": "👥",
+        "place": "📍",
+        "event": "📜",
+        "help": "❓"
+    }
+
     for r in records:
         cohort = r.get("cohort", "Unknown Cohort")
         records_per_cohort[cohort] += 1  
@@ -81,15 +91,33 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             lat = geo_data.get("latitude") if isinstance(geo_data, dict) else None
             lon = geo_data.get("longitude") if isinstance(geo_data, dict) else None
 
+            # Base Demographics
             occ = extract_labels(ent.get("occupation"))
             gender = extract_labels(ent.get("genderIdentity"))
             ethnic = extract_labels(ent.get("ethnicGroup"))
             religion = extract_labels(ent.get("religion"))
             country = extract_labels(ent.get("country"))
             
-            # FIX: Handle exact script keys (dateOfBirth, dateOfDeath) alongside fallback schema keys
-            start_keys = ["dateOfBirth", "birthDate", "birth_date", "schema:birthDate", "startDate", "start_date", "schema:startDate", "date", "schema:date"]
-            end_keys = ["dateOfDeath", "deathDate", "death_date", "schema:deathDate", "endDate", "end_date", "schema:endDate"]
+            # Newly Mapped Rich Properties
+            ideology = extract_labels(ent.get("politicalIdeology"))
+            member = extract_labels(ent.get("memberOf"))
+            convictions = extract_labels(ent.get("convictedOf"))
+            participant = extract_labels(ent.get("participant"))
+            
+            # Extract and format VIAF Link
+            viaf_url = None
+            same_as = ent.get("schema:sameAs")
+            if same_as and isinstance(same_as, str) and same_as.startswith("viaf:"):
+                viaf_id = same_as.replace("viaf:", "")
+                viaf_url = f"https://viaf.org/viaf/{viaf_id}/"
+
+            # Parse Icon
+            icon_str = ent.get("visualIcon", "help")
+            emoji_icon = icon_mapping.get(icon_str, "❓")
+            
+            # Handle start/end bounds dynamically
+            start_keys = ["dateOfBirth", "startDate", "schema:startDate"]
+            end_keys = ["dateOfDeath", "endDate", "schema:endDate"]
             
             local_start = None
             for k in start_keys:
@@ -104,6 +132,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                     if local_end: break
 
             flat_entities.append({
+                "Icon": emoji_icon,
                 "Entity ID": ent_id,
                 "Surface Text": ent.get("entity_span", ""),
                 "Official Name": ent.get("officialName", ent.get("entity_span", "")),
@@ -116,18 +145,31 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "Latitude": lat,
                 "Longitude": lon,
                 "Image URL": ent.get("image"),
+                
+                # Relational Lists
                 "Occupation": occ,
                 "Gender Identity": gender,
                 "Ethnic Group/Tribe": ethnic,
                 "Religion": religion,
                 "Country": country,
+                "Political Ideology": ideology,
+                "Member Of": member,
+                "Convicted Of": convictions,
+                "Participant In": participant,
+                "VIAF Link": viaf_url,
+                
                 "Target Year": local_start,
                 "End Year": local_end
             })
 
     # Join list attributes into simple display strings
+    list_fields = [
+        "Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", 
+        "Political Ideology", "Member Of", "Convicted Of", "Participant In"
+    ]
+    
     for item in flat_entities:
-        for field in ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]:
+        for field in list_fields:
             item[field] = ", ".join(item[field]) if item[field] else None
 
     df_entities = pd.DataFrame(flat_entities)
@@ -157,13 +199,13 @@ if df is not None:
             with m2: st.metric("Entity Mentions", len(df_filtered))
             with m3: st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
             with m4:
-                wd_links = len(df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"])
-                st.metric("Wikidata Links", wd_links)
+                viaf_links = df_filtered["VIAF Link"].notna().sum()
+                st.metric("VIAF Authority Links", viaf_links)
             with m5:
-                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
+                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "Political Ideology", "Member Of", "Convicted Of", "Participant In"]
                 populated_count = df_filtered[relational_columns].notna().sum().sum()
                 avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
-                st.metric("Demographics / Mention", f"{avg_demo:.2f}x")
+                st.metric("Metadata / Mention", f"{avg_demo:.2f}x")
             with m6:
                 avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
                 st.metric("Paths / Record", f"{avg_paths:.2f}x")
@@ -179,14 +221,17 @@ if df is not None:
         # --- GIS Map ---
         with tab1:
             st.subheader("Geospatial Entity Distribution")
-            df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()]
+            df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
             if len(df_geo) > 0:
+                # Add Icon to hover title
+                df_geo["Hover Title"] = df_geo["Icon"] + " " + df_geo["Official Name"]
+                
                 fig_map = px.scatter_mapbox(
                     df_geo,
                     lat="Latitude",
                     lon="Longitude",
-                    hover_name="Official Name",
-                    hover_data=["Surface Text", "Cohort", "Description"],
+                    hover_name="Hover Title",
+                    hover_data=["Surface Text", "Cohort", "Member Of", "Participant In", "Description"],
                     color="Visual Group",
                     zoom=2,
                     height=600
@@ -198,17 +243,20 @@ if df is not None:
 
         # --- Tab 2: Enhanced Demographic Analysis ---
         with tab2:
-            st.subheader("Archival Intersectionality & Demographic Distributions")
+            st.subheader("Archival Intersectionality & Metadata Distributions")
             
             # --- Row 1: Dynamic Profiles ---
-            st.markdown("### 📊 Dynamic Demographic Profiler")
-            demo_options = ["Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country"]
+            st.markdown("### 📊 Dynamic Metadata Profiler")
+            # Added new properties to the dropdown
+            demo_options = [
+                "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
+                "Political Ideology", "Member Of", "Convicted Of", "Participant In"
+            ]
             selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
             
             df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
             
             if not df_demo.empty:
-                # Properly split and expand multi-valued lists (e.g., "Author, Politician") for exact tallies
                 df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
                 df_demo = df_demo.explode(selected_demo)
                 
@@ -223,7 +271,6 @@ if df is not None:
                 with col2:
                     st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
                     cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
-                    # Filter chart categories to top 10 values to preserve clean readability
                     cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
                     fig_cohort = px.bar(cohort_counts, x="count", y=selected_demo, color="Cohort", orientation='h', barmode="stack")
                     fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
@@ -241,18 +288,17 @@ if df is not None:
             with cx_col1:
                 attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
             with cx_col2:
-                attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=4)
+                # Default to Political Ideology if available for an interesting default cross-reference
+                attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
                 
             if attr_x == attr_y:
                 st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
             else:
                 df_cross = df_filtered[[attr_x, attr_y]].dropna()
                 if not df_cross.empty:
-                    # Isolate primary/first value to maintain clear matrix relationships
                     df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
                     df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
                     
-                    # Restrict grid density to the top 8 elements on each axis to keep text clear
                     top_x_items = df_cross[attr_x].value_counts().head(8).index
                     top_y_items = df_cross[attr_y].value_counts().head(8).index
                     df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
@@ -278,29 +324,28 @@ if df is not None:
         with tab3:
             st.subheader("⏳ Calendar-Year Narrative Timeline")
             st.markdown("""
-            This view charts historical actors and events across an absolute horizontal calendar time axis.
-            * **People** display as timeline tracks extending from their birth year to their death year.
+            This view charts historical actors, events, and organizations across an absolute horizontal calendar time axis.
+            * **People / Organizations** display as timeline tracks extending from their start year to their end year.
             * **Events** plot as diamond point-milestones.
             """)
 
-            df_time = df_filtered[df_filtered["NER Class"].str.contains("Person|Event", case=False, na=False)].copy()
-            df_time = df_time[df_time["Target Year"].notna()]
+            df_time = df_filtered[df_filtered["Target Year"].notna()].copy()
 
             if df_time.empty:
                 st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
             else:
                 df_time = df_time.sort_values(by="Target Year")
-                
                 fig_timeline = go.Figure()
 
                 for idx, row in df_time.iterrows():
                     name = row["Official Name"]
                     start = int(row["Target Year"])
-                    ent_type = "Person" if "Person" in row["NER Class"] else "Event"
-                    color = "#3498DB" if ent_type == "Person" else "#E67E22"
-                    hover = f"<b>{name}</b><br>Type: {ent_type}<br>Cohort: {row['Cohort']}<br>Desc: {row['Description']}"
+                    icon = row["Icon"]
+                    
+                    color = "#3498DB" if "Person" in row["NER Class"] else ("#2ECC71" if "Organization" in row["NER Class"] else "#E67E22")
+                    hover = f"<b>{icon} {name}</b><br>Type: {row['NER Class']}<br>Cohort: {row['Cohort']}<br>Desc: {row['Description']}"
 
-                    if ent_type == "Person" and pd.notna(row["End Year"]):
+                    if pd.notna(row["End Year"]) and "Event" not in row["NER Class"]:
                         end = int(row["End Year"])
                         hover += f"<br>Lifespan: {start} – {end}"
                         fig_timeline.add_trace(go.Scatter(
@@ -321,12 +366,13 @@ if df is not None:
 
                 # Custom clean legends
                 fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
+                fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#2ECC71"), name="Organization Lifespan"))
                 fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Event Milestone"))
 
                 fig_timeline.update_layout(
                     xaxis_title="Linear Calendar Axis (Years)",
                     yaxis=dict(autorange="reversed", title="", tickmode='linear'),
-                    height=200 + (len(df_time) * 32), # Height stretches naturally based on entity count
+                    height=200 + (len(df_time) * 32),
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
                     margin=dict(l=220)
                 )
@@ -340,7 +386,22 @@ if df is not None:
             df_display = df_filtered.copy()
             if search_query:
                 df_display = df_display[df_display["Surface Text"].str.contains(search_query, case=False, na=False)]
-            st.dataframe(df_display[["Entity ID", "Surface Text", "Official Name", "NER Class", "Resolution Type", "Confidence"]], use_container_width=True, hide_index=True)
+            
+            # Configure data columns to make VIAF URL a clickable link
+            cols_to_show = ["Icon", "Official Name", "Surface Text", "NER Class", "Political Ideology", "Member Of", "Convicted Of", "VIAF Link", "Resolution Type"]
+            
+            st.dataframe(
+                df_display[cols_to_show], 
+                use_container_width=True, 
+                hide_index=True,
+                column_config={
+                    "VIAF Link": st.column_config.LinkColumn(
+                        "Authority Data (VIAF)",
+                        help="Cross-database linkage to the Virtual International Authority File",
+                        display_text="View Profile"
+                    )
+                }
+            )
 
         # --- Tab 5: Pipeline Quality Diagnostics ---
         with tab5:
@@ -357,7 +418,6 @@ if df is not None:
                 
             with d_col2:
                 st.markdown("#### NER Confidence Scores")
-                # Histogram to see where the bulk of confidence scores lie
                 fig_conf = px.histogram(df_filtered, x="Confidence", nbins=20, color_discrete_sequence=["#3498DB"])
                 fig_conf.update_layout(yaxis_title="Entity Count", xaxis_title="Confidence Score")
                 st.plotly_chart(fig_conf, use_container_width=True)
@@ -375,11 +435,12 @@ if df is not None:
                 
             with d_col4:
                 st.markdown("#### Metadata Completeness (Fill Rate)")
-                # Calculate the percentage of non-null values for key relational attributes
-                attributes = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
+                # Updated to include the new metadata properties
+                attributes = ["Occupation", "Political Ideology", "Member Of", "Participant In", "Convicted Of", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "VIAF Link"]
                 completeness = [(df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 for col in attributes]
                 
                 df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
                 fig_comp = px.bar(df_comp, x="Fill Rate (%)", y="Attribute", orientation='h', color_discrete_sequence=["#9B59B6"])
                 fig_comp.update_xaxes(range=[0, 100])
+                fig_comp.update_layout(yaxis={'categoryorder':'total ascending'})
                 st.plotly_chart(fig_comp, use_container_width=True)
