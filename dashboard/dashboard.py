@@ -342,7 +342,7 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: Quantitative Temporal Analytics (Color Synced & Pastel) ---
+       # --- Tab 3: Quantitative Temporal Analytics (Unified IBM Colors) ---
         with tab3:
             st.subheader("⏳ Chronological Distribution & Historical Velocity")
             st.markdown("""
@@ -360,17 +360,6 @@ if df is not None:
                 df_time["Target Year"] = df_time["Target Year"].astype(int)
                 df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
                 
-                # 🎨 UNIFIED PASTEL COLOR MAP (Ensures 1:1 color parity across all charts)
-                PASTEL_COLOR_MAP = {
-                    "Person": "#92A8D1",        # Soft Serenity Blue
-                    "Organization": "#F7CAC9",  # Pastel Rose Pink
-                    "Place": "#B5EAD7",         # Mint Green
-                    "Event": "#FFDAC1",         # Soft Apricot Orange
-                    "NORP": "#E0BBE4",          # Light Lavender
-                    "Thing": "#FFF5BA"          # Pale Cream Yellow
-                }
-                DEFAULT_PASTEL = "#C7CEEA"      # Muted Periwinkle fallback for unexpected classes
-
                 # ==========================================
                 # QUANTITATIVE TEMPORAL METRICS
                 # ==========================================
@@ -405,7 +394,7 @@ if df is not None:
                 st.markdown("---")
 
                 # ==========================================
-                # VIEW 1: MACRO TEMPORAL SWIMLANES (Color Synced)
+                # VIEW 1: MACRO SWIMLANES (Enforcing Master Palette)
                 # ==========================================
                 st.markdown("### 🗺️ Macro Density Swimlanes")
                 st.markdown("_Look for vertical alignments across tracks to identify cross-category historical triggers._")
@@ -420,8 +409,8 @@ if df is not None:
                         for _, row in df_cat.iterrows()
                     ]
 
-                    # Extract the locked pastel color for this category
-                    assigned_color = PASTEL_COLOR_MAP.get(cat, DEFAULT_PASTEL)
+                    # Grab the locked color from our global master dictionary
+                    assigned_color = IBM_LABEL_COLOR_MAP.get(cat, IBM_LABEL_COLOR_MAP["Thing"])
 
                     fig_macro.add_trace(go.Scatter(
                         x=df_cat["Target Year"],
@@ -430,7 +419,7 @@ if df is not None:
                         marker=dict(
                             size=16, 
                             symbol="diamond" if "Event" in cat else "circle", 
-                            color=assigned_color,  # Explicitly overriding color assignment
+                            color=assigned_color,  # Enforced matching color
                             line=dict(width=1, color="white")
                         ),
                         text=hover_texts,
@@ -451,7 +440,7 @@ if df is not None:
                 st.markdown("---")
 
                 # ==========================================
-                # VIEW 2: QUANTITATIVE HISTORICAL PULSE (Color Synced)
+                # VIEW 2: HISTORICAL PULSE (Enforcing Master Palette)
                 # ==========================================
                 st.markdown("### 📈 Historical Velocity (Decadal Node Density)")
                 st.markdown("_Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges._")
@@ -467,8 +456,8 @@ if df is not None:
                     y="Node Count",
                     color="NER Class",
                     barmode="stack",
-                    # Explicitly map the same dictionary map to the categorical bar trace
-                    color_discrete_map=PASTEL_COLOR_MAP, 
+                    # Pass the exact same master dictionary to Plotly Express
+                    color_discrete_map=IBM_LABEL_COLOR_MAP, 
                     height=350
                 )
                 
