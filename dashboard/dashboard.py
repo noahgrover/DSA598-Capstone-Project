@@ -1,5 +1,5 @@
 # =========================================================================================================================================
-# Streamlit Archival Knowledge Graph Dashboard (FIXED DATALOADER)
+# Streamlit Archival Knowledge Graph Dashboard (OPTIMIZED & DECOUPLED)
 # =========================================================================================================================================
 
 import json
@@ -10,7 +10,6 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import requests 
 
 # Set page configurations
 st.set_page_config(
@@ -23,35 +22,16 @@ st.set_page_config(
 st.title("🕸️ Archival Entity Linking & Semantic Graph Dashboard")
 st.markdown("""
 This dashboard visualizes the structural and qualitative improvements introduced by our advanced NER,
-Linking, NIL Clustering, and W3C Semantic Enrichment pipeline.
+Linking, NIL Clustering, and W3C Semantic Enrichment pipeline. Live API calls have been moved upstream 
+for instant rendering.
 """)
 
-def extract_year_from_text(text):
-    """Helper utility to parse a numeric year out of messy strings or ISO dates."""
-    if not text:
-        return None
-    match = re.search(r'\b(\d{3,4})\b', str(text))
-    if match:
-        return int(match.group(1))
-    return None
-
-def extract_wikidata_year(claims, property_id):
-    """Helper utility to safely step into Wikidata claims arrays and extract calendar years."""
+def safe_int(value):
+    """Safely converts mixed data types to integers for the timeline."""
     try:
-        prop_claims = claims.get(property_id, [])
-        if prop_claims:
-            snak = prop_claims[0].get("mainsnak", {})
-            datavalue = snak.get("datavalue", {})
-            value = datavalue.get("value", {})
-            time_str = value.get("time")
-            if time_str:
-                is_bc = time_str.startswith('-')
-                clean_str = time_str.lstrip('+-')
-                year_part = clean_str.split('-')[0]
-                return -int(year_part) if is_bc else int(year_part)
-    except Exception:
-        pass
-    return None
+        return int(float(value))
+    except (ValueError, TypeError):
+        return None
 
 @st.cache_data
 def load_and_parse_jsonld(filename="enriched.jsonld"):
@@ -68,14 +48,6 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
     records = data.get("@graph", [])
     flat_entities = []
     records_per_cohort = Counter()
-    all_qids = set()
-
-    def extract_qids(val):
-        if isinstance(val, list):
-            return [str(v).replace("wd:", "").strip() for v in val if v]
-        if val:
-            return [str(val).replace("wd:", "").strip()]
-        return []
 
     for r in records:
         cohort = r.get("cohort", "Unknown Cohort")
@@ -84,13 +56,10 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
         for ent in r.get("entities", []):
             ent_id = ent.get("@id", "")
 
-            # FIX 1: Explicitly add the entity's own QID to the fetch queue!
-            if ent_id.startswith("wd:"):
-                all_qids.add(ent_id.replace("wd:", "").strip())
-
-            if ent_id.startswith("wd:"):
+            # Robust Resolution Typing
+            if ent_id.startswith("wd:") or "wikidata.org" in ent_id:
                 resolution_type = "Wikidata Resolved"
-            elif ent_id.startswith("local:entity/"):
+            elif ent_id.startswith("local:entity/") or "b0" in ent_id:
                 resolution_type = "NIL Clustered"
             else:
                 resolution_type = "Unlinked Entity"
@@ -102,96 +71,36 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             lat = geo_data.get("latitude") if isinstance(geo_data, dict) else None
             lon = geo_data.get("longitude") if isinstance(geo_data, dict) else None
 
-            occ = extract_qids(ent.get("occupation"))
-            gender = extract_qids(ent.get("genderIdentity"))
-            ethnic = extract_qids(ent.get("ethnicGroup"))
-            religion = extract_qids(ent.get("religion"))
-            country = extract_qids(ent.get("country"))
-
-            all_qids.update(occ + gender + ethnic + religion + country)
-            
-            # FIX 2: Handle messy or namespaced keys locally (e.g., schema:birthDate vs birth_date)
-            start_keys = ["birthDate", "birth_date", "schema:birthDate", "startDate", "start_date", "schema:startDate", "date", "schema:date"]
-            end_keys = ["deathDate", "death_date", "schema:deathDate", "endDate", "end_date", "schema:endDate"]
-            
-            local_start = None
-            for k in start_keys:
-                if k in ent:
-                    local_start = extract_year_from_text(ent[k])
-                    if local_start: break
-            
-            local_end = None
-            for k in end_keys:
-                if k in ent:
-                    local_end = extract_year_from_text(ent[k])
-                    if local_end: break
-
+            # Flattening strictly to schema.org standardized fields injected upstream
             flat_entities.append({
                 "Entity ID": ent_id,
                 "Surface Text": ent.get("entity_span", ""),
                 "Official Name": ent.get("officialName", ent.get("entity_span", "")),
-                "NER Class": resolved_type.replace("schema:", "").replace("local:", ""),
-                "Confidence": ent.get("ner_confidence", 1.0),
+                "NER Class": str(resolved_type).replace("schema:", "").replace("local:", ""),
+                "Confidence": float(ent.get("ner_confidence", 1.0)),
+                "Mapping Confidence": float(ent.get("mapping_confidence_score", 0.0)),
+                "LLM Reasoning": ent.get("llm_reasoning", "No reasoning provided."),
+                "Mentions Count": int(ent.get("mentions_count", 1)),
+                "Source URL": ent.get("schema:url", ""),
+                "Historical Significance": ent.get("historical_significance", ""),
                 "Resolution Type": resolution_type,
                 "Cohort": cohort,
-                "Visual Group": ent.get("visualGroup", "Other"),
-                "Description": ent.get("description", "No description available."),
+                "Location Type": ent.get("schema:locationType", "Unknown"),
                 "Latitude": lat,
                 "Longitude": lon,
-                "Image URL": ent.get("image"),
-                "Occupation": occ,
-                "Gender Identity": gender,
-                "Ethnic Group/Tribe": ethnic,
-                "Religion": religion,
-                "Country": country,
-                "Target Year": local_start,
-                "End Year": local_end
-            })
-
-    # Fetch labels AND core historical claims from Wikidata
-    valid_qids = [q for q in all_qids if q.startswith("Q") and q[1:].isdigit()]
-    labels_map = {}
-    wikidata_dates = {}
-    
-    if valid_qids:
-        for i in range(0, len(valid_qids), 50):
-            chunk = valid_qids[i:i+50]
-            ids_str = "|".join(chunk)
-            url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={ids_str}&props=labels|claims&languages=en&format=json"
-            try:
-                headers = {"User-Agent": "ArchivalKG-Dashboard/1.0 (https://share.streamlit.io; contact@example.com)"}
-                response = requests.get(url, headers=headers, timeout=10).json()
-                entities = response.get("entities", {})
                 
-                for qid, entity_data in entities.items():
-                    label = entity_data.get("labels", {}).get("en", {}).get("value", qid)
-                    labels_map[qid] = label
-                    
-                    claims = entity_data.get("claims", {})
-                    b_year = extract_wikidata_year(claims, "P569")  # Birth Date
-                    d_year = extract_wikidata_year(claims, "P570")  # Death Date
-                    e_year = extract_wikidata_year(claims, "P585") or extract_wikidata_year(claims, "P571") or extract_wikidata_year(claims, "P580") # Point in time/Inception
-                    
-                    wikidata_dates[qid] = {"birth": b_year, "death": d_year, "event": e_year}
-            except Exception:
-                pass 
-
-    # Backfill calendar targets onto entities
-    for item in flat_entities:
-        ent_clean_id = item["Entity ID"].replace("wd:", "").strip()
-        
-        if ent_clean_id in wikidata_dates:
-            w_dates = wikidata_dates[ent_clean_id]
-            if "Person" in item["NER Class"]:
-                if w_dates["birth"]: item["Target Year"] = w_dates["birth"]
-                if w_dates["death"]: item["End Year"] = w_dates["death"]
-            else:
-                if w_dates["event"]: item["Target Year"] = w_dates["event"]
-
-        for field in ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]:
-            raw_ids = item[field]
-            mapped_names = [labels_map.get(qid, qid) for qid in raw_ids]
-            item[field] = ", ".join(mapped_names) if mapped_names else None
+                # Categorical fields (expecting native Python lists from the JSON)
+                "Occupation": ent.get("occupation", []),
+                "Gender Identity": ent.get("genderIdentity", []),
+                "Ethnic Group/Tribe": ent.get("ethnicGroup", []),
+                "Religion": ent.get("religion", []),
+                "Country": ent.get("country", []),
+                "Affiliation": ent.get("schema:affiliation", []),
+                
+                # Strict Timeline Mapping
+                "Target Year": safe_int(ent.get("schema:startDate")),
+                "End Year": safe_int(ent.get("schema:endDate"))
+            })
 
     df_entities = pd.DataFrame(flat_entities)
     return df_entities, records_per_cohort
@@ -217,19 +126,19 @@ if df is not None:
         with st.container(border=True):
             m1, m2, m3, m4, m5, m6 = st.columns(6)
             with m1: st.metric("Total Records", filtered_records_count)
-            with m2: st.metric("Entity Mentions", len(df_filtered))
-            with m3: st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
+            with m2: st.metric("Entity Mentions", df_filtered["Mentions Count"].sum())
+            with m3: st.metric("Unique Nodes", df_filtered["Entity ID"].nunique())
             with m4:
                 wd_links = len(df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"])
                 st.metric("Wikidata Links", wd_links)
             with m5:
-                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
-                populated_count = df_filtered[relational_columns].notna().sum().sum()
+                # Count non-empty lists
+                populated_count = df_filtered[["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Affiliation"]].apply(lambda col: col.map(bool)).sum().sum()
                 avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
-                st.metric("Demographics / Mention", f"{avg_demo:.2f}x")
+                st.metric("Demographics / Node", f"{avg_demo:.2f}x")
             with m6:
-                avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
-                st.metric("Paths / Record", f"{avg_paths:.2f}x")
+                avg_conf = df_filtered["Mapping Confidence"].mean() * 100
+                st.metric("Avg Map Confidence", f"{avg_conf:.1f}%")
 
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🗺️ Archival Geospatial Map",
@@ -238,18 +147,27 @@ if df is not None:
             "🔍 Interactive Entity Explorer",
             "📈 Pipeline Quality Diagnostics"
         ])
-        # --- GIS Map ---
+        
+        # --- TAB 1: GIS Map ---
         with tab1:
             st.subheader("Geospatial Entity Distribution")
             df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()]
-            if len(df_geo) > 0:
+            
+            if not df_geo.empty:
+                loc_types = ["All"] + list(df_geo["Location Type"].unique())
+                selected_loc_type = st.selectbox("Filter by Location Type:", options=loc_types)
+                
+                if selected_loc_type != "All":
+                    df_geo = df_geo[df_geo["Location Type"] == selected_loc_type]
+                    
                 fig_map = px.scatter_mapbox(
                     df_geo,
                     lat="Latitude",
                     lon="Longitude",
                     hover_name="Official Name",
-                    hover_data=["Surface Text", "Cohort", "Description"],
-                    color="Visual Group",
+                    hover_data=["Surface Text", "Cohort", "Location Type"],
+                    color="Location Type",
+                    size="Mentions Count", # Dynamic node sizing
                     zoom=2,
                     height=600
                 )
@@ -258,20 +176,19 @@ if df is not None:
             else:
                 st.info("No geospatial data coordinates found in filtered dataset.")
 
-        # --- Tab 2: Enhanced Demographic Analysis ---
+        # --- TAB 2: Enhanced Demographic Analysis ---
         with tab2:
             st.subheader("Archival Intersectionality & Demographic Distributions")
             
             # --- Row 1: Dynamic Profiles ---
             st.markdown("### 📊 Dynamic Demographic Profiler")
-            demo_options = ["Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country"]
+            demo_options = ["Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", "Affiliation"]
             selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
             
-            df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
+            # Filter out empty lists, then natively explode them
+            df_demo = df_filtered[df_filtered[selected_demo].astype(bool)][[selected_demo, "Cohort"]]
             
             if not df_demo.empty:
-                # Properly split and expand multi-valued lists (e.g., "Author, Politician") for exact tallies
-                df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
                 df_demo = df_demo.explode(selected_demo)
                 
                 col1, col2 = st.columns(2)
@@ -285,7 +202,6 @@ if df is not None:
                 with col2:
                     st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
                     cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
-                    # Filter chart categories to top 10 values to preserve clean readability
                     cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
                     fig_cohort = px.bar(cohort_counts, x="count", y=selected_demo, color="Cohort", orientation='h', barmode="stack")
                     fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
@@ -300,60 +216,45 @@ if df is not None:
             st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
             
             cx_col1, cx_col2 = st.columns(2)
-            with cx_col1:
-                attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
-            with cx_col2:
-                attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=4)
+            with cx_col1: attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
+            with cx_col2: attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5) # Default to Affiliation
                 
             if attr_x == attr_y:
                 st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
             else:
-                df_cross = df_filtered[[attr_x, attr_y]].dropna()
+                df_cross = df_filtered[df_filtered[attr_x].astype(bool) & df_filtered[attr_y].astype(bool)][[attr_x, attr_y]]
                 if not df_cross.empty:
-                    # Isolate primary/first value to maintain clear matrix relationships
-                    df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
-                    df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
+                    # Extract primary value from the list for clear matrix visualization
+                    df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x[0])
+                    df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x[0])
                     
-                    # Restrict grid density to the top 8 elements on each axis to keep text clear
-                    top_x_items = df_cross[attr_x].value_counts().head(8).index
-                    top_y_items = df_cross[attr_y].value_counts().head(8).index
-                    df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
+                    top_x = df_cross[attr_x].value_counts().head(8).index
+                    top_y = df_cross[attr_y].value_counts().head(8).index
+                    df_cross_f = df_cross[df_cross[attr_x].isin(top_x) & df_cross[attr_y].isin(top_y)]
                     
-                    if not df_cross_filtered.empty:
-                        cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
+                    if not df_cross_f.empty:
+                        cross_matrix = df_cross_f.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
                         fig_heatmap = px.density_heatmap(
-                            cross_matrix, 
-                            x=attr_x, 
-                            y=attr_y, 
-                            z="Co-occurrences",
-                            text_auto=True,
-                            color_continuous_scale="Viridis"
+                            cross_matrix, x=attr_x, y=attr_y, z="Co-occurrences",
+                            text_auto=True, color_continuous_scale="Viridis"
                         )
-                        fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
                         st.plotly_chart(fig_heatmap, use_container_width=True)
                     else:
-                        st.info("No explicit intersections found for the top elements of these attributes.")
+                        st.info("No explicit intersections found for the top elements.")
                 else:
-                    st.info("No co-occurring data coordinates available for this configuration.")
+                    st.info("No co-occurring data coordinates available.")
         
-       # --- Tab 3: True Linear Calendar Timeline (UNLIMITED) ---
+        # --- TAB 3: Timeline ---
         with tab3:
             st.subheader("⏳ Calendar-Year Narrative Timeline")
-            st.markdown("""
-            This view charts historical actors and events across an absolute horizontal calendar time axis.
-            * **People** display as timeline tracks extending from their birth year to their death year.
-            * **Events** plot as diamond point-milestones.
-            """)
-
+            
             df_time = df_filtered[df_filtered["NER Class"].str.contains("Person|Event", case=False, na=False)].copy()
             df_time = df_time[df_time["Target Year"].notna()]
 
             if df_time.empty:
-                st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
+                st.info("No elements with valid timelines or local date stamps match your active filters.")
             else:
-                # Completely removed truncation / limit caps to render the full subset
                 df_time = df_time.sort_values(by="Target Year")
-                
                 fig_timeline = go.Figure()
 
                 for idx, row in df_time.iterrows():
@@ -361,7 +262,9 @@ if df is not None:
                     start = int(row["Target Year"])
                     ent_type = "Person" if "Person" in row["NER Class"] else "Event"
                     color = "#3498DB" if ent_type == "Person" else "#E67E22"
-                    hover = f"<b>{name}</b><br>Type: {ent_type}<br>Cohort: {row['Cohort']}<br>Desc: {row['Description']}"
+                    
+                    # Enhanced Hover Information
+                    hover = f"<b>{name}</b><br>Type: {ent_type}<br>Sig: {row['Historical Significance']}"
 
                     if ent_type == "Person" and pd.notna(row["End Year"]):
                         end = int(row["End Year"])
@@ -382,36 +285,41 @@ if df is not None:
                             hovertext=hover, hoverinfo="text", showlegend=False
                         ))
 
-                # Custom clean legends
                 fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
                 fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Event Milestone"))
 
                 fig_timeline.update_layout(
                     xaxis_title="Linear Calendar Axis (Years)",
                     yaxis=dict(autorange="reversed", title="", tickmode='linear'),
-                    height=200 + (len(df_time) * 32), # Height stretches naturally based on entity count
+                    height=200 + (len(df_time) * 32),
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
                     margin=dict(l=220)
                 )
-                
                 st.plotly_chart(fig_timeline, use_container_width=True)
         
-        # --- Tab 4: Search and Explore Directory ---
+        # --- TAB 4: Search and Explore Directory ---
         with tab4:
             st.subheader("Knowledge Graph Node Directory")
             search_query = st.text_input("🔍 Search nodes...", "")
             df_display = df_filtered.copy()
             if search_query:
                 df_display = df_display[df_display["Surface Text"].str.contains(search_query, case=False, na=False)]
-            st.dataframe(df_display[["Entity ID", "Surface Text", "Official Name", "NER Class", "Resolution Type", "Confidence"]], use_container_width=True, hide_index=True)
+            
+            # Format URLs to be clickable in the dataframe
+            st.dataframe(
+                df_display[["Entity ID", "Surface Text", "Official Name", "NER Class", "Mentions Count", "Source URL", "Resolution Type"]], 
+                use_container_width=True, 
+                hide_index=True,
+                column_config={
+                    "Source URL": st.column_config.LinkColumn("Source URL")
+                }
+            )
 
-        # --- Tab 5: Pipeline Quality Diagnostics ---
+        # --- TAB 5: Pipeline Quality Diagnostics ---
         with tab5:
             st.subheader("Pipeline Quality & Resolution Diagnostics")
             
-            # Top Row: Resolution & Confidence
             d_col1, d_col2 = st.columns(2)
-            
             with d_col1:
                 st.markdown("#### Entity Resolution Types")
                 res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
@@ -419,30 +327,14 @@ if df is not None:
                 st.plotly_chart(fig_res, use_container_width=True)
                 
             with d_col2:
-                st.markdown("#### NER Confidence Scores")
-                # Histogram to see where the bulk of confidence scores lie
-                fig_conf = px.histogram(df_filtered, x="Confidence", nbins=20, color_discrete_sequence=["#3498DB"])
-                fig_conf.update_layout(yaxis_title="Entity Count", xaxis_title="Confidence Score")
+                st.markdown("#### Knowledge Graph Mapping Confidence")
+                fig_conf = px.histogram(df_filtered, x="Mapping Confidence", nbins=20, color_discrete_sequence=["#9B59B6"])
+                fig_conf.update_layout(yaxis_title="Entity Count", xaxis_title="Confidence Score (0.0 to 1.0)")
                 st.plotly_chart(fig_conf, use_container_width=True)
 
             st.markdown("---")
             
-            # Bottom Row: Classes & Completeness
-            d_col3, d_col4 = st.columns(2)
-            
-            with d_col3:
-                st.markdown("#### Extracted NER Classes")
-                class_counts = df_filtered["NER Class"].value_counts().reset_index()
-                fig_class = px.bar(class_counts, x="count", y="NER Class", orientation='h', color_discrete_sequence=["#F1C40F"])
-                st.plotly_chart(fig_class, use_container_width=True)
-                
-            with d_col4:
-                st.markdown("#### Metadata Completeness (Fill Rate)")
-                # Calculate the percentage of non-null values for key relational attributes
-                attributes = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
-                completeness = [(df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 for col in attributes]
-                
-                df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
-                fig_comp = px.bar(df_comp, x="Fill Rate (%)", y="Attribute", orientation='h', color_discrete_sequence=["#9B59B6"])
-                fig_comp.update_xaxes(range=[0, 100])
-                st.plotly_chart(fig_comp, use_container_width=True)
+            st.markdown("#### LLM Reasoning Audit (NIL & Ambiguous Entities)")
+            st.markdown("Audit the logical steps generated by the LLM for entity clustering and disambiguation.")
+            df_reasoning = df_filtered[df_filtered["Resolution Type"] == "NIL Clustered"][["Official Name", "Mapping Confidence", "LLM Reasoning"]]
+            st.dataframe(df_reasoning, use_container_width=True, hide_index=True)
