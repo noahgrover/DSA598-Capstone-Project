@@ -280,7 +280,15 @@ if df is not None:
             with col1:
                 st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
                 top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
-                fig_demo = px.bar(top_10, x="count", y=selected_demo, orientation='h', color_discrete_sequence=["#2ECC71"])
+                
+                # FIX 1: Swapped out random green for official IBM Magenta 50 (#DC267F)
+                fig_demo = px.bar(
+                    top_10, 
+                    x="count", 
+                    y=selected_demo, 
+                    orientation='h', 
+                    color_discrete_sequence=["#DC267F"] 
+                )
                 fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
                 st.plotly_chart(fig_demo, use_container_width=True)
                 
@@ -327,13 +335,16 @@ if df is not None:
                 
                 if not df_cross_filtered.empty:
                     cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
+                    
+                    # FIX 2: Swapped out "Viridis" for a high-contrast, single-hue IBM Ultramarine sequence
+                    # Transitions cleanly from a neutral off-white background right up to dominant IBM Blue
                     fig_heatmap = px.density_heatmap(
                         cross_matrix, 
                         x=attr_x, 
                         y=attr_y, 
                         z="Co-occurrences",
                         text_auto=True,
-                        color_continuous_scale="Viridis"
+                        color_continuous_scale=["#F4F6FF", "#648FFF", "#002D9C"]
                     )
                     fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
                     st.plotly_chart(fig_heatmap, use_container_width=True)
