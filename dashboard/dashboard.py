@@ -318,13 +318,13 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: Reimagined Temporal Analytics (Macro + Micro) ---
+       # --- Tab 3: Reimagined Packed Temporal Analytics ---
         with tab3:
-            st.subheader("⏳ Temporal Patterns & Narrative Chronology")
+            st.subheader("⏳ Temporal Patterns & Packed Narrative Chronology")
             st.markdown("""
-            To help you spot trends instantly, this timeline splits your data into two views:
-            1. **Macro Swimlanes:** Flattens entities into broad categories to reveal historical density and clustering.
-            2. **Chronological Waterfall:** Orders individual actors sequentially by their appearance in history.
+            To maximize scannability, this view eliminates vertical sprawl:
+            1. **Macro Swimlanes:** Flattens entities into broad functional categories to highlight historical density waves.
+            2. **Packed Overlap Timeline:** Dynamically stacks entities into the minimum possible horizontal tracks without overlapping lifespans.
             """)
 
             # Filter out records without a timestamp
@@ -333,42 +333,30 @@ if df is not None:
             if df_time.empty:
                 st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
             else:
-                # Core processing: Ensure numeric types for proper time axis tracking
+                # Ensure clean numeric integers for year math
                 df_time["Target Year"] = df_time["Target Year"].astype(int)
-                
-                # Create a clean presentation label for the charts
                 df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
 
                 # ==========================================
-                # VIEW 1: MACRO TEMPORAL SWIMLANES
+                # VIEW 1: MACRO TEMPORAL SWIMLANES (Retained)
                 # ==========================================
                 st.markdown("### 🗺️ Macro Density & Historical Clusters")
-                st.markdown("_Look for vertical alignments across swimlanes to find cause-and-effect patterns._")
-
+                
                 fig_macro = go.Figure()
-
-                # Group by NER Class to create clean horizontal swimlanes
                 categories = df_time["NER Class"].unique()
                 
                 for cat in categories:
                     df_cat = df_time[df_time["NER Class"] == cat]
-                    
-                    # Construct smart hover text
                     hover_texts = [
                         f"<b>{row['Timeline Label']}</b><br>Cohort: {row['Cohort']}<br>Start: {row['Target Year']}<br>Desc: {row['Description']}"
                         for _, row in df_cat.iterrows()
                     ]
 
-                    # Map uniform markers per category
                     fig_macro.add_trace(go.Scatter(
                         x=df_cat["Target Year"],
                         y=[cat] * len(df_cat),
                         mode="markers",
-                        marker=dict(
-                            size=16,
-                            symbol="diamond" if "Event" in cat else "circle",
-                            line=dict(width=1, color="white")
-                        ),
+                        marker=dict(size=16, symbol="diamond" if "Event" in cat else "circle", line=dict(width=1, color="white")),
                         text=hover_texts,
                         hoverinfo="text",
                         name=cat
@@ -377,7 +365,7 @@ if df is not None:
                 fig_macro.update_layout(
                     xaxis_title="Calendar Year (Absolute Axis)",
                     yaxis_title="Semantic Swimlanes",
-                    height=300,
+                    height=280,
                     margin=dict(l=150, r=20, t=20, b=40),
                     showlegend=True,
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
@@ -387,71 +375,96 @@ if df is not None:
                 st.markdown("---")
 
                 # ==========================================
-                # VIEW 2: CHRONOLOGICAL WATERFALL GANTT
+                # VIEW 2: COMPACT PACKED TIMELINE (The Fix)
                 # ==========================================
-                st.markdown("### 🌊 Chronological Waterfall (Lifespans & Milestones)")
-                st.markdown("_Sorted strictly by chronological appearance to visualize generational overlaps._")
+                st.markdown("### 🧬 Packed Contemporary Timeline")
+                st.markdown("_Entities are packed into shared horizontal rows. Vertical alignment reveals who or what co-existed simultaneously._")
 
-                # THE FIX: Sort strictly by Target Year to create the waterfall cascade
-                df_waterfall = df_time.sort_values(by="Target Year", ascending=True)
+                # Sort strictly by start year to prepare for the greedy lane allocation
+                df_packed = df_time.sort_values(by="Target Year", ascending=True).copy()
 
-                fig_micro = go.Figure()
+                lanes = []  # Tracks the end year of each row
+                assigned_lanes = []
+                
+                # Dynamic Track Packing Loop
+                for idx, row in df_packed.iterrows():
+                    start = int(row["Target Year"])
+                    # Safely calculate when this entity clears the track (add small buffer so labels don't collide)
+                    end = int(row["End Year"]) if (pd.notna(row["End Year"]) and "Event" not in row["NER Class"]) else start + 4
+                    
+                    placed = False
+                    for lane_idx, lane_end_year in enumerate(lanes):
+                        # If this entity starts after the previous entity in this lane ended, reuse the lane
+                        if start > lane_end_year:
+                            assigned_lanes.append(lane_idx)
+                            lanes[lane_idx] = end
+                            placed = True
+                            break
+                    
+                    if not placed:
+                        # No open lanes found, mint a brand new track layer
+                        lanes.append(end)
+                        assigned_lanes.append(len(lanes) - 1)
 
-                for idx, row in df_waterfall.iterrows():
+                df_packed["Lane ID"] = assigned_lanes
+                total_lanes = len(lanes)
+
+                fig_packed = go.Figure()
+
+                for idx, row in df_packed.iterrows():
                     name_label = row["Timeline Label"]
                     start = row["Target Year"]
+                    lane = row["Lane ID"]
                     
-                    # Dynamic color mapping based on class strings
                     color = "#3498DB" if "Person" in row["NER Class"] else ("#2ECC71" if "Organization" in row["NER Class"] else "#E67E22")
                     hover = f"<b>{name_label}</b><br>Type: {row['NER Class']}<br>Cohort: {row['Cohort']}<br>Description: {row['Description']}"
 
-                    # If it's a structural entity with a lifespan, draw a clean Gantt bar
                     if pd.notna(row["End Year"]) and "Event" not in row["NER Class"]:
                         end = int(row["End Year"])
-                        hover += f"<br>Duration: {start} – {end} ({end - start} years)"
+                        hover += f"<br>Lifespan: {start} – {end} ({end - start} yrs)"
                         
-                        fig_micro.add_trace(go.Scatter(
+                        fig_packed.add_trace(go.Scatter(
                             x=[start, end], 
-                            y=[name_label, name_label],
+                            y=[lane, lane],
                             mode="lines+markers",
-                            line=dict(color=color, width=5),
+                            line=dict(color=color, width=6),
                             marker=dict(size=8, color=color),
                             hovertext=hover, 
                             hoverinfo="text", 
                             showlegend=False
                         ))
                     else:
-                        # Point-in-time milestone
                         hover += f"<br>Year: {start}"
-                        fig_micro.add_trace(go.Scatter(
+                        fig_packed.add_trace(go.Scatter(
                             x=[start], 
-                            y=[name_label, name_label],
+                            y=[lane, lane],
                             mode="markers",
-                            marker=dict(size=12, symbol="diamond", color=color),
+                            marker=dict(size=14, symbol="diamond", color=color),
                             hovertext=hover, 
                             hoverinfo="text", 
                             showlegend=False
                         ))
 
-                # Add explicit pseudo-traces just to build a clean legend framework
-                fig_micro.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
-                fig_micro.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#2ECC71"), name="Organization Lifespan"))
-                fig_micro.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Point Event"))
+                # Clean legend framework
+                fig_packed.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
+                fig_packed.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#2ECC71"), name="Organization Lifespan"))
+                fig_packed.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Point Event"))
 
-                fig_micro.update_layout(
+                fig_packed.update_layout(
                     xaxis_title="Historical Timeline Axis (Years)",
                     yaxis=dict(
-                        autorange="reversed", # Forces oldest entities to sit at the top left corner
-                        tickmode='linear',
-                        automargin=True
+                        title="Packed Linear Tracks",
+                        showticklabels=False,   # Hide arbitrary lane integers to keep chart beautifully clean
+                        range=[-0.5, total_lanes - 0.5],
+                        fixedrange=True
                     ),
-                    # Scales dynamically so you never get tiny or giant tracks
-                    height=150 + (len(df_waterfall) * 25), 
-                    legend=dict(orientation="h", yanchor="bottom", y=1.01, xanchor="center", x=0.5),
-                    margin=dict(l=250, r=20, t=40, b=40)
+                    # Forces a perfectly compact fixed-height window that never explodes vertically
+                    height=180 + (total_lanes * 35), 
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+                    margin=dict(l=40, r=20, t=40, b=40)
                 )
                 
-                st.plotly_chart(fig_micro, use_container_width=True)
+                st.plotly_chart(fig_packed, use_container_width=True)
         
         # --- Tab 4: Search and Explore Directory ---
         with tab4:
