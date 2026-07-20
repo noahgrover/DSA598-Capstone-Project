@@ -4,6 +4,7 @@
 
 import json
 from pathlib import Path
+from collections import Counter
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -23,19 +24,8 @@ This dashboard visualizes the structural and qualitative improvements introduced
 Linking, NIL Clustering, and W3C Semantic Enrichment pipeline.
 """)
 
-# Visualization Properties[cite: 1]
-VISUAL_CONFIG = {
-    "schema:Person": {"group": "Person", "color": "#FF5733"},
-    "schema:Organization": {"group": "Organization", "color": "#2ECC71"},
-    "local:NORP": {"group": "Demographic (NORP)", "color": "#9B59B6"},
-    "schema:Place": {"group": "Location", "color": "#3498DB"},
-    "schema:Event": {"group": "Historical Event", "color": "#F1C40F"},
-    "schema:Thing": {"group": "Other", "color": "#95A5A6"}
-}
-
 @st.cache_data
 def load_and_parse_jsonld(filename="enriched.jsonld"):
-    # Dynamically locate the file relative to this script
     script_dir = Path(__file__).parent
     filepath = script_dir / filename
 
@@ -48,13 +38,16 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 
     records = data.get("@graph", [])
     flat_entities = []
-
-    total_records = len(records)
+    
+    # Dynamically track how many source records belong to each cohort
+    records_per_cohort = Counter()
     total_nil_mentions = 0
     total_wikidata_mentions = 0
 
     for r in records:
         cohort = r.get("cohort", "Unknown Cohort")
+        records_per_cohort[cohort] += 1  # Increment record count for this cohort
+        
         for ent in r.get("entities", []):
             ent_id = ent.get("@id", "")
 
@@ -100,16 +93,9 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             })
 
     df_entities = pd.DataFrame(flat_entities)
-    stats = {
-        "total_records": total_records,
-        "total_mentions": len(df_entities),
-        "total_nil": total_nil_mentions,
-        "total_wd": total_wikidata_mentions,
-        "unique_resolved": df_entities["Entity ID"].nunique() if len(df_entities) > 0 else 0
-    }
-    return df_entities, stats
+    return df_entities, records_per_cohort
 
-df, stats = load_and_parse_jsonld()
+df, records_per_cohort = load_and_parse_jsonld()
 
 if df is not None:
     # Sidebar Filters
@@ -122,30 +108,39 @@ if df is not None:
 
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
 
-    # ⚠️ Empty State Guard
+    # Empty State Guard
     if df_filtered.empty:
         st.warning("⚠️ Please select at least one cohort in the sidebar to display data.")
     else:
-        # Metrics Row wrapped in a container for a premium UI card look
+        # Calculate total source records represented by the user's selected cohorts
+        filtered_records_count = sum(records_per_cohort[cohort] for cohort in selected_cohorts)
+
+        # Metrics Row wrapped in a container (Now with 6 columns)
         with st.container(border=True):
-            m1, m2, m3, m4, m5 = st.columns(5)
+            m1, m2, m3, m4, m5, m6 = st.columns(6)
             with m1:
-                # Updated to dynamically show the filtered entity count
-                st.metric("Total Entity Mentions", len(df_filtered))
+                st.metric("Total Records", filtered_records_count)
             with m2:
-                st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
+                st.metric("Entity Mentions", len(df_filtered))
             with m3:
+                st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
+            with m4:
                 wd_links = len(df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"])
                 st.metric("Wikidata Links", wd_links)
-            with m4:
-                nil_links = len(df_filtered[df_filtered["Resolution Type"] == "NIL Clustered"])
-                st.metric("NIL Clusters", nil_links)
+            
+            # Calculate total populated demographic fields
+            relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
+            populated_count = df_filtered[relational_columns].notna().sum().sum()
+
             with m5:
-                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
-                populated_count = df_filtered[relational_columns].notna().sum().sum()
-                # Corrected logic: calculate demographic density on the current filtered entities, not the global stat
-                avg_paths = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
-                st.metric("Avg Demographics / Mention", f"{avg_paths:.2f}x")
+                # Metric 1: Demographics per Mention
+                avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
+                st.metric("Demographics / Mention", f"{avg_demo:.2f}x")
+                
+            with m6:
+                # Metric 2: Paths per Record
+                avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
+                st.metric("Paths / Record", f"{avg_paths:.2f}x")
 
         tab1, tab2, tab3, tab4 = st.tabs([
             "🗺️ Archival Geospatial Map",
