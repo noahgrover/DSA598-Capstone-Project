@@ -179,12 +179,11 @@ if df is not None:
     # accessible, high-contrast color map for cohorts (IBM Colorblind-Safe Palette)
     unique_cohorts = sorted(list(df["Cohort"].unique()))
     HIGH_CONTRAST_COHORT_COLORS = ["#005AB5", "#DC3220", "#FFC20A"] 
-    
     COHORT_COLOR_MAP = {
         cohort: HIGH_CONTRAST_COHORT_COLORS[i % len(HIGH_CONTRAST_COHORT_COLORS)] 
         for i, cohort in enumerate(unique_cohorts)
     }
-
+    
     # Sidebar UI layout logic
     st.sidebar.header("📊 Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
@@ -192,13 +191,20 @@ if df is not None:
         options=unique_cohorts,
         default=unique_cohorts
     )
-
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
-
     if df_filtered.empty:
         st.warning("⚠️ Please select at least one cohort in the sidebar to display data.")
     else:
         filtered_records_count = sum(records_per_cohort[cohort] for cohort in selected_cohorts)
+
+    IBM_LABEL_COLOR_MAP = {
+    "Person": "#648FFF",        # Accessible Cornflower Blue
+    "Organization": "#785EF0",  # Vivid Indigo/Purple
+    "Place": "#FE6100",         # High-Contrast Orange
+    "Event": "#FFB000",         # Golden Yellow
+    "NORP": "#D01C8B",          # Vivid Magenta
+    "Thing": "#A3A8B8"          # Muted Slate Gray (Fallback)
+    }
 
         # Metrics Row
         with st.container(border=True):
