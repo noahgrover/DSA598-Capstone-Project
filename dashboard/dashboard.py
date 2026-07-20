@@ -32,14 +32,22 @@ VISUAL_CONFIG = {
     "schema:Thing": {"group": "Other", "color": "#95A5A6"}
 }
 
+from pathlib import Path  # Add this import at the top of your file if it isn't there
+
 @st.cache_data
-def load_and_parse_jsonld(filepath="enriched.jsonld"):
+def load_and_parse_jsonld(filename="enriched.jsonld"):
+    # Dynamically find the directory where THIS script is running
+    script_dir = Path(__file__).parent
+    filepath = script_dir / filename
+
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             data = json.load(f)
     except FileNotFoundError:
         st.error(f"Could not find the target file: `{filepath}`. Please ensure your enrichment script has run.")
         return None, None
+
+    # ... (the rest of your function code remains exactly the same) ...
 
     records = data.get("@graph", [])
     flat_entities = []
