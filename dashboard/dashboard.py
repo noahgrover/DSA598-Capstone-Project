@@ -330,72 +330,71 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: Unified Horizontal Timeline Ribbon ---
+       # --- Tab 3: True Linear Calendar Timeline (RE-ENGINEERED) ---
         with tab3:
-            st.subheader("⏳ Horizontal Archival Narrative Timeline")
+            st.subheader("⏳ Calendar-Year Narrative Timeline")
             st.markdown("""
-            This view places all historical **People** and **Events** along a single unified horizontal axis. 
-            To optimize readability, individuals branch **upward** and occurrences branch **downward** away from the main timeline track.
+            This infographic scales every entity across an **absolute linear calendar axis**. 
+            * **People** are anchored at their birth year, with a line charting their lifelong span through their year of death.
+            * **Events** are plotted as distinct single-point milestone flags.
             """)
-            
-            # Isolate people and events specifically
-            df_timeline = df_filtered[df_filtered["NER Class"].str.contains("Person|Event", case=False, na=False)].copy()
-            
-            if df_timeline.empty:
-                st.info("No entities explicitly categorized as 'Person' or 'Event' are available under current sidebar filters.")
-            else:
-                t_col1, t_col2 = st.columns(2)
-                with t_col1:
-                    max_total = st.slider("Max milestones to display globally:", min_value=10, max_value=100, value=40)
-                with t_col2:
-                    st.caption("💡 Hint: Use your sidebar filters to restrict which cohorts are drawn along the timeline string.")
 
-                # Sort chronologically, then by type
-                df_timeline = df_timeline.sort_values(by=["Cohort", "NER Class", "Official Name"]).head(max_total)
+            # Isolate target classes and remove entries lacking absolute date values
+            df_time = df_filtered[df_filtered["NER Class"].str.contains("Person|Event", case=False, na=False)].copy()
+            df_time = df_time[df_time["Target Year"].notna()]
+
+            if df_time.empty:
+                st.info("No elements with valid Wikidata dates or local date values match your current filters.")
+            else:
+                max_display = st.slider("Limit to top N entities (ordered alphabetically):", min_value=5, max_value=60, value=25)
+                df_time = df_time.sort_values(by="Official Name").head(max_display)
                 
-                # Math Trick: Calculate an alternating structural offset for each item inside its cohort column
-                # This spaces out labels cleanly above and below the zero line
-                df_timeline["_item_index"] = df_timeline.groupby("Cohort").cumcount()
-                df_timeline["Timeline Spine Height"] = df_timeline["_item_index"].apply(
-                    lambda idx: ((idx // 2) + 1) * (1 if idx % 2 == 0 else -1)
-                )
-                
-                sorted_cohort_order = sorted(list(df_timeline["Cohort"].unique()))
-                
-                # Plot everything onto a single horizontal vector framework
-                fig_timeline = px.scatter(
-                    df_timeline,
-                    x="Cohort",
-                    y="Timeline Spine Height",
-                    color="NER Class",
-                    text="Official Name",
-                    hover_data=["Surface Text", "Description"],
-                    category_orders={"Cohort": sorted_cohort_order},
-                    color_discrete_map={"Person": "#3498DB", "Event": "#E67E22"}, # Clear visual distinction
-                    height=550
-                )
-                
-                # Turn markers into anchored flags with text callouts
-                fig_timeline.update_traces(
-                    textposition='top center',
-                    mode='markers+text',
-                    marker=dict(size=14, opacity=0.9, symbol="diamond", line=dict(width=1.5, color='White'))
-                )
-                
+                # Assign stable horizontal rows to entities so they are indexed cleanly down the screen
+                df_time = df_time.reset_index(drop=True)
+                df_time["Timeline Row"] = df_time["Official Name"]
+
+                # Construct raw vector trace graph
+                fig_timeline = go.Figure()
+
+                # Iterate through nodes to plot explicit individual elements
+                for idx, row in df_time.iterrows():
+                    name = row["Official Name"]
+                    start = int(row["Target Year"])
+                    ent_type = "Person" if "Person" in row["NER Class"] else "Event"
+                    color = "#3498DB" if ent_type == "Person" else "#E67E22"
+                    hover = f"<b>{name}</b><br>Type: {ent_type}<br>Cohort: {row['Cohort']}<br>Desc: {row['Description']}"
+
+                    if ent_type == "Person" and pd.notna(row["End Year"]):
+                        end = int(row["End Year"])
+                        hover += f"<br>Lifespan: {start} – {end}"
+                        # Draw structural line segment representing continuous lifespan duration
+                        fig_timeline.add_trace(go.Scatter(
+                            x=[start, end], y=[name, name],
+                            mode="lines+markers",
+                            line=dict(color=color, width=4),
+                            marker=dict(size=10, symbol="circle", color=[color, color]),
+                            hovertext=hover, hoverinfo="text", showlegend=False
+                        ))
+                    else:
+                        # Draw single marker representing a clear moment/milestone in history
+                        hover += f"<br>Year: {start}"
+                        fig_timeline.add_trace(go.Scatter(
+                            x=[start], y=[name, name],
+                            mode="markers",
+                            marker=dict(size=14, symbol="diamond", color=color),
+                            hovertext=hover, hoverinfo="text", showlegend=False
+                        ))
+
+                # Custom dummy legends to keep display clean
+                fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
+                fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Event Milestone"))
+
                 fig_timeline.update_layout(
-                    xaxis_title="Historical Narrative Progression (Cohorts)",
-                    # Re-engineer the chart layout to transform the Y=0 axis line into a thick physical timeline track
-                    yaxis=dict(
-                        showgrid=False, 
-                        zeroline=True, 
-                        zerolinewidth=4, 
-                        zerolinecolor='rgba(140, 140, 140, 0.8)', # The timeline track line
-                        showticklabels=False, 
-                        title="",
-                        range=[df_timeline["Timeline Spine Height"].min() - 1, df_timeline["Timeline Spine Height"].max() + 1]
-                    ),
-                    xaxis=dict(showgrid=True, gridcolor="rgba(230, 230, 230, 0.5)", tickmode='linear'),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
+                    xaxis_title="Calendar Timeline (Years)",
+                    yaxis=dict(autorange="reversed", title="", tickmode='linear'),
+                    height=200 + (len(df_time) * 30),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+                    margin=dict(l=200) # Give labels ample room to display on left axis side
                 )
                 
                 st.plotly_chart(fig_timeline, use_container_width=True)
