@@ -288,7 +288,7 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: Archival Entity Timeline (RE-ENGINEERED FOR VISUAL CLARITY) ---
+       # --- Tab 3: Archival Entity Timeline (FIXED VALIDATION) ---
         with tab3:
             st.subheader("⏳ Archival Entity Chronological Roster")
             st.markdown("""
@@ -343,14 +343,13 @@ if df is not None:
             
             fig_timeline.update_layout(
                 xaxis_title="Historical Timeline (Cohorts)",
-                # Reverse the axis so Rank 1 (Alphabetical top) appears at the very top of the screen
-                yaxis=dict(autorange="reverse", showticklabels=False, showgrid=False, title=""), 
+                # FIXED: Changed "reverse" to "reversed" to satisfy Plotly's validator
+                yaxis=dict(autorange="reversed", showticklabels=False, showgrid=False, title=""), 
                 xaxis=dict(showgrid=True, tickmode='linear'),
                 legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
             )
             
             st.plotly_chart(fig_timeline, use_container_width=True)
-        
         
         # --- Tab 4: Search and Explore Directory ---
         with tab4:
