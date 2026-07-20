@@ -195,9 +195,44 @@ if df is not None:
                 df_display = df_display[df_display["Surface Text"].str.contains(search_query, case=False, na=False)]
             st.dataframe(df_display[["Entity ID", "Surface Text", "Official Name", "NER Class", "Resolution Type", "Confidence"]], use_container_width=True, hide_index=True)
 
-        # --- Tab 4: Resolution Type Ratios ---
+        # --- Tab 4: Pipeline Quality Diagnostics ---
         with tab4:
-            st.subheader("Resolution Diagnostics")
-            res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
-            fig_res = px.pie(res_counts, values="count", names="Resolution Type", color_discrete_map={"Wikidata Resolved": "#2ECC71", "NIL Clustered": "#3498DB", "Unlinked Entity": "#E74C3C"})
-            st.plotly_chart(fig_res, use_container_width=True)
+            st.subheader("Pipeline Quality & Resolution Diagnostics")
+            
+            # Top Row: Resolution & Confidence
+            d_col1, d_col2 = st.columns(2)
+            
+            with d_col1:
+                st.markdown("#### Entity Resolution Types")
+                res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
+                fig_res = px.pie(res_counts, values="count", names="Resolution Type", color_discrete_map={"Wikidata Resolved": "#2ECC71", "NIL Clustered": "#3498DB", "Unlinked Entity": "#E74C3C"})
+                st.plotly_chart(fig_res, use_container_width=True)
+                
+            with d_col2:
+                st.markdown("#### NER Confidence Scores")
+                # Histogram to see where the bulk of confidence scores lie
+                fig_conf = px.histogram(df_filtered, x="Confidence", nbins=20, color_discrete_sequence=["#3498DB"])
+                fig_conf.update_layout(yaxis_title="Entity Count", xaxis_title="Confidence Score")
+                st.plotly_chart(fig_conf, use_container_width=True)
+
+            st.markdown("---")
+            
+            # Bottom Row: Classes & Completeness
+            d_col3, d_col4 = st.columns(2)
+            
+            with d_col3:
+                st.markdown("#### Extracted NER Classes")
+                class_counts = df_filtered["NER Class"].value_counts().reset_index()
+                fig_class = px.bar(class_counts, x="count", y="NER Class", orientation='h', color_discrete_sequence=["#F1C40F"])
+                st.plotly_chart(fig_class, use_container_width=True)
+                
+            with d_col4:
+                st.markdown("#### Metadata Completeness (Fill Rate)")
+                # Calculate the percentage of non-null values for key relational attributes
+                attributes = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
+                completeness = [(df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 for col in attributes]
+                
+                df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
+                fig_comp = px.bar(df_comp, x="Fill Rate (%)", y="Attribute", orientation='h', color_discrete_sequence=["#9B59B6"])
+                fig_comp.update_xaxes(range=[0, 100])
+                st.plotly_chart(fig_comp, use_container_width=True)
