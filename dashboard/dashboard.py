@@ -8,6 +8,7 @@ from collections import Counter
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import requests  # Added for API label resolution
 
 # Set page configurations
 st.set_page_config(
@@ -38,25 +39,29 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 
     records = data.get("@graph", [])
     flat_entities = []
-    
-    # Dynamically track how many source records belong to each cohort
     records_per_cohort = Counter()
-    total_nil_mentions = 0
-    total_wikidata_mentions = 0
+    
+    # Set to collect all unique QIDs across all demographic attributes for batch lookups
+    all_qids = set()
+
+    def extract_qids(val):
+        if isinstance(val, list):
+            return [str(v).replace("wd:", "").strip() for v in val if v]
+        if val:
+            return [str(val).replace("wd:", "").strip()]
+        return []
 
     for r in records:
         cohort = r.get("cohort", "Unknown Cohort")
-        records_per_cohort[cohort] += 1  # Increment record count for this cohort
+        records_per_cohort[cohort] += 1  
         
         for ent in r.get("entities", []):
             ent_id = ent.get("@id", "")
 
             if ent_id.startswith("wd:"):
                 resolution_type = "Wikidata Resolved"
-                total_wikidata_mentions += 1
             elif ent_id.startswith("local:entity/"):
                 resolution_type = "NIL Clustered"
-                total_nil_mentions += 1
             else:
                 resolution_type = "Unlinked Entity"
 
@@ -67,10 +72,15 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             lat = geo_data.get("latitude") if isinstance(geo_data, dict) else None
             lon = geo_data.get("longitude") if isinstance(geo_data, dict) else None
 
-            def get_first_or_string(val):
-                if isinstance(val, list):
-                    return ", ".join([v.replace("wd:", "") for v in val])
-                return str(val).replace("wd:", "") if val else None
+            # Pull raw list arrays of IDs
+            occ = extract_qids(ent.get("occupation"))
+            gender = extract_qids(ent.get("genderIdentity"))
+            ethnic = extract_qids(ent.get("ethnicGroup"))
+            religion = extract_qids(ent.get("religion"))
+            country = extract_qids(ent.get("country"))
+
+            # Track discovered IDs globally
+            all_qids.update(occ + gender + ethnic + religion + country)
 
             flat_entities.append({
                 "Entity ID": ent_id,
@@ -85,12 +95,42 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "Latitude": lat,
                 "Longitude": lon,
                 "Image URL": ent.get("image"),
-                "Occupation": get_first_or_string(ent.get("occupation")),
-                "Gender Identity": get_first_or_string(ent.get("genderIdentity")),
-                "Ethnic Group/Tribe": get_first_or_string(ent.get("ethnicGroup")),
-                "Religion": get_first_or_string(ent.get("religion")),
-                "Country": get_first_or_string(ent.get("country"))
+                # Keep as lists temporarily for mapping step below
+                "Occupation": occ,
+                "Gender Identity": gender,
+                "Ethnic Group/Tribe": ethnic,
+                "Religion": religion,
+                "Country": country
             })
+
+    # --- Batch Fetch English Labels from Wikidata API ---
+    # Isolate valid Wikidata items (starts with Q and followed by digits)
+    valid_qids = [q for q in all_qids if q.startswith("Q") and q[1:].isdigit()]
+    labels_map = {}
+    
+    if valid_qids:
+        # Query in chunks of 50 (Wikidata API restriction limit)
+        for i in range(0, len(valid_qids), 50):
+            chunk = valid_qids[i:i+50]
+            ids_str = "|".join(chunk)
+            url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={ids_str}&props=labels&languages=en&format=json"
+            try:
+                # Provide a descriptive User-Agent header as required by Wikimedia policy
+                headers = {"User-Agent": "ArchivalKG-Dashboard/1.0 (https://share.streamlit.io; contact@example.com)"}
+                response = requests.get(url, headers=headers, timeout=10).json()
+                entities = response.get("entities", {})
+                for qid, entity_data in entities.items():
+                    label = entity_data.get("labels", {}).get("en", {}).get("value", qid)
+                    labels_map[qid] = label
+            except Exception:
+                pass  # Gracefully fall back to original QID values if network fails
+
+    # --- Map Identifiers to Translated Strings ---
+    for item in flat_entities:
+        for field in ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]:
+            raw_ids = item[field]
+            mapped_names = [labels_map.get(qid, qid) for qid in raw_ids]
+            item[field] = ", ".join(mapped_names) if mapped_names else None
 
     df_entities = pd.DataFrame(flat_entities)
     return df_entities, records_per_cohort
