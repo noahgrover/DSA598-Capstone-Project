@@ -340,7 +340,7 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: Quantitative Temporal Analytics (Unified IBM Colors) ---
+        # --- Tab 3: Quantitative Temporal Analytics (Unified IBM Colors) ---
         with tab3:
             st.subheader("⏳ Chronological Distribution & Historical Velocity")
             st.markdown("""
@@ -466,30 +466,6 @@ if df is not None:
                     margin=dict(l=40, r=20, t=20, b=40)
                 )
                 st.plotly_chart(fig_pulse, use_container_width=True)
-        
-        # --- Tab 4: Search and Explore Directory ---
-        with tab4:
-            st.subheader("Knowledge Graph Node Directory")
-            search_query = st.text_input("🔍 Search nodes...", "")
-            df_display = df_filtered.copy()
-            if search_query:
-                df_display = df_display[df_display["Surface Text"].str.contains(search_query, case=False, na=False)]
-            
-            # Configure data columns to make VIAF URL a clickable link
-            cols_to_show = ["Icon", "Official Name", "Surface Text", "NER Class", "Political Ideology", "Member Of", "VIAF Link", "Resolution Type"]
-            
-            st.dataframe(
-                df_display[cols_to_show], 
-                use_container_width=True, 
-                hide_index=True,
-                column_config={
-                    "VIAF Link": st.column_config.LinkColumn(
-                        "Authority Data (VIAF)",
-                        help="Cross-database linkage to the Virtual International Authority File",
-                        display_text="View Profile"
-                    )
-                }
-            )
 
         # --- Tab 5: Pipeline Quality Diagnostics ---
         with tab5:
