@@ -169,22 +169,83 @@ if df is not None:
             else:
                 st.info("No geospatial data coordinates found in filtered dataset.")
 
-        # --- Tab 2: Demographic Analysis ---
+# --- Tab 2: Enhanced Demographic Analysis ---
         with tab2:
             st.subheader("Archival Intersectionality & Demographic Distributions")
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("#### 🏢 Top Occupations (P106)")
-                df_occ = df_filtered["Occupation"].dropna().str.split(", ").explode().value_counts().reset_index()
-                if not df_occ.empty:
-                    fig_occ = px.bar(df_occ.head(10), x="count", y="Occupation", orientation='h', color_discrete_sequence=["#2ECC71"])
-                    st.plotly_chart(fig_occ, use_container_width=True)
-            with col2:
-                st.markdown("#### 🪶 Ethnic & Tribal Identities (P172)")
-                df_eth = df_filtered["Ethnic Group/Tribe"].dropna().str.split(", ").explode().value_counts().reset_index()
-                if not df_eth.empty:
-                    fig_eth = px.bar(df_eth.head(10), x="count", y="Ethnic Group/Tribe", orientation='h', color_discrete_sequence=["#9B59B6"])
-                    st.plotly_chart(fig_eth, use_container_width=True)
+            
+            # --- Row 1: Dynamic Profiles ---
+            st.markdown("### 📊 Dynamic Demographic Profiler")
+            demo_options = ["Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country"]
+            selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
+            
+            df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
+            
+            if not df_demo.empty:
+                # Properly split and expand multi-valued lists (e.g., "Author, Politician") for exact tallies
+                df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
+                df_demo = df_demo.explode(selected_demo)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
+                    top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
+                    fig_demo = px.bar(top_10, x="count", y=selected_demo, orientation='h', color_discrete_sequence=["#2ECC71"])
+                    fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
+                    st.plotly_chart(fig_demo, use_container_width=True)
+                    
+                with col2:
+                    st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
+                    cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
+                    # Filter chart categories to top 10 values to preserve clean readability
+                    cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
+                    fig_cohort = px.bar(cohort_counts, x="count", y=selected_demo, color="Cohort", orientation='h', barmode="stack")
+                    fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
+                    st.plotly_chart(fig_cohort, use_container_width=True)
+            else:
+                st.info(f"No extracted data found for '{selected_demo}' within the selected filters.")
+                
+            st.markdown("---")
+            
+            # --- Row 2: Matrix Intersections ---
+            st.markdown("### 🔀 Intersectionality Matrix")
+            st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
+            
+            cx_col1, cx_col2 = st.columns(2)
+            with cx_col1:
+                attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
+            with cx_col2:
+                attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=4)
+                
+            if attr_x == attr_y:
+                st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
+            else:
+                df_cross = df_filtered[[attr_x, attr_y]].dropna()
+                if not df_cross.empty:
+                    # Isolate primary/first value to maintain clear matrix relationships
+                    df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
+                    df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
+                    
+                    # Restrict grid density to the top 8 elements on each axis to keep text clear
+                    top_x_items = df_cross[attr_x].value_counts().head(8).index
+                    top_y_items = df_cross[attr_y].value_counts().head(8).index
+                    df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
+                    
+                    if not df_cross_filtered.empty:
+                        cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
+                        fig_heatmap = px.density_heatmap(
+                            cross_matrix, 
+                            x=attr_x, 
+                            y=attr_y, 
+                            z="Co-occurrences",
+                            text_auto=True,
+                            color_continuous_scale="Viridis"
+                        )
+                        fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
+                        st.plotly_chart(fig_heatmap, use_container_width=True)
+                    else:
+                        st.info("No explicit intersections found for the top elements of these attributes.")
+                else:
+                    st.info("No co-occurring data coordinates available for this configuration.")
 
         # --- Tab 3: Search and Explore Directory ---
         with tab3:
