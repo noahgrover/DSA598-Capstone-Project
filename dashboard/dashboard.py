@@ -3,12 +3,14 @@
 # =========================================================================================================================================
 
 import json
+import re
 from pathlib import Path
 from collections import Counter
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import requests  # Added for API label resolution
+import plotly.graph_objects as go
+import requests 
 
 # Set page configurations
 st.set_page_config(
@@ -25,6 +27,35 @@ This dashboard visualizes the structural and qualitative improvements introduced
 Linking, NIL Clustering, and W3C Semantic Enrichment pipeline.
 """)
 
+def extract_year_from_text(text):
+    """Helper utility to parse a numeric year out of messy strings or ISO dates."""
+    if not text:
+        return None
+    match = re.search(r'\b(\d{3,4})\b', str(text))
+    if match:
+        return int(match.group(1))
+    return None
+
+def extract_wikidata_year(claims, property_id):
+    """Helper utility to safely step into Wikidata claims arrays and extract calendar years."""
+    try:
+        prop_claims = claims.get(property_id, [])
+        if prop_claims:
+            snak = prop_claims[0].get("mainsnak", {})
+            datavalue = snak.get("datavalue", {})
+            value = datavalue.get("value", {})
+            time_str = value.get("time")
+            if time_str:
+                # Wikidata time string sample: "+1855-03-09T00:00:00Z" or "-0444-00-00..."
+                is_bc = time_str.startswith('-')
+                clean_str = time_str.lstrip('+-')
+                year_part = clean_str.split('-')[0]
+                year = int(year_part)
+                return -year if is_bc else year
+    except Exception:
+        pass
+    return None
+
 @st.cache_data
 def load_and_parse_jsonld(filename="enriched.jsonld"):
     script_dir = Path(__file__).parent
@@ -40,8 +71,6 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
     records = data.get("@graph", [])
     flat_entities = []
     records_per_cohort = Counter()
-    
-    # Set to collect all unique QIDs across all demographic attributes for batch lookups
     all_qids = set()
 
     def extract_qids(val):
@@ -72,15 +101,17 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             lat = geo_data.get("latitude") if isinstance(geo_data, dict) else None
             lon = geo_data.get("longitude") if isinstance(geo_data, dict) else None
 
-            # Pull raw list arrays of IDs
             occ = extract_qids(ent.get("occupation"))
             gender = extract_qids(ent.get("genderIdentity"))
             ethnic = extract_qids(ent.get("ethnicGroup"))
             religion = extract_qids(ent.get("religion"))
             country = extract_qids(ent.get("country"))
 
-            # Track discovered IDs globally
             all_qids.update(occ + gender + ethnic + religion + country)
+            
+            # Layer 1: Attempt to extract dates directly from local JSON-LD attributes if present
+            local_start = extract_year_from_text(ent.get("birthDate", ent.get("startDate", ent.get("date"))))
+            local_end = extract_year_from_text(ent.get("deathDate", ent.get("endDate")))
 
             flat_entities.append({
                 "Entity ID": ent_id,
@@ -95,38 +126,60 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "Latitude": lat,
                 "Longitude": lon,
                 "Image URL": ent.get("image"),
-                # Keep as lists temporarily for mapping step below
                 "Occupation": occ,
                 "Gender Identity": gender,
                 "Ethnic Group/Tribe": ethnic,
                 "Religion": religion,
-                "Country": country
+                "Country": country,
+                "Target Year": local_start,
+                "End Year": local_end
             })
 
-    # --- Batch Fetch English Labels from Wikidata API ---
-    # Isolate valid Wikidata items (starts with Q and followed by digits)
+    # Layer 2: Fetch missing data directly from Wikidata API Claims Engine
     valid_qids = [q for q in all_qids if q.startswith("Q") and q[1:].isdigit()]
     labels_map = {}
+    wikidata_dates = {}
     
     if valid_qids:
-        # Query in chunks of 50 (Wikidata API restriction limit)
         for i in range(0, len(valid_qids), 50):
             chunk = valid_qids[i:i+50]
             ids_str = "|".join(chunk)
-            url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={ids_str}&props=labels&languages=en&format=json"
+            # Upgraded URL to retrieve claims data arrays alongside labels
+            url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={ids_str}&props=labels|claims&languages=en&format=json"
             try:
-                # Provide a descriptive User-Agent header as required by Wikimedia policy
                 headers = {"User-Agent": "ArchivalKG-Dashboard/1.0 (https://share.streamlit.io; contact@example.com)"}
                 response = requests.get(url, headers=headers, timeout=10).json()
                 entities = response.get("entities", {})
+                
                 for qid, entity_data in entities.items():
                     label = entity_data.get("labels", {}).get("en", {}).get("value", qid)
                     labels_map[qid] = label
+                    
+                    claims = entity_data.get("claims", {})
+                    # Pull historical milestones
+                    b_year = extract_wikidata_year(claims, "P569") # Birth
+                    d_year = extract_wikidata_year(claims, "P570") # Death
+                    
+                    # Pull event milestones (Point in time, Inception, or Start Time)
+                    e_year = extract_wikidata_year(claims, "P585") or extract_wikidata_year(claims, "P571") or extract_wikidata_year(claims, "P580")
+                    
+                    wikidata_dates[qid] = {"birth": b_year, "death": d_year, "event": e_year}
             except Exception:
-                pass  # Gracefully fall back to original QID values if network fails
+                pass 
 
-    # --- Map Identifiers to Translated Strings ---
+    # Re-map labels and overlay missing architectural temporal dates
     for item in flat_entities:
+        ent_clean_id = item["Entity ID"].replace("wd:", "").strip()
+        
+        # Override dates if authentic structural records were fetched from the API
+        if ent_clean_id in wikidata_dates:
+            w_dates = wikidata_dates[ent_clean_id]
+            if item["NER Class"] == "Person":
+                if w_dates["birth"]: item["Target Year"] = w_dates["birth"]
+                if w_dates["death"]: item["End Year"] = w_dates["death"]
+            else: # Events / Orgs
+                if w_dates["event"]: item["Target Year"] = w_dates["event"]
+
         for field in ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]:
             raw_ids = item[field]
             mapped_names = [labels_map.get(qid, qid) for qid in raw_ids]
@@ -138,7 +191,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 df, records_per_cohort = load_and_parse_jsonld()
 
 if df is not None:
-    # Sidebar Filters
+    # Sidebar Filters (Affects the data frame backing all views)
     st.sidebar.header("📊 Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
         "Select Historical Cohorts",
@@ -148,44 +201,33 @@ if df is not None:
 
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
 
-    # Empty State Guard
     if df_filtered.empty:
         st.warning("⚠️ Please select at least one cohort in the sidebar to display data.")
     else:
-        # Calculate total source records represented by the user's selected cohorts
         filtered_records_count = sum(records_per_cohort[cohort] for cohort in selected_cohorts)
 
-        # Metrics Row wrapped in a container (Now with 6 columns)
+        # Metrics Row
         with st.container(border=True):
             m1, m2, m3, m4, m5, m6 = st.columns(6)
-            with m1:
-                st.metric("Total Records", filtered_records_count)
-            with m2:
-                st.metric("Entity Mentions", len(df_filtered))
-            with m3:
-                st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
+            with m1: st.metric("Total Records", filtered_records_count)
+            with m2: st.metric("Entity Mentions", len(df_filtered))
+            with m3: st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
             with m4:
                 wd_links = len(df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"])
                 st.metric("Wikidata Links", wd_links)
-            
-            # Calculate total populated demographic fields
-            relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
-            populated_count = df_filtered[relational_columns].notna().sum().sum()
-
             with m5:
-                # Metric 1: Demographics per Mention
+                relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]
+                populated_count = df_filtered[relational_columns].notna().sum().sum()
                 avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
                 st.metric("Demographics / Mention", f"{avg_demo:.2f}x")
-                
             with m6:
-                # Metric 2: Paths per Record
                 avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
                 st.metric("Paths / Record", f"{avg_paths:.2f}x")
 
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🗺️ Archival Geospatial Map",
             "📊 Demographic & Crossover Insights",
-            "⏳ Chronological Eras & Trends",
+            "⏳ Archival Calendar Timeline",
             "🔍 Interactive Entity Explorer",
             "📈 Pipeline Quality Diagnostics"
         ])
