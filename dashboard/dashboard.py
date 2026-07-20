@@ -288,65 +288,67 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-        # --- Tab 3: Archival Entity Constellation Timeline (NEW & UPDATED) ---
+       # --- Tab 3: Archival Entity Timeline (RE-ENGINEERED FOR VISUAL CLARITY) ---
         with tab3:
-            st.subheader("⏳ Archival Entity Constellation Timeline")
+            st.subheader("⏳ Archival Entity Chronological Roster")
             st.markdown("""
-            This interactive visualization plots **every individual entity** as a distinct node mapped chronologically. 
-            Entities appearing in the same vertical column are temporally clustered within that cohort.
-            Adjust the drop-downs below to space out and color the nodes to locate specific cross-era patterns.
+            This timeline organizes your knowledge graph entities into readable chronological columns. 
+            Entities are stacked vertically within their respective historical cohorts, allowing you to instantly 
+            read and compare exactly who or what co-occurs in the same era.
             """)
             
-            # Form controls to dynamically slice the visualization space
+            # Form controls to prevent visual overcrowding
             t_col1, t_col2 = st.columns(2)
             with t_col1:
-                timeline_y = st.selectbox(
-                    "Group timeline vertically by:",
-                    options=["NER Class", "Resolution Type", "Confidence"],
-                    index=0
-                )
+                max_per_cohort = st.slider("Max entities to list per column:", min_value=5, max_value=50, value=20)
             with t_col2:
                 timeline_color = st.selectbox(
                     "Color entity nodes by:",
-                    options=["Visual Group", "Resolution Type", "Cohort"],
-                    index=0
+                    options=["Visual Group", "Resolution Type", "NER Class"],
+                    index=0,
+                    key="timeline_color_roster"
                 )
             
-            # Chronologically order cohorts alpha-numerically left-to-right
-            sorted_cohort_order = sorted(list(df_filtered["Cohort"].unique()))
+            # Sort data for consistent column rendering
+            df_timeline = df_filtered.copy()
+            df_timeline = df_timeline.sort_values(by=["Cohort", "Official Name"])
             
-            # Use standard scatter if plotting a continuous float like Confidence, otherwise use Strip plot for clean categorical spacing
-            if timeline_y == "Confidence":
-                fig_timeline = px.scatter(
-                    df_filtered,
-                    x="Cohort",
-                    y="Confidence",
-                    color=timeline_color,
-                    hover_name="Official Name",
-                    hover_data=["Surface Text", "NER Class", "Description"],
-                    category_orders={"Cohort": sorted_cohort_order},
-                    height=600
-                )
-            else:
-                # px.strip automatically introduces horizontal jitter within categorical columns to make overlapping dots legible
-                fig_timeline = px.strip(
-                    df_filtered,
-                    x="Cohort",
-                    y=timeline_y,
-                    color=timeline_color,
-                    hover_name="Official Name",
-                    hover_data=["Surface Text", "Description"],
-                    category_orders={"Cohort": sorted_cohort_order},
-                    height=600
-                )
-                
+            # Generate an explicit chronological vertical index (rank) for each entity inside its cohort
+            df_timeline["Era Rank"] = df_timeline.groupby("Cohort").cumcount() + 1
+            
+            # Trim the list down to the user's legibility constraint
+            df_timeline = df_timeline[df_timeline["Era Rank"] <= max_per_cohort]
+            
+            sorted_cohort_order = sorted(list(df_timeline["Cohort"].unique()))
+            
+            # Dynamically calculate chart height so text rows expand naturally and stay completely legible
+            dynamic_height = 200 + (max_per_cohort * 25)
+            
+            fig_timeline = px.scatter(
+                df_timeline,
+                x="Cohort",
+                y="Era Rank",
+                color=timeline_color,
+                text="Official Name",
+                hover_data=["Surface Text", "Description"],
+                category_orders={"Cohort": sorted_cohort_order},
+                height=dynamic_height
+            )
+            
+            fig_timeline.update_traces(
+                textposition='top right',
+                mode='markers+text',
+                marker=dict(size=12, opacity=0.85, line=dict(width=1, color='White'))
+            )
+            
             fig_timeline.update_layout(
                 xaxis_title="Historical Timeline (Cohorts)",
-                yaxis_title=timeline_y,
-                showlegend=True
+                # Reverse the axis so Rank 1 (Alphabetical top) appears at the very top of the screen
+                yaxis=dict(autorange="reverse", showticklabels=False, showgrid=False, title=""), 
+                xaxis=dict(showgrid=True, tickmode='linear'),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
             )
-            # Optimize node sizing and transparency to make tightly packed clusters visible
-            fig_timeline.update_traces(marker=dict(size=9, opacity=0.75, line=dict(width=0.5, color='White')))
+            
             st.plotly_chart(fig_timeline, use_container_width=True)
         
         
