@@ -182,9 +182,10 @@ if df is not None:
                 avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
                 st.metric("Paths / Record", f"{avg_paths:.2f}x")
 
-        tab1, tab2, tab3, tab4 = st.tabs([
+        tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🗺️ Archival Geospatial Map",
             "📊 Demographic & Crossover Insights",
+            "⏳ Chronological Eras & Trends",
             "🔍 Interactive Entity Explorer",
             "📈 Pipeline Quality Diagnostics"
         ])
@@ -209,7 +210,7 @@ if df is not None:
             else:
                 st.info("No geospatial data coordinates found in filtered dataset.")
 
-# --- Tab 2: Enhanced Demographic Analysis ---
+        # --- Tab 2: Enhanced Demographic Analysis ---
         with tab2:
             st.subheader("Archival Intersectionality & Demographic Distributions")
             
@@ -286,9 +287,43 @@ if df is not None:
                         st.info("No explicit intersections found for the top elements of these attributes.")
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
-
-        # --- Tab 3: Search and Explore Directory ---
+        
+        # --- Tab 3: Chronological Eras & Trends (NEW) ---
         with tab3:
+            st.subheader("Chronological Knowledge Graph Shifts")
+            st.markdown("Monitor how entity concentrations and mapping fidelity migrate across historical cohorts.")
+            
+            # Sort cohorts alpha-numerically so timelines read left-to-right correctly
+            sorted_cohort_order = sorted(list(df_filtered["Cohort"].unique()))
+            
+            t_col1, t_col2 = st.columns(2)
+            
+            with t_col1:
+                st.markdown("#### NER Class Distribution Shifts Across Cohorts")
+                # Aggregate counts per cohort and semantic type
+                df_ner_time = df_filtered.groupby(["Cohort", "NER Class"]).size().reset_index(name="Mentions")
+                fig_ner_time = px.line(
+                    df_ner_time, x="Cohort", y="Mentions", color="NER Class",
+                    category_orders={"Cohort": sorted_cohort_order}, markers=True
+                )
+                fig_ner_time.update_layout(xaxis_title="Historical Cohorts", yaxis_title="Total Extracted Mentions")
+                st.plotly_chart(fig_ner_time, use_container_width=True)
+                
+            with t_col2:
+                st.markdown("#### Linking Strategy Yields Across Cohorts")
+                # Aggregate mapping strategy distributions across timelines
+                df_res_time = df_filtered.groupby(["Cohort", "Resolution Type"]).size().reset_index(name="Count")
+                fig_res_time = px.area(
+                    df_res_time, x="Cohort", y="Count", color="Resolution Type",
+                    category_orders={"Cohort": sorted_cohort_order},
+                    color_discrete_map={"Wikidata Resolved": "#2ECC71", "NIL Clustered": "#3498DB", "Unlinked Entity": "#E74C3C"}
+                )
+                fig_res_time.update_layout(xaxis_title="Historical Cohorts", yaxis_title="Resolution Split Count")
+                st.plotly_chart(fig_res_time, use_container_width=True)
+        
+        
+        # --- Tab 4: Search and Explore Directory ---
+        with tab4:
             st.subheader("Knowledge Graph Node Directory")
             search_query = st.text_input("🔍 Search nodes...", "")
             df_display = df_filtered.copy()
@@ -297,7 +332,7 @@ if df is not None:
             st.dataframe(df_display[["Entity ID", "Surface Text", "Official Name", "NER Class", "Resolution Type", "Confidence"]], use_container_width=True, hide_index=True)
 
         # --- Tab 4: Pipeline Quality Diagnostics ---
-        with tab4:
+        with tab5:
             st.subheader("Pipeline Quality & Resolution Diagnostics")
             
             # Top Row: Resolution & Confidence
