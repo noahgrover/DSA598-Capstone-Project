@@ -318,13 +318,12 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: Reimagined Packed Temporal Analytics ---
+       # --- Tab 3: Quantitative Temporal Analytics ---
         with tab3:
-            st.subheader("⏳ Temporal Patterns & Packed Narrative Chronology")
+            st.subheader("⏳ Chronological Distribution & Historical Velocity")
             st.markdown("""
-            To maximize scannability, this view eliminates vertical sprawl:
-            1. **Macro Swimlanes:** Flattens entities into broad functional categories to highlight historical density waves.
-            2. **Packed Overlap Timeline:** Dynamically stacks entities into the minimum possible horizontal tracks without overlapping lifespans.
+            This layout pairs your high-level category swimlanes with macro temporal metrics 
+            and velocity tracking to show exactly where your archive aggregates in time.
             """)
 
             # Filter out records without a timestamp
@@ -333,15 +332,49 @@ if df is not None:
             if df_time.empty:
                 st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
             else:
-                # Ensure clean numeric integers for year math
+                # Force uniform types for chronological calculations
                 df_time["Target Year"] = df_time["Target Year"].astype(int)
                 df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
+                
+                # ==========================================
+                # QUANTITATIVE TEMPORAL METRICS
+                # ==========================================
+                with st.container(border=True):
+                    t_col1, t_col2, t_col3, t_col4 = st.columns(4)
+                    
+                    # 1. Total absolute era coverage
+                    start_era = int(df_time["Target Year"].min())
+                    end_era = int(df_time["Target Year"].max())
+                    t_col1.metric("Chronological Span", f"{start_era} – {end_era}")
+                    
+                    # 2. Average lifespan of historical actors (excluding events)
+                    df_lifespan = df_time[df_time["End Year"].notna() & (~df_time["NER Class"].str.contains("Event", na=False))].copy()
+                    if not df_lifespan.empty:
+                        avg_life = int((df_lifespan["End Year"].astype(int) - df_lifespan["Target Year"]).mean())
+                        t_col2.metric("Avg. Entity Lifespan", f"{avg_life} Years")
+                    else:
+                        t_col2.metric("Avg. Entity Lifespan", "Static / N/A")
+                    
+                    # 3. Mode calculation for historical density concentration
+                    df_time["Decade"] = (df_time["Target Year"] // 10) * 10
+                    peak_decade = df_time["Decade"].mode()
+                    if not peak_decade.empty:
+                        t_col3.metric("Peak Active Decade", f"{int(peak_decade.iloc[0])}s")
+                    else:
+                        t_col3.metric("Peak Active Decade", "N/A")
+                        
+                    # 4. Total count of milestone incidents
+                    total_events = df_time["NER Class"].str.contains("Event", na=False).sum()
+                    t_col4.metric("Point-in-Time Events", f"{total_events} Milestones")
+
+                st.markdown("---")
 
                 # ==========================================
-                # VIEW 1: MACRO TEMPORAL SWIMLANES (Retained)
+                # VIEW 1: MACRO TEMPORAL SWIMLANES 
                 # ==========================================
-                st.markdown("### 🗺️ Macro Density & Historical Clusters")
-                
+                st.markdown("### 🗺️ Macro Density Swimlanes")
+                st.markdown("_Look for vertical alignments across tracks to identify cross-category historical triggers._")
+
                 fig_macro = go.Figure()
                 categories = df_time["NER Class"].unique()
                 
@@ -356,7 +389,11 @@ if df is not None:
                         x=df_cat["Target Year"],
                         y=[cat] * len(df_cat),
                         mode="markers",
-                        marker=dict(size=16, symbol="diamond" if "Event" in cat else "circle", line=dict(width=1, color="white")),
+                        marker=dict(
+                            size=16, 
+                            symbol="diamond" if "Event" in cat else "circle", 
+                            line=dict(width=1, color="white")
+                        ),
                         text=hover_texts,
                         hoverinfo="text",
                         name=cat
@@ -375,96 +412,33 @@ if df is not None:
                 st.markdown("---")
 
                 # ==========================================
-                # VIEW 2: COMPACT PACKED TIMELINE (The Fix)
+                # VIEW 2: QUANTITATIVE HISTORICAL PULSE (The New Addition)
                 # ==========================================
-                st.markdown("### 🧬 Packed Contemporary Timeline")
-                st.markdown("_Entities are packed into shared horizontal rows. Vertical alignment reveals who or what co-existed simultaneously._")
-
-                # Sort strictly by start year to prepare for the greedy lane allocation
-                df_packed = df_time.sort_values(by="Target Year", ascending=True).copy()
-
-                lanes = []  # Tracks the end year of each row
-                assigned_lanes = []
+                st.markdown("### 📈 Historical Velocity (Decadal Node Density)")
+                st.markdown("_Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges._")
                 
-                # Dynamic Track Packing Loop
-                for idx, row in df_packed.iterrows():
-                    start = int(row["Target Year"])
-                    # Safely calculate when this entity clears the track (add small buffer so labels don't collide)
-                    end = int(row["End Year"]) if (pd.notna(row["End Year"]) and "Event" not in row["NER Class"]) else start + 4
-                    
-                    placed = False
-                    for lane_idx, lane_end_year in enumerate(lanes):
-                        # If this entity starts after the previous entity in this lane ended, reuse the lane
-                        if start > lane_end_year:
-                            assigned_lanes.append(lane_idx)
-                            lanes[lane_idx] = end
-                            placed = True
-                            break
-                    
-                    if not placed:
-                        # No open lanes found, mint a brand new track layer
-                        lanes.append(end)
-                        assigned_lanes.append(len(lanes) - 1)
+                # Group by decade and type to showcase stacked composition over time
+                decade_counts = df_time.groupby(["Decade", "NER Class"]).size().reset_index(name="Node Count")
+                decade_counts["Decade Display"] = decade_counts["Decade"].astype(str) + "s"
+                decade_counts = decade_counts.sort_values("Decade")
 
-                df_packed["Lane ID"] = assigned_lanes
-                total_lanes = len(lanes)
-
-                fig_packed = go.Figure()
-
-                for idx, row in df_packed.iterrows():
-                    name_label = row["Timeline Label"]
-                    start = row["Target Year"]
-                    lane = row["Lane ID"]
-                    
-                    color = "#3498DB" if "Person" in row["NER Class"] else ("#2ECC71" if "Organization" in row["NER Class"] else "#E67E22")
-                    hover = f"<b>{name_label}</b><br>Type: {row['NER Class']}<br>Cohort: {row['Cohort']}<br>Description: {row['Description']}"
-
-                    if pd.notna(row["End Year"]) and "Event" not in row["NER Class"]:
-                        end = int(row["End Year"])
-                        hover += f"<br>Lifespan: {start} – {end} ({end - start} yrs)"
-                        
-                        fig_packed.add_trace(go.Scatter(
-                            x=[start, end], 
-                            y=[lane, lane],
-                            mode="lines+markers",
-                            line=dict(color=color, width=6),
-                            marker=dict(size=8, color=color),
-                            hovertext=hover, 
-                            hoverinfo="text", 
-                            showlegend=False
-                        ))
-                    else:
-                        hover += f"<br>Year: {start}"
-                        fig_packed.add_trace(go.Scatter(
-                            x=[start], 
-                            y=[lane, lane],
-                            mode="markers",
-                            marker=dict(size=14, symbol="diamond", color=color),
-                            hovertext=hover, 
-                            hoverinfo="text", 
-                            showlegend=False
-                        ))
-
-                # Clean legend framework
-                fig_packed.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
-                fig_packed.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#2ECC71"), name="Organization Lifespan"))
-                fig_packed.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Point Event"))
-
-                fig_packed.update_layout(
-                    xaxis_title="Historical Timeline Axis (Years)",
-                    yaxis=dict(
-                        title="Packed Linear Tracks",
-                        showticklabels=False,   # Hide arbitrary lane integers to keep chart beautifully clean
-                        range=[-0.5, total_lanes - 0.5],
-                        fixedrange=True
-                    ),
-                    # Forces a perfectly compact fixed-height window that never explodes vertically
-                    height=180 + (total_lanes * 35), 
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
-                    margin=dict(l=40, r=20, t=40, b=40)
+                fig_pulse = px.bar(
+                    decade_counts,
+                    x="Decade Display",
+                    y="Node Count",
+                    color="NER Class",
+                    barmode="stack",
+                    color_discrete_sequence=px.colors.qualitative.Safe,
+                    height=350
                 )
                 
-                st.plotly_chart(fig_packed, use_container_width=True)
+                fig_pulse.update_layout(
+                    xaxis_title="Historical Decades",
+                    yaxis_title="Entities Introduced",
+                    legend_title_text="Entity Class",
+                    margin=dict(l=40, r=20, t=20, b=40)
+                )
+                st.plotly_chart(fig_pulse, use_container_width=True)
         
         # --- Tab 4: Search and Explore Directory ---
         with tab4:
