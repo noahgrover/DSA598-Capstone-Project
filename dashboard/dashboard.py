@@ -288,66 +288,72 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: Archival Entity Timeline (LIMITED TO PEOPLE & EVENTS) ---
+       # --- Tab 3: Unified Horizontal Timeline Ribbon ---
         with tab3:
-            st.subheader("⏳ Chronological Roster: Historical Actors & Events")
+            st.subheader("⏳ Horizontal Archival Narrative Timeline")
             st.markdown("""
-            This timeline isolates **People** and **Events** from your knowledge graph, filtering out geographic places, 
-            organizations, and abstract concepts to focus purely on historical actors and occurrences across eras.
+            This view places all historical **People** and **Events** along a single unified horizontal axis. 
+            To optimize readability, individuals branch **upward** and occurrences branch **downward** away from the main timeline track.
             """)
             
-            # Filter rows where the NER Class contains 'Person' or 'Event' (case-insensitive)
+            # Isolate people and events specifically
             df_timeline = df_filtered[df_filtered["NER Class"].str.contains("Person|Event", case=False, na=False)].copy()
             
             if df_timeline.empty:
-                st.info("No entities explicitly categorized as 'Person' or 'Event' were found within the current filters.")
+                st.info("No entities explicitly categorized as 'Person' or 'Event' are available under current sidebar filters.")
             else:
-                # Form controls to fine-tune layout dynamically
                 t_col1, t_col2 = st.columns(2)
                 with t_col1:
-                    max_per_cohort = st.slider("Max entries to list per column:", min_value=5, max_value=50, value=25)
+                    max_total = st.slider("Max milestones to display globally:", min_value=10, max_value=100, value=40)
                 with t_col2:
-                    timeline_color = st.selectbox(
-                        "Color entity nodes by:",
-                        options=["NER Class", "Visual Group", "Resolution Type"],
-                        index=0,  # Default to NER Class to clearly highlight People vs Events
-                        key="timeline_color_roster"
-                    )
+                    st.caption("💡 Hint: Use your sidebar filters to restrict which cohorts are drawn along the timeline string.")
+
+                # Sort chronologically, then by type
+                df_timeline = df_timeline.sort_values(by=["Cohort", "NER Class", "Official Name"]).head(max_total)
                 
-                # Sort elements cleanly: Cohort columns first, then by Class, then Alphabetical Name
-                df_timeline = df_timeline.sort_values(by=["Cohort", "NER Class", "Official Name"])
-                
-                # Generate chronological vertical rank indexing per cohort
-                df_timeline["Era Rank"] = df_timeline.groupby("Cohort").cumcount() + 1
-                
-                # Apply roster length cap
-                df_timeline = df_timeline[df_timeline["Era Rank"] <= max_per_cohort]
+                # Math Trick: Calculate an alternating structural offset for each item inside its cohort column
+                # This spaces out labels cleanly above and below the zero line
+                df_timeline["_item_index"] = df_timeline.groupby("Cohort").cumcount()
+                df_timeline["Timeline Spine Height"] = df_timeline["_item_index"].apply(
+                    lambda idx: ((idx // 2) + 1) * (1 if idx % 2 == 0 else -1)
+                )
                 
                 sorted_cohort_order = sorted(list(df_timeline["Cohort"].unique()))
-                dynamic_height = 200 + (max_per_cohort * 25)
                 
+                # Plot everything onto a single horizontal vector framework
                 fig_timeline = px.scatter(
                     df_timeline,
                     x="Cohort",
-                    y="Era Rank",
-                    color=timeline_color,
+                    y="Timeline Spine Height",
+                    color="NER Class",
                     text="Official Name",
-                    hover_data=["Surface Text", "Description", "NER Class"],
+                    hover_data=["Surface Text", "Description"],
                     category_orders={"Cohort": sorted_cohort_order},
-                    height=dynamic_height
+                    color_discrete_map={"Person": "#3498DB", "Event": "#E67E22"}, # Clear visual distinction
+                    height=550
                 )
                 
+                # Turn markers into anchored flags with text callouts
                 fig_timeline.update_traces(
-                    textposition='top right',
+                    textposition='top center',
                     mode='markers+text',
-                    marker=dict(size=12, opacity=0.85, line=dict(width=1, color='White'))
+                    marker=dict(size=14, opacity=0.9, symbol="diamond", line=dict(width=1.5, color='White'))
                 )
                 
                 fig_timeline.update_layout(
-                    xaxis_title="Historical Timeline (Cohorts)",
-                    yaxis=dict(autorange="reversed", showticklabels=False, showgrid=False, title=""), 
-                    xaxis=dict(showgrid=True, tickmode='linear'),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                    xaxis_title="Historical Narrative Progression (Cohorts)",
+                    # Re-engineer the chart layout to transform the Y=0 axis line into a thick physical timeline track
+                    yaxis=dict(
+                        showgrid=False, 
+                        zeroline=True, 
+                        zerolinewidth=4, 
+                        zerolinecolor='rgba(140, 140, 140, 0.8)', # The timeline track line
+                        showticklabels=False, 
+                        title="",
+                        range=[df_timeline["Timeline Spine Height"].min() - 1, df_timeline["Timeline Spine Height"].max() + 1]
+                    ),
+                    xaxis=dict(showgrid=True, gridcolor="rgba(230, 230, 230, 0.5)", tickmode='linear'),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5)
                 )
                 
                 st.plotly_chart(fig_timeline, use_container_width=True)
