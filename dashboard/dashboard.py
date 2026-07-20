@@ -176,11 +176,21 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 df, records_per_cohort = load_and_parse_jsonld()
 
 if df is not None:
+    # accessible, high-contrast color map for cohorts (IBM Colorblind-Safe Palette)
+    unique_cohorts = sorted(list(df["Cohort"].unique()))
+    HIGH_CONTRAST_COHORT_COLORS = ["#005AB5", "#DC3220", "#FFC20A"] 
+    
+    COHORT_COLOR_MAP = {
+        cohort: HIGH_CONTRAST_COHORT_COLORS[i % len(HIGH_CONTRAST_COHORT_COLORS)] 
+        for i, cohort in enumerate(unique_cohorts)
+    }
+
+    # Sidebar UI layout logic
     st.sidebar.header("📊 Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
         "Select Historical Cohorts",
-        options=list(df["Cohort"].unique()),
-        default=list(df["Cohort"].unique())
+        options=unique_cohorts,
+        default=unique_cohorts
     )
 
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
@@ -270,7 +280,15 @@ if df is not None:
                     st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
                     cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
                     cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
-                    fig_cohort = px.bar(cohort_counts, x="count", y=selected_demo, color="Cohort", orientation='h', barmode="stack")
+                    fig_cohort = px.bar(
+                        cohort_counts, 
+                        x="count", 
+                        y=selected_demo, 
+                        color="Cohort", 
+                        orientation='h', 
+                        barmode="stack",
+                        color_discrete_map=COHORT_COLOR_MAP
+                    )
                     fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
                     st.plotly_chart(fig_cohort, use_container_width=True)
             else:
