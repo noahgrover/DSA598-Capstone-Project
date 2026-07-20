@@ -111,8 +111,8 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             all_qids.update(occ + gender + ethnic + religion + country)
             
             # FIX 2: Handle messy or namespaced keys locally (e.g., schema:birthDate vs birth_date)
-            start_keys = ["birthDate", "birth_date", "schema:birthDate", "startDate", "start_date", "schema:startDate", "date", "schema:date"]
-            end_keys = ["deathDate", "death_date", "schema:deathDate", "endDate", "end_date", "schema:endDate"]
+            start_keys = ["dateOfBirth", "birthDate", "birth_date", "schema:birthDate", "startDate", "start_date", "schema:startDate", "date", "schema:date"]
+            end_keys = ["dateOfDeath", "deathDate", "death_date", "schema:deathDate", "endDate", "end_date", "schema:endDate"]
             
             local_start = None
             for k in start_keys:
