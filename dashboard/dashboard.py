@@ -204,6 +204,8 @@ if df is not None:
 
     # Apply your sidebar filter mask to the main dataset
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
+        
+    
         # Metrics Row
         with st.container(border=True):
             m1, m2, m3, m4, m5, m6 = st.columns(6)
