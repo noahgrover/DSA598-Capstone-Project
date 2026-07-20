@@ -24,12 +24,12 @@ st.markdown(
     <style>
     /* Change the background of the selected items in the multiselect dropdown */
     div[data-baseweb="tag"] {
-        background-color: #005AB5 !important;
+        background-color: #785EF0 !important; /* IBM Colorblind-Safe Vivid Purple */
         border-radius: 4px !important;
     }
-    /* Change the text color inside the selected chips */
+    /* Change the text color inside the selected chips to crisp white for contrast */
     div[data-baseweb="tag"] span {
-        color: white !important;
+        color: #FFFFFF !important; 
     }
     </style>
     """,
