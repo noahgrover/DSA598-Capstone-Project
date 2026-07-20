@@ -336,33 +336,26 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-       # --- Tab 3: True Linear Calendar Timeline (RE-ENGINEERED) ---
+       # --- Tab 3: True Linear Calendar Timeline (UNLIMITED) ---
         with tab3:
             st.subheader("⏳ Calendar-Year Narrative Timeline")
             st.markdown("""
-            This infographic scales every entity across an **absolute linear calendar axis**. 
-            * **People** are anchored at their birth year, with a line charting their lifelong span through their year of death.
-            * **Events** are plotted as distinct single-point milestone flags.
+            This view charts historical actors and events across an absolute horizontal calendar time axis.
+            * **People** display as timeline tracks extending from their birth year to their death year.
+            * **Events** plot as diamond point-milestones.
             """)
 
-            # Isolate target classes and remove entries lacking absolute date values
             df_time = df_filtered[df_filtered["NER Class"].str.contains("Person|Event", case=False, na=False)].copy()
             df_time = df_time[df_time["Target Year"].notna()]
 
             if df_time.empty:
-                st.info("No elements with valid Wikidata dates or local date values match your current filters.")
+                st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
             else:
-                max_display = st.slider("Limit to top N entities (ordered alphabetically):", min_value=5, max_value=60, value=25)
-                df_time = df_time.sort_values(by="Official Name").head(max_display)
+                # Completely removed truncation / limit caps to render the full subset
+                df_time = df_time.sort_values(by="Target Year")
                 
-                # Assign stable horizontal rows to entities so they are indexed cleanly down the screen
-                df_time = df_time.reset_index(drop=True)
-                df_time["Timeline Row"] = df_time["Official Name"]
-
-                # Construct raw vector trace graph
                 fig_timeline = go.Figure()
 
-                # Iterate through nodes to plot explicit individual elements
                 for idx, row in df_time.iterrows():
                     name = row["Official Name"]
                     start = int(row["Target Year"])
@@ -373,7 +366,6 @@ if df is not None:
                     if ent_type == "Person" and pd.notna(row["End Year"]):
                         end = int(row["End Year"])
                         hover += f"<br>Lifespan: {start} – {end}"
-                        # Draw structural line segment representing continuous lifespan duration
                         fig_timeline.add_trace(go.Scatter(
                             x=[start, end], y=[name, name],
                             mode="lines+markers",
@@ -382,7 +374,6 @@ if df is not None:
                             hovertext=hover, hoverinfo="text", showlegend=False
                         ))
                     else:
-                        # Draw single marker representing a clear moment/milestone in history
                         hover += f"<br>Year: {start}"
                         fig_timeline.add_trace(go.Scatter(
                             x=[start], y=[name, name],
@@ -391,16 +382,16 @@ if df is not None:
                             hovertext=hover, hoverinfo="text", showlegend=False
                         ))
 
-                # Custom dummy legends to keep display clean
+                # Custom clean legends
                 fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=10, color="#3498DB"), name="Person Lifespan"))
                 fig_timeline.add_trace(go.Scatter(x=[None], y=[None], mode="markers", marker=dict(size=12, symbol="diamond", color="#E67E22"), name="Event Milestone"))
 
                 fig_timeline.update_layout(
-                    xaxis_title="Calendar Timeline (Years)",
+                    xaxis_title="Linear Calendar Axis (Years)",
                     yaxis=dict(autorange="reversed", title="", tickmode='linear'),
-                    height=200 + (len(df_time) * 30),
+                    height=200 + (len(df_time) * 32), # Height stretches naturally based on entity count
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
-                    margin=dict(l=200) # Give labels ample room to display on left axis side
+                    margin=dict(l=220)
                 )
                 
                 st.plotly_chart(fig_timeline, use_container_width=True)
