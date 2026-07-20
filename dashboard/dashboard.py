@@ -1,5 +1,5 @@
 # =========================================================================================================================================
-# Streamlit Archival Knowledge Graph Dashboard
+# Streamlit Archival Knowledge Graph Dashboard (FIXED DATALOADER)
 # =========================================================================================================================================
 
 import json
@@ -20,7 +20,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Title & Description
 st.title("🕸️ Archival Entity Linking & Semantic Graph Dashboard")
 st.markdown("""
 This dashboard visualizes the structural and qualitative improvements introduced by our advanced NER,
@@ -46,12 +45,10 @@ def extract_wikidata_year(claims, property_id):
             value = datavalue.get("value", {})
             time_str = value.get("time")
             if time_str:
-                # Wikidata time string sample: "+1855-03-09T00:00:00Z" or "-0444-00-00..."
                 is_bc = time_str.startswith('-')
                 clean_str = time_str.lstrip('+-')
                 year_part = clean_str.split('-')[0]
-                year = int(year_part)
-                return -year if is_bc else year
+                return -int(year_part) if is_bc else int(year_part)
     except Exception:
         pass
     return None
@@ -87,6 +84,10 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
         for ent in r.get("entities", []):
             ent_id = ent.get("@id", "")
 
+            # FIX 1: Explicitly add the entity's own QID to the fetch queue!
+            if ent_id.startswith("wd:"):
+                all_qids.add(ent_id.replace("wd:", "").strip())
+
             if ent_id.startswith("wd:"):
                 resolution_type = "Wikidata Resolved"
             elif ent_id.startswith("local:entity/"):
@@ -109,9 +110,21 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 
             all_qids.update(occ + gender + ethnic + religion + country)
             
-            # Layer 1: Attempt to extract dates directly from local JSON-LD attributes if present
-            local_start = extract_year_from_text(ent.get("birthDate", ent.get("startDate", ent.get("date"))))
-            local_end = extract_year_from_text(ent.get("deathDate", ent.get("endDate")))
+            # FIX 2: Handle messy or namespaced keys locally (e.g., schema:birthDate vs birth_date)
+            start_keys = ["birthDate", "birth_date", "schema:birthDate", "startDate", "start_date", "schema:startDate", "date", "schema:date"]
+            end_keys = ["deathDate", "death_date", "schema:deathDate", "endDate", "end_date", "schema:endDate"]
+            
+            local_start = None
+            for k in start_keys:
+                if k in ent:
+                    local_start = extract_year_from_text(ent[k])
+                    if local_start: break
+            
+            local_end = None
+            for k in end_keys:
+                if k in ent:
+                    local_end = extract_year_from_text(ent[k])
+                    if local_end: break
 
             flat_entities.append({
                 "Entity ID": ent_id,
@@ -135,7 +148,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "End Year": local_end
             })
 
-    # Layer 2: Fetch missing data directly from Wikidata API Claims Engine
+    # Fetch labels AND core historical claims from Wikidata
     valid_qids = [q for q in all_qids if q.startswith("Q") and q[1:].isdigit()]
     labels_map = {}
     wikidata_dates = {}
@@ -144,7 +157,6 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
         for i in range(0, len(valid_qids), 50):
             chunk = valid_qids[i:i+50]
             ids_str = "|".join(chunk)
-            # Upgraded URL to retrieve claims data arrays alongside labels
             url = f"https://www.wikidata.org/w/api.php?action=wbgetentities&ids={ids_str}&props=labels|claims&languages=en&format=json"
             try:
                 headers = {"User-Agent": "ArchivalKG-Dashboard/1.0 (https://share.streamlit.io; contact@example.com)"}
@@ -156,28 +168,24 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                     labels_map[qid] = label
                     
                     claims = entity_data.get("claims", {})
-                    # Pull historical milestones
-                    b_year = extract_wikidata_year(claims, "P569") # Birth
-                    d_year = extract_wikidata_year(claims, "P570") # Death
-                    
-                    # Pull event milestones (Point in time, Inception, or Start Time)
-                    e_year = extract_wikidata_year(claims, "P585") or extract_wikidata_year(claims, "P571") or extract_wikidata_year(claims, "P580")
+                    b_year = extract_wikidata_year(claims, "P569")  # Birth Date
+                    d_year = extract_wikidata_year(claims, "P570")  # Death Date
+                    e_year = extract_wikidata_year(claims, "P585") or extract_wikidata_year(claims, "P571") or extract_wikidata_year(claims, "P580") # Point in time/Inception
                     
                     wikidata_dates[qid] = {"birth": b_year, "death": d_year, "event": e_year}
             except Exception:
                 pass 
 
-    # Re-map labels and overlay missing architectural temporal dates
+    # Backfill calendar targets onto entities
     for item in flat_entities:
         ent_clean_id = item["Entity ID"].replace("wd:", "").strip()
         
-        # Override dates if authentic structural records were fetched from the API
         if ent_clean_id in wikidata_dates:
             w_dates = wikidata_dates[ent_clean_id]
-            if item["NER Class"] == "Person":
+            if "Person" in item["NER Class"]:
                 if w_dates["birth"]: item["Target Year"] = w_dates["birth"]
                 if w_dates["death"]: item["End Year"] = w_dates["death"]
-            else: # Events / Orgs
+            else:
                 if w_dates["event"]: item["Target Year"] = w_dates["event"]
 
         for field in ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country"]:
@@ -191,7 +199,6 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 df, records_per_cohort = load_and_parse_jsonld()
 
 if df is not None:
-    # Sidebar Filters (Affects the data frame backing all views)
     st.sidebar.header("📊 Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
         "Select Historical Cohorts",
@@ -231,7 +238,6 @@ if df is not None:
             "🔍 Interactive Entity Explorer",
             "📈 Pipeline Quality Diagnostics"
         ])
-
         # --- GIS Map ---
         with tab1:
             st.subheader("Geospatial Entity Distribution")
