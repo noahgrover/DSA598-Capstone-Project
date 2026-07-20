@@ -288,38 +288,66 @@ if df is not None:
                 else:
                     st.info("No co-occurring data coordinates available for this configuration.")
         
-        # --- Tab 3: Chronological Eras & Trends (NEW) ---
+        # --- Tab 3: Archival Entity Constellation Timeline (NEW & UPDATED) ---
         with tab3:
-            st.subheader("Chronological Knowledge Graph Shifts")
-            st.markdown("Monitor how entity concentrations and mapping fidelity migrate across historical cohorts.")
+            st.subheader("⏳ Archival Entity Constellation Timeline")
+            st.markdown("""
+            This interactive visualization plots **every individual entity** as a distinct node mapped chronologically. 
+            Entities appearing in the same vertical column are temporally clustered within that cohort.
+            Adjust the drop-downs below to space out and color the nodes to locate specific cross-era patterns.
+            """)
             
-            # Sort cohorts alpha-numerically so timelines read left-to-right correctly
+            # Form controls to dynamically slice the visualization space
+            t_col1, t_col2 = st.columns(2)
+            with t_col1:
+                timeline_y = st.selectbox(
+                    "Group timeline vertically by:",
+                    options=["NER Class", "Resolution Type", "Confidence"],
+                    index=0
+                )
+            with t_col2:
+                timeline_color = st.selectbox(
+                    "Color entity nodes by:",
+                    options=["Visual Group", "Resolution Type", "Cohort"],
+                    index=0
+                )
+            
+            # Chronologically order cohorts alpha-numerically left-to-right
             sorted_cohort_order = sorted(list(df_filtered["Cohort"].unique()))
             
-            t_col1, t_col2 = st.columns(2)
-            
-            with t_col1:
-                st.markdown("#### NER Class Distribution Shifts Across Cohorts")
-                # Aggregate counts per cohort and semantic type
-                df_ner_time = df_filtered.groupby(["Cohort", "NER Class"]).size().reset_index(name="Mentions")
-                fig_ner_time = px.line(
-                    df_ner_time, x="Cohort", y="Mentions", color="NER Class",
-                    category_orders={"Cohort": sorted_cohort_order}, markers=True
-                )
-                fig_ner_time.update_layout(xaxis_title="Historical Cohorts", yaxis_title="Total Extracted Mentions")
-                st.plotly_chart(fig_ner_time, use_container_width=True)
-                
-            with t_col2:
-                st.markdown("#### Linking Strategy Yields Across Cohorts")
-                # Aggregate mapping strategy distributions across timelines
-                df_res_time = df_filtered.groupby(["Cohort", "Resolution Type"]).size().reset_index(name="Count")
-                fig_res_time = px.area(
-                    df_res_time, x="Cohort", y="Count", color="Resolution Type",
+            # Use standard scatter if plotting a continuous float like Confidence, otherwise use Strip plot for clean categorical spacing
+            if timeline_y == "Confidence":
+                fig_timeline = px.scatter(
+                    df_filtered,
+                    x="Cohort",
+                    y="Confidence",
+                    color=timeline_color,
+                    hover_name="Official Name",
+                    hover_data=["Surface Text", "NER Class", "Description"],
                     category_orders={"Cohort": sorted_cohort_order},
-                    color_discrete_map={"Wikidata Resolved": "#2ECC71", "NIL Clustered": "#3498DB", "Unlinked Entity": "#E74C3C"}
+                    height=600
                 )
-                fig_res_time.update_layout(xaxis_title="Historical Cohorts", yaxis_title="Resolution Split Count")
-                st.plotly_chart(fig_res_time, use_container_width=True)
+            else:
+                # px.strip automatically introduces horizontal jitter within categorical columns to make overlapping dots legible
+                fig_timeline = px.strip(
+                    df_filtered,
+                    x="Cohort",
+                    y=timeline_y,
+                    color=timeline_color,
+                    hover_name="Official Name",
+                    hover_data=["Surface Text", "Description"],
+                    category_orders={"Cohort": sorted_cohort_order},
+                    height=600
+                )
+                
+            fig_timeline.update_layout(
+                xaxis_title="Historical Timeline (Cohorts)",
+                yaxis_title=timeline_y,
+                showlegend=True
+            )
+            # Optimize node sizing and transparency to make tightly packed clusters visible
+            fig_timeline.update_traces(marker=dict(size=9, opacity=0.75, line=dict(width=0.5, color='White')))
+            st.plotly_chart(fig_timeline, use_container_width=True)
         
         
         # --- Tab 4: Search and Explore Directory ---
@@ -331,7 +359,7 @@ if df is not None:
                 df_display = df_display[df_display["Surface Text"].str.contains(search_query, case=False, na=False)]
             st.dataframe(df_display[["Entity ID", "Surface Text", "Official Name", "NER Class", "Resolution Type", "Confidence"]], use_container_width=True, hide_index=True)
 
-        # --- Tab 4: Pipeline Quality Diagnostics ---
+        # --- Tab 5: Pipeline Quality Diagnostics ---
         with tab5:
             st.subheader("Pipeline Quality & Resolution Diagnostics")
             
