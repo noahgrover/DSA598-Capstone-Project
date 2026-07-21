@@ -200,17 +200,6 @@ if df is not None:
         options=unique_cohorts,
         default=unique_cohorts
     )
-    # Place in sidebar or top navigation bar
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("### 📥 Archival Data Export")
-    csv_data = df_filtered.to_csv(index=False).encode('utf-8')
-    st.sidebar.download_button(
-        label="Export Filtered Subset (CSV)",
-        data=csv_data,
-        file_name="archival_knowledge_graph_subset.csv",
-        mime="text/csv",
-        use_container_width=True
-    )
 
     # Apply your sidebar filter mask to the main dataset
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
