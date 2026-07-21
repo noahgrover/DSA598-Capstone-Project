@@ -551,10 +551,22 @@ if df is not None:
                         st.markdown(f"### {entity_row['Icon']} {entity_row['Official Name']}")
                         st.caption(f"**ID:** `{entity_row['Entity ID']}` | **Class:** {entity_row['NER Class']} | **Cohort:** {entity_row['Cohort']}")
                         
-                        # Handle Image rendering if present
-                        if pd.notna(entity_row["Image URL"]) and str(entity_row["Image URL"]).strip():
-                            st.image(entity_row["Image URL"], use_container_width=True)
+                        # Handle Image rendering safely (handles strings, lists, dicts, or missing values)
+                        raw_img = entity_row.get("Image URL")
+                        
+                        # 1. Extract string if JSON-LD parsed image as a list or dict
+                        if isinstance(raw_img, list) and len(raw_img) > 0:
+                            raw_img = raw_img[0]
+                        if isinstance(raw_img, dict):
+                            raw_img = raw_img.get("schema:url", raw_img.get("@id", ""))
 
+                        # 2. Safely check if we have a valid non-empty image URL string
+                        if isinstance(raw_img, str) and raw_img.strip() and raw_img.strip().lower() not in ("none", "nan"):
+                            try:
+                                st.image(raw_img.strip(), use_container_width=True)
+                            except Exception:
+                                st.caption("🖼️ *(Image link present but unreachable)*")
+                        
                         # Description
                         st.markdown(f"**Description:** \n> {entity_row['Description']}")
                         
