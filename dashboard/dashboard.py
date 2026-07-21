@@ -540,7 +540,7 @@ if df is not None:
 # =========================================================================================================================================
     
     with tab3:
-        st.caption("Explore the distribution and intersection of demographic metadata from linked entities.")
+        st.caption("Analyze the distribution and intersection of demographic metadata from linked entities.")
         demo_options = [
             "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
             "Political Ideology", "Member Of", "Participant In"
@@ -657,7 +657,7 @@ if df is not None:
             
             # view switcher control
             map_view = st.radio(
-                "Select Map Display Mode:", 
+                "SELECT DISPLAY MODE:", 
                 options=["Weighted Markers", "Density Heatmap"], 
                 horizontal=True
             )
@@ -718,7 +718,7 @@ if df is not None:
     
     with tab5:
         st.caption("""
-        Explore the temporal distribution of graph entities through quantitative metrics, track cross-category historical triggers with a swimlane chart, and identify structural data gaps or historical surges with decadal node histograms.
+        View the temporal distribution of graph entities through quantitative metrics, track cross-category historical triggers with a swimlane chart, and identify structural data gaps or historical surges with decadal node histograms.
         """)
 
         # filter out records without a timestamp
@@ -763,7 +763,7 @@ if df is not None:
             st.markdown("---")
 
             # view 1 (swimlane)
-            st.caption("Look for vertical alignments across tracks to identify cross-category historical triggers.")
+            st.caption("Creates vertical alignments across tracks to identify cross-category historical triggers.")
 
             fig_macro = go.Figure()
             categories = df_time["NER Class"].unique()
@@ -836,17 +836,16 @@ if df is not None:
 # =========================================================================================================================================
 
     with tab6:
-        st.subheader("📈 Pipeline Quality Diagnostics & Model Benchmarks")
-        st.markdown("""
-        Assess structural accuracy, resolution efficacy, and metadata completeness across the extraction pipeline.
-        This includes empirical ground-truth benchmark evaluation (In-KB Linking, NIL Precision/Recall/F1, and Candidate Recall@5) 
+        st.caption("""
+        Assess structural accuracy, resolution efficacy, and metadata completeness across the extraction and linking pipeline.
+        This includes empirical ground-truth benchmark evaluation (in-knowledgebase [In-KB] Linking, NIL Precision/Recall/F1, and Candidate Recall@5) 
         segmented by historical archival cohort.
         """)
 
         if df_filtered.empty:
             st.info("No data available for quality diagnostics based on current filters.")
         else:
-            # 1. High-Level Quality & KPI Metric Highlights
+            # high level qulity and kpi metrics
             df_nil = df_filtered[df_filtered["Resolution Type"] == "NIL Clustered"]
             df_resolved = df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"]
             
@@ -866,9 +865,8 @@ if df is not None:
 
             st.markdown("---")
 
-            # 2. Section 1: Empirical Ground-Truth Model Benchmarks
-            st.markdown("### 🎯 Empirical Model Performance Benchmarks")
-            st.markdown("Ground-truth evaluation results across global baseline and segmented historical archival cohorts.")
+            # empirical model benchmarks
+            st.caption("Pipeline evaluation resulted compared to a human-annotated set of records.")
 
             benchmark_data = [
                 {
@@ -917,7 +915,7 @@ if df is not None:
             m_col1, m_col2 = st.columns([1, 1])
 
             with m_col1:
-                st.markdown("#### Cohort Metric Comparison")
+                st.markdown("### Cohort Metric Comparison")
                 
                 df_bench_melted = df_benchmarks.melt(
                     id_vars=["Scope / Cohort"],
@@ -926,7 +924,6 @@ if df is not None:
                     value_name="Score (%)"
                 )
                 
-                # Dedicated, 100% unique IBM Carbon Palette for benchmark metrics
                 BENCHMARK_COLOR_MAP = {
                     "Candidate Recall@5": "#EE5396",  # IBM Carbon Pink 50
                     "In-KB F1":           "#D2A100",  # IBM Carbon Gold 30
@@ -962,7 +959,7 @@ if df is not None:
                 st.plotly_chart(fig_bench, use_container_width=True)
 
             with m_col2:
-                st.markdown("#### Performance Matrix & Definitions")
+                st.markdown("### Performance Matrix & Definitions")
                 
                 metric_descriptions = {
                     "Candidate Recall@5": "Rate at which the true entity is retrieved within the top 5 search candidates.",
@@ -1000,7 +997,7 @@ if df is not None:
 
             st.markdown("---")
 
-            # 3. Section 2: Resolution Breakdown & NIL Cluster Deep-Dive
+            # resolution and clustering breakdown
             res_col1, res_col2 = st.columns(2)
 
             RESOLUTION_COLOR_MAP = {
@@ -1010,7 +1007,7 @@ if df is not None:
             }
 
             with res_col1:
-                st.markdown("#### Entity Resolution Distribution")
+                st.markdown("### Entity Resolution Distribution")
                 res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
                 fig_res = px.pie(
                     res_counts, 
@@ -1025,7 +1022,7 @@ if df is not None:
                 st.plotly_chart(fig_res, use_container_width=True)
 
             with res_col2:
-                st.markdown("#### Largest NIL Entity Clusters")
+                st.markdown("### Largest NIL Entity Clusters")
                 if not df_nil.empty:
                     top_nil = df_nil.groupby("Official Name").agg(
                         mentions=("Entity ID", "count"),
@@ -1052,11 +1049,11 @@ if df is not None:
 
             st.markdown("---")
 
-            # 4. Section 3: Model Confidence & Data Completeness
+            # model confidence and data completeness
             diag_col1, diag_col2 = st.columns(2)
 
             with diag_col1:
-                st.markdown("#### NER Model Confidence Distribution")
+                st.markdown("### NER Model Confidence Distribution")
                 fig_conf = px.histogram(
                     df_filtered, 
                     x="Confidence", 
@@ -1071,7 +1068,7 @@ if df is not None:
                 st.plotly_chart(fig_conf, use_container_width=True)
 
             with diag_col2:
-                st.markdown("#### Semantic Metadata Fill Rate (%)")
+                st.markdown("### Semantic Metadata Fill Rate (%)")
                 attributes = [
                     "Occupation", "Political Ideology", "Member Of", 
                     "Participant In", "Gender Identity", "Ethnic Group/Tribe", 
