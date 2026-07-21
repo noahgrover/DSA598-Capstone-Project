@@ -672,11 +672,11 @@ if df is not None:
             # 2. Section 1: Resolution Breakdown & NIL Cluster Deep-Dive
             res_col1, res_col2 = st.columns(2)
 
-            # IBM Color Map specifically for entity resolution statuses
+            # EXTENDED IBM CARBON PALETTE (Distinct Diagnostic Shades)
             RESOLUTION_COLOR_MAP = {
-                "Wikidata Resolved": "#648FFF",  # IBM Ultramarine
-                "NIL Clustered": "#785EF0",      # IBM Indigo
-                "Unlinked Entity": "#FE6100"     # IBM Orange
+                "Wikidata Resolved": "#009D9A",  # IBM Carbon Teal 40
+                "NIL Clustered": "#4589FF",      # IBM Carbon Cerulean / Blue 40
+                "Unlinked Entity": "#8D8D8D"     # IBM Carbon Cool Gray 50
             }
 
             with res_col1:
@@ -702,13 +702,13 @@ if df is not None:
                         cohort_span=("Cohort", "nunique")
                     ).reset_index().sort_values("mentions", ascending=False).head(8)
 
-                    # Used IBM Magenta (#DC267F) for cluster representation
+                    # IBM Carbon Deep Teal (#005D5D) for cluster representation
                     fig_nil = px.bar(
                         top_nil,
                         x="mentions",
                         y="Official Name",
                         orientation="h",
-                        color_discrete_sequence=["#DC267F"],
+                        color_discrete_sequence=["#005D5D"],
                         hover_data=["cohort_span"]
                     )
                     fig_nil.update_layout(
@@ -728,12 +728,12 @@ if df is not None:
 
             with diag_col1:
                 st.markdown("#### NER Model Confidence Distribution")
-                # Used IBM Deep Blue (#002D9C) for model diagnostics
+                # IBM Carbon Deep Violet (#491D8B) for confidence modeling
                 fig_conf = px.histogram(
                     df_filtered, 
                     x="Confidence", 
                     nbins=20, 
-                    color_discrete_sequence=["#002D9C"]
+                    color_discrete_sequence=["#491D8B"]
                 )
                 fig_conf.update_layout(
                     yaxis_title="Entity Count", 
@@ -755,13 +755,13 @@ if df is not None:
                 ]
                 
                 df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
-                # Used IBM Gold (#FFB000) for metadata completeness
+                # IBM Carbon Forest Green (#198038) for completeness metrics
                 fig_comp = px.bar(
                     df_comp, 
                     x="Fill Rate (%)", 
                     y="Attribute", 
                     orientation='h', 
-                    color_discrete_sequence=["#FFB000"]
+                    color_discrete_sequence=["#198038"]
                 )
                 fig_comp.update_xaxes(range=[0, 100])
                 fig_comp.update_layout(
