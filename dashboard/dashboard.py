@@ -247,8 +247,7 @@ if df is not None:
         st.markdown("---")
         st.markdown("""
         Search, filter, and inspect specific semantic nodes within the graph. Selecting an entity from the list of unique nodes on the right
-        will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.
-        """)
+        will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.""")
         st.markdown("---")
 
         if df_filtered.empty:
