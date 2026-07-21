@@ -199,7 +199,7 @@ if df is not None:
     }
 
     # sidebar filters
-    st.sidebar.header("Global Dashboard Filters")
+    st.sidebar.header("GLOBAL DASHBOARD FILTERS:")
     selected_cohorts = st.sidebar.pills(
     "Select historical cohort(s)",
     options=unique_cohorts,
