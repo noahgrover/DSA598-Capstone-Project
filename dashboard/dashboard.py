@@ -14,16 +14,21 @@ import networkx as nx
 
 # page configurations
 st.set_page_config(
-    page_title="Archival Knowledge Graph Analytics",
-    page_icon="🕸️",
+    page_title="Marginalized Metadata Enrichment",
+    page_icon="⚙",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-st.title("🕸️ Archival Entity Linking & Semantic Graph Dashboard")
+st.title("Marginalized Metadata Enrichment Dashboard")
 st.markdown("""
-This dashboard visualizes the structural and qualitative improvements introduced by our advanced NER,
-Linking, NIL Clustering, and W3C Semantic Enrichment pipeline.
+This dashboard visualizes the structural and qualitative improvements to flat archival metadata extracted from the Digital Publc Library of America. Our pipeline consists of the following steps:
+- Extracts the title and description fields from archival records,
+- Passes them into flattened JSON records,
+- Extracts named entities,
+- Locates viable Wikidata candidates,
+- Links correct candidate to entity
+- Produces enriched JSONLD for linked entities and clusters NIL (out-of-network) entities
 """)
 
 def extract_year_from_text(text):
