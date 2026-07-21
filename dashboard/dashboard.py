@@ -258,20 +258,12 @@ if df is not None:
                 df_geo_nodes["Mentions"].apply(lambda x: "s" if x > 1 else "") + ")"
             )
             
-            # 3. Interactive Map View Controls
-            ctrl_col1, ctrl_col2 = st.columns([2, 1])
-            with ctrl_col1:
-                map_view = st.radio(
-                    "Select Map Display Mode:", 
-                    options=["Weighted Markers", "Density Heatmap"], 
-                    horizontal=True
-                )
-            with ctrl_col2:
-                map_style = st.selectbox(
-                    "Base Map Tile Style:", 
-                    options=["open-street-map", "carto-positron", "carto-darkmatter"],
-                    index=0
-                )
+            # 3. View Switcher Control
+            map_view = st.radio(
+                "Select Map Display Mode:", 
+                options=["Weighted Markers", "Density Heatmap"], 
+                horizontal=True
+            )
             
             # 4. Conditional Map Rendering
             if map_view == "Weighted Markers":
@@ -296,7 +288,7 @@ if df is not None:
                     height=600
                 )
             else:
-                # Custom IBM Ultramarine sequential gradient for density display
+                # Custom IBM Ultramarine sequential gradient for dark theme map
                 fig_map = px.density_mapbox(
                     df_geo_nodes,
                     lat="Latitude",
@@ -312,11 +304,12 @@ if df is not None:
                     radius=22,
                     zoom=2,
                     height=600,
-                    color_continuous_scale=["#F4F6FF", "#648FFF", "#002D9C"]
+                    color_continuous_scale=["#161616", "#648FFF", "#785EF0", "#DC267F"]
                 )
             
+            # Hardcoded to carto-darkmatter tile style
             fig_map.update_layout(
-                mapbox_style=map_style,
+                mapbox_style="carto-darkmatter",
                 margin=dict(l=0, r=0, t=10, b=0)
             )
             st.plotly_chart(fig_map, use_container_width=True)
