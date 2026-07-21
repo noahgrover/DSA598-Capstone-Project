@@ -713,12 +713,11 @@ if df is not None:
             ]
             df_benchmarks = pd.DataFrame(benchmark_data)
 
-            m_col1, m_col2 = st.columns([3, 2])
+            m_col1, m_col2 = st.columns([1, 1]) # Adjusted to equal width for better table readability
 
             with m_col1:
                 st.markdown("#### Cohort Metric Comparison")
                 
-                # Reshape for grouped bar visualization
                 df_bench_melted = df_benchmarks.melt(
                     id_vars=["Scope / Cohort"],
                     value_vars=["Candidate Recall@5", "In-KB F1", "NIL F1"],
@@ -726,7 +725,6 @@ if df is not None:
                     value_name="Score (%)"
                 )
                 
-                # Dedicated, distinct IBM Carbon Palette for benchmarks
                 BENCHMARK_COLOR_MAP = {
                     "Candidate Recall@5": "#8A3FFC",  # IBM Carbon Purple 60
                     "In-KB F1":           "#1192E8",  # IBM Carbon Cyan 50
@@ -743,7 +741,6 @@ if df is not None:
                     height=320
                 )
                 
-                # Add horizontal reference line at 75%
                 fig_bench.add_hline(
                     y=75,
                     line_dash="dash",
@@ -763,14 +760,42 @@ if df is not None:
                 st.plotly_chart(fig_bench, use_container_width=True)
 
             with m_col2:
-                st.markdown("#### Full Performance Matrix")
-                df_display = df_benchmarks.copy()
-                for col in df_display.columns:
-                    if col != "Scope / Cohort":
-                        df_display[col] = df_display[col].apply(lambda x: f"{x:.2f}%")
+                st.markdown("#### Performance Matrix & Definitions")
+                
+                # 1. Define plain-English descriptions for the metrics
+                metric_descriptions = {
+                    "Candidate Recall@5": "Rate at which the true entity is retrieved within the top 5 search candidates.",
+                    "In-KB Precision": "Accuracy: % of pipeline-assigned Wikidata links that are historically correct.",
+                    "In-KB Recall": "Coverage: % of actual Wikidata entities successfully captured and linked.",
+                    "In-KB F1": "Harmonic mean of In-KB Precision and Recall (Overall linking performance).",
+                    "NIL Precision": "Accuracy: % of local unlinked entity clusters that are correctly grouped.",
+                    "NIL Recall": "Coverage: % of actual unlinked entities successfully grouped together.",
+                    "NIL F1": "Harmonic mean of NIL Precision and Recall (Overall clustering performance)."
+                }
+                
+                # 2. Transpose the dataframe: Metrics become rows, Cohorts become columns
+                df_matrix = df_benchmarks.set_index("Scope / Cohort").T.reset_index()
+                
+                # 3. Clean up the column headers for UI display
+                df_matrix.rename(columns={
+                    "index": "Metric",
+                    "GLOBAL BASELINE (All Cohorts)": "Global Baseline",
+                    "Cohort A (Racial/Ethnic Minorities)": "Cohort A",
+                    "Cohort B (LGBTQIA+ Histories)": "Cohort B",
+                    "Cohort C (Indigenous Populations)": "Cohort C"
+                }, inplace=True)
+                
+                # 4. Insert descriptions right next to the Metric name
+                df_matrix.insert(1, "Description", df_matrix["Metric"].map(metric_descriptions))
+                
+                # 5. Format numerical values cleanly with percentages
+                numeric_cols = ["Global Baseline", "Cohort A", "Cohort B", "Cohort C"]
+                for col in numeric_cols:
+                    if col in df_matrix.columns:
+                        df_matrix[col] = df_matrix[col].apply(lambda x: f"{x:.2f}%")
                 
                 st.dataframe(
-                    df_display,
+                    df_matrix,
                     use_container_width=True,
                     hide_index=True,
                     height=320
@@ -810,7 +835,6 @@ if df is not None:
                         cohort_span=("Cohort", "nunique")
                     ).reset_index().sort_values("mentions", ascending=False).head(8)
 
-                    # IBM Carbon Deep Teal (#005D5D)
                     fig_nil = px.bar(
                         top_nil,
                         x="mentions",
@@ -836,7 +860,6 @@ if df is not None:
 
             with diag_col1:
                 st.markdown("#### NER Model Confidence Distribution")
-                # IBM Carbon Deep Violet (#491D8B)
                 fig_conf = px.histogram(
                     df_filtered, 
                     x="Confidence", 
@@ -863,7 +886,6 @@ if df is not None:
                 ]
                 
                 df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
-                # IBM Carbon Forest Green (#198038)
                 fig_comp = px.bar(
                     df_comp, 
                     x="Fill Rate (%)", 
