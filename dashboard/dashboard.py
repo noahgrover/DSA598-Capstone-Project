@@ -20,49 +20,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown("""
-<style>
-/* 1. Make all filter field titles/labels bigger */
-[data-testid="stWidgetLabel"] p {
-    font-size: 1.2rem !important;
-    font-weight: 700 !important;
-}
-
-/* 2. Enlarge Selectbox (Dropdowns) and MultiSelect boxes */
-[data-testid="stSelectbox"] > div, 
-[data-testid="stMultiSelect"] > div {
-    min-height: 56px !important;
-}
-
-/* 3. Increase font size of text INSIDE dropdowns & search inputs */
-[data-baseweb="select"] *, [data-testid="stTextInput"] input {
-    font-size: 18px !important;
-}
-
-/* 4. Enlarge selected tags/pills inside MultiSelect filters */
-[data-baseweb="tag"] {
-    height: 36px !important;
-    font-size: 16px !important;
-}
-
-/* 5. Enlarge Radio Filter buttons (e.g. Map Display Mode) */
-[data-testid="stRadio"] div[role="radiogroup"] {
-    gap: 12px !important;
-}
-
-[data-testid="stRadio"] div[role="radiogroup"] label {
-    padding: 10px 18px !important;
-    border-radius: 8px !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
-}
-
-[data-testid="stRadio"] div[role="radiogroup"] label p {
-    font-size: 17px !important;
-    font-weight: 600 !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 st.title("Marginalized Metadata Enrichment: Dashboard")
 st.markdown("""
 This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:
