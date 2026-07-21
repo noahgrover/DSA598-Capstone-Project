@@ -23,12 +23,12 @@ st.set_page_config(
 st.title("MARGINALIZED METADATA ENRICHMENT: DASHBOARD")
 st.markdown("""
 This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:
-- Extracts title and description fields from digital records stored in DPLA;
-- Passes them into flattened JSON records;
-- Recognizes and extracts named entities;
-- Locates viable Wikidata candidates;
-- Links the correct candidate to each entity;
-- Produces enriched JSONLD for linked entities and clusters NIL (out-of-network) entities.
+1. Extracts title and description fields from digital records stored in DPLA;
+2. Passes them into flattened JSON records;
+3. Recognizes and extracts named entities;
+4. Locates viable Wikidata candidates;
+5. Links the correct candidate to each entity;
+6. Produces enriched JSONLD for linked entities and clusters NIL (out-of-network) entities.
 """)
 
 def extract_year_from_text(text):
@@ -540,136 +540,104 @@ if df is not None:
                     st.error(f"Error rendering network topology: {str(e)}")
         
 # =========================================================================================================================================
-# Tab 3 : 
+# Tab 3: Demographic Analysis
 # =========================================================================================================================================
     
     with tab3:
-        st.subheader("⏳ Chronological Distribution & Historical Velocity")
-        st.markdown("""
-        This layout pairs your high-level category swimlanes with macro temporal metrics 
-        and velocity tracking to show exactly where your archive aggregates in time.
-        """)
-
-        # Filter out records without a timestamp
-        df_time = df_filtered[df_filtered["Target Year"].notna()].copy()
-
-        if df_time.empty:
-            st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
+        st.subheader("Archival Intersectionality & Metadata Distributions")
+        
+        st.markdown("### 📊 Dynamic Metadata Profiler")
+        demo_options = [
+            "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
+            "Political Ideology", "Member Of", "Participant In"
+        ]
+        selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
+        
+        df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
+        
+        if not df_demo.empty:
+            df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
+            df_demo = df_demo.explode(selected_demo)
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
+                top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
+                
+                # FIX 1: Swapped out random green for official IBM Magenta 50 (#DC267F)
+                fig_demo = px.bar(
+                    top_10, 
+                    x="count", 
+                    y=selected_demo, 
+                    orientation='h', 
+                    color_discrete_sequence=["#DC267F"] 
+                )
+                fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_demo, use_container_width=True)
+                
+            with col2:
+                st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
+                cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
+                cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
+                fig_cohort = px.bar(
+                    cohort_counts, 
+                    x="count", 
+                    y=selected_demo, 
+                    color="Cohort", 
+                    orientation='h', 
+                    barmode="stack",
+                    color_discrete_map=COHORT_COLOR_MAP
+                )
+                fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_cohort, use_container_width=True)
         else:
-            # Force uniform types for chronological calculations
-            df_time["Target Year"] = df_time["Target Year"].astype(int)
-            df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
+            st.info(f"No extracted data found for '{selected_demo}' within the selected filters.")
             
-            # ==========================================
-            # QUANTITATIVE TEMPORAL METRICS
-            # ==========================================
-            with st.container(border=True):
-                t_col1, t_col2, t_col3, t_col4 = st.columns(4)
+        st.markdown("---")
+        
+        st.markdown("### 🔀 Intersectionality Matrix")
+        st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
+        
+        cx_col1, cx_col2 = st.columns(2)
+        with cx_col1:
+            attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
+        with cx_col2:
+            attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
+            
+        if attr_x == attr_y:
+            st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
+        else:
+            df_cross = df_filtered[[attr_x, attr_y]].dropna()
+            if not df_cross.empty:
+                df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
+                df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
                 
-                # 1. Total absolute era coverage
-                start_era = int(df_time["Target Year"].min())
-                end_era = int(df_time["Target Year"].max())
-                t_col1.metric("Chronological Span", f"{start_era} – {end_era}")
+                top_x_items = df_cross[attr_x].value_counts().head(8).index
+                top_y_items = df_cross[attr_y].value_counts().head(8).index
+                df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
                 
-                # 2. Average lifespan of historical actors (excluding events)
-                df_lifespan = df_time[df_time["End Year"].notna() & (~df_time["NER Class"].str.contains("Event", na=False))].copy()
-                if not df_lifespan.empty:
-                    avg_life = int((df_lifespan["End Year"].astype(int) - df_lifespan["Target Year"]).mean())
-                    t_col2.metric("Avg. Entity Lifespan", f"{avg_life} Years")
-                else:
-                    t_col2.metric("Avg. Entity Lifespan", "Static / N/A")
-                
-                # 3. Mode calculation for historical density concentration
-                df_time["Decade"] = (df_time["Target Year"] // 10) * 10
-                peak_decade = df_time["Decade"].mode()
-                if not peak_decade.empty:
-                    t_col3.metric("Peak Active Decade", f"{int(peak_decade.iloc[0])}s")
-                else:
-                    t_col3.metric("Peak Active Decade", "N/A")
+                if not df_cross_filtered.empty:
+                    cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
                     
-                # 4. Total count of milestone incidents
-                total_events = df_time["NER Class"].str.contains("Event", na=False).sum()
-                t_col4.metric("Point-in-Time Events", f"{total_events} Milestones")
-
-            st.markdown("---")
-
-            # ==========================================
-            # VIEW 1: MACRO SWIMLANES (Enforcing Master Palette)
-            # ==========================================
-            st.markdown("### 🗺️ Macro Density Swimlanes")
-            st.markdown("_Look for vertical alignments across tracks to identify cross-category historical triggers._")
-
-            fig_macro = go.Figure()
-            categories = df_time["NER Class"].unique()
-            
-            for cat in categories:
-                df_cat = df_time[df_time["NER Class"] == cat]
-                hover_texts = [
-                    f"<b>{row['Timeline Label']}</b><br>Cohort: {row['Cohort']}<br>Start: {row['Target Year']}<br>Desc: {row['Description']}"
-                    for _, row in df_cat.iterrows()
-                ]
-
-                # Grab the locked color from our global master dictionary
-                assigned_color = IBM_LABEL_COLOR_MAP.get(cat, IBM_LABEL_COLOR_MAP["Thing"])
-
-                fig_macro.add_trace(go.Scatter(
-                    x=df_cat["Target Year"],
-                    y=[cat] * len(df_cat),
-                    mode="markers",
-                    marker=dict(
-                        size=16, 
-                        symbol="diamond" if "Event" in cat else "circle", 
-                        color=assigned_color,
-                        line=dict(width=1, color="white")
-                    ),
-                    text=hover_texts,
-                    hoverinfo="text",
-                    name=cat
-                ))
-
-            fig_macro.update_layout(
-                xaxis_title="Calendar Year (Absolute Axis)",
-                yaxis_title="Semantic Swimlanes",
-                height=280,
-                margin=dict(l=150, r=20, t=20, b=40),
-                showlegend=True,
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-            )
-            st.plotly_chart(fig_macro, use_container_width=True)
-
-            st.markdown("---")
-
-            # ==========================================
-            # VIEW 2: HISTORICAL PULSE (Enforcing Master Palette)
-            # ==========================================
-            st.markdown("### 📈 Historical Velocity (Decadal Node Density)")
-            st.markdown("_Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges._")
-            
-            # Group by decade and type to showcase stacked composition over time
-            decade_counts = df_time.groupby(["Decade", "NER Class"]).size().reset_index(name="Node Count")
-            decade_counts["Decade Display"] = decade_counts["Decade"].astype(str) + "s"
-            decade_counts = decade_counts.sort_values("Decade")
-
-            fig_pulse = px.bar(
-                decade_counts,
-                x="Decade Display",
-                y="Node Count",
-                color="NER Class",
-                barmode="stack",
-                color_discrete_map=IBM_LABEL_COLOR_MAP, 
-                height=350
-            )
-            
-            fig_pulse.update_layout(
-                xaxis_title="Historical Decades",
-                yaxis_title="Entities Introduced",
-                legend_title_text="Entity Class",
-                margin=dict(l=40, r=20, t=20, b=40)
-            )
-            st.plotly_chart(fig_pulse, use_container_width=True)
+                    # FIX 2: Swapped out "Viridis" for a high-contrast, single-hue IBM Ultramarine sequence
+                    # Transitions cleanly from a neutral off-white background right up to dominant IBM Blue
+                    fig_heatmap = px.density_heatmap(
+                        cross_matrix, 
+                        x=attr_x, 
+                        y=attr_y, 
+                        z="Co-occurrences",
+                        text_auto=True,
+                        color_continuous_scale=["#F4F6FF", "#648FFF", "#002D9C"]
+                    )
+                    fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
+                    st.plotly_chart(fig_heatmap, use_container_width=True)
+                else:
+                    st.info("No explicit intersections found for the top elements of these attributes.")
+            else:
+                st.info("No co-occurring data coordinates available for this configuration.")
 
 # =========================================================================================================================================
-# Tab 4 : 
+# Tab 4: Geospatial Map 
 # =========================================================================================================================================
     
     with tab4:
@@ -755,10 +723,133 @@ if df is not None:
             st.info("No geospatial coordinates found for the selected entity filters.")
 
 # =========================================================================================================================================
-# Tab 5 : 
+# Tab 5: Timeline 
 # =========================================================================================================================================
     
     with tab5:
+        st.subheader("⏳ Chronological Distribution & Historical Velocity")
+        st.markdown("""
+        This layout pairs your high-level category swimlanes with macro temporal metrics 
+        and velocity tracking to show exactly where your archive aggregates in time.
+        """)
+
+        # Filter out records without a timestamp
+        df_time = df_filtered[df_filtered["Target Year"].notna()].copy()
+
+        if df_time.empty:
+            st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
+        else:
+            # Force uniform types for chronological calculations
+            df_time["Target Year"] = df_time["Target Year"].astype(int)
+            df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
+            
+            # quantitative temporal metrics
+            with st.container(border=True):
+                t_col1, t_col2, t_col3, t_col4 = st.columns(4)
+                
+                # 1. Total absolute era coverage
+                start_era = int(df_time["Target Year"].min())
+                end_era = int(df_time["Target Year"].max())
+                t_col1.metric("Chronological Span", f"{start_era} – {end_era}")
+                
+                # 2. Average lifespan of historical actors (excluding events)
+                df_lifespan = df_time[df_time["End Year"].notna() & (~df_time["NER Class"].str.contains("Event", na=False))].copy()
+                if not df_lifespan.empty:
+                    avg_life = int((df_lifespan["End Year"].astype(int) - df_lifespan["Target Year"]).mean())
+                    t_col2.metric("Avg. Entity Lifespan", f"{avg_life} Years")
+                else:
+                    t_col2.metric("Avg. Entity Lifespan", "Static / N/A")
+                
+                # 3. Mode calculation for historical density concentration
+                df_time["Decade"] = (df_time["Target Year"] // 10) * 10
+                peak_decade = df_time["Decade"].mode()
+                if not peak_decade.empty:
+                    t_col3.metric("Peak Active Decade", f"{int(peak_decade.iloc[0])}s")
+                else:
+                    t_col3.metric("Peak Active Decade", "N/A")
+                    
+                # 4. Total count of milestone incidents
+                total_events = df_time["NER Class"].str.contains("Event", na=False).sum()
+                t_col4.metric("Point-in-Time Events", f"{total_events} Milestones")
+
+            st.markdown("---")
+
+            # view 1 (swimlane)
+            st.markdown("### 🗺️ Macro Density Swimlanes")
+            st.markdown("_Look for vertical alignments across tracks to identify cross-category historical triggers._")
+
+            fig_macro = go.Figure()
+            categories = df_time["NER Class"].unique()
+            
+            for cat in categories:
+                df_cat = df_time[df_time["NER Class"] == cat]
+                hover_texts = [
+                    f"<b>{row['Timeline Label']}</b><br>Cohort: {row['Cohort']}<br>Start: {row['Target Year']}<br>Desc: {row['Description']}"
+                    for _, row in df_cat.iterrows()
+                ]
+
+                # Grab the locked color from our global master dictionary
+                assigned_color = IBM_LABEL_COLOR_MAP.get(cat, IBM_LABEL_COLOR_MAP["Thing"])
+
+                fig_macro.add_trace(go.Scatter(
+                    x=df_cat["Target Year"],
+                    y=[cat] * len(df_cat),
+                    mode="markers",
+                    marker=dict(
+                        size=16, 
+                        symbol="diamond" if "Event" in cat else "circle", 
+                        color=assigned_color,
+                        line=dict(width=1, color="white")
+                    ),
+                    text=hover_texts,
+                    hoverinfo="text",
+                    name=cat
+                ))
+
+            fig_macro.update_layout(
+                xaxis_title="Calendar Year (Absolute Axis)",
+                yaxis_title="Semantic Swimlanes",
+                height=280,
+                margin=dict(l=150, r=20, t=20, b=40),
+                showlegend=True,
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            )
+            st.plotly_chart(fig_macro, use_container_width=True)
+
+            st.markdown("---")
+
+            # view 2 (historical pulse)
+            st.markdown("### 📈 Historical Velocity (Decadal Node Density)")
+            st.markdown("_Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges._")
+            
+            # Group by decade and type to showcase stacked composition over time
+            decade_counts = df_time.groupby(["Decade", "NER Class"]).size().reset_index(name="Node Count")
+            decade_counts["Decade Display"] = decade_counts["Decade"].astype(str) + "s"
+            decade_counts = decade_counts.sort_values("Decade")
+
+            fig_pulse = px.bar(
+                decade_counts,
+                x="Decade Display",
+                y="Node Count",
+                color="NER Class",
+                barmode="stack",
+                color_discrete_map=IBM_LABEL_COLOR_MAP, 
+                height=350
+            )
+            
+            fig_pulse.update_layout(
+                xaxis_title="Historical Decades",
+                yaxis_title="Entities Introduced",
+                legend_title_text="Entity Class",
+                margin=dict(l=40, r=20, t=20, b=40)
+            )
+            st.plotly_chart(fig_pulse, use_container_width=True)
+    
+# =========================================================================================================================================
+# Tab 6: Pipeline Quality Diagnostics
+# =========================================================================================================================================
+
+    with tab6:
         st.subheader("📈 Pipeline Quality Diagnostics & Model Benchmarks")
         st.markdown("""
         Assess structural accuracy, resolution efficacy, and metadata completeness across the extraction pipeline.
@@ -1019,99 +1110,3 @@ if df is not None:
                     margin=dict(t=30, b=10, l=10, r=10)
                 )
                 st.plotly_chart(fig_comp, use_container_width=True)
-# =========================================================================================================================================
-# Tab 6: 
-# =========================================================================================================================================
-
-    with tab6:
-        st.subheader("Archival Intersectionality & Metadata Distributions")
-        
-        st.markdown("### 📊 Dynamic Metadata Profiler")
-        demo_options = [
-            "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
-            "Political Ideology", "Member Of", "Participant In"
-        ]
-        selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
-        
-        df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
-        
-        if not df_demo.empty:
-            df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
-            df_demo = df_demo.explode(selected_demo)
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
-                top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
-                
-                # FIX 1: Swapped out random green for official IBM Magenta 50 (#DC267F)
-                fig_demo = px.bar(
-                    top_10, 
-                    x="count", 
-                    y=selected_demo, 
-                    orientation='h', 
-                    color_discrete_sequence=["#DC267F"] 
-                )
-                fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
-                st.plotly_chart(fig_demo, use_container_width=True)
-                
-            with col2:
-                st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
-                cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
-                cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
-                fig_cohort = px.bar(
-                    cohort_counts, 
-                    x="count", 
-                    y=selected_demo, 
-                    color="Cohort", 
-                    orientation='h', 
-                    barmode="stack",
-                    color_discrete_map=COHORT_COLOR_MAP
-                )
-                fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
-                st.plotly_chart(fig_cohort, use_container_width=True)
-        else:
-            st.info(f"No extracted data found for '{selected_demo}' within the selected filters.")
-            
-        st.markdown("---")
-        
-        st.markdown("### 🔀 Intersectionality Matrix")
-        st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
-        
-        cx_col1, cx_col2 = st.columns(2)
-        with cx_col1:
-            attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
-        with cx_col2:
-            attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
-            
-        if attr_x == attr_y:
-            st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
-        else:
-            df_cross = df_filtered[[attr_x, attr_y]].dropna()
-            if not df_cross.empty:
-                df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
-                df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
-                
-                top_x_items = df_cross[attr_x].value_counts().head(8).index
-                top_y_items = df_cross[attr_y].value_counts().head(8).index
-                df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
-                
-                if not df_cross_filtered.empty:
-                    cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
-                    
-                    # FIX 2: Swapped out "Viridis" for a high-contrast, single-hue IBM Ultramarine sequence
-                    # Transitions cleanly from a neutral off-white background right up to dominant IBM Blue
-                    fig_heatmap = px.density_heatmap(
-                        cross_matrix, 
-                        x=attr_x, 
-                        y=attr_y, 
-                        z="Co-occurrences",
-                        text_auto=True,
-                        color_continuous_scale=["#F4F6FF", "#648FFF", "#002D9C"]
-                    )
-                    fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
-                    st.plotly_chart(fig_heatmap, use_container_width=True)
-                else:
-                    st.info("No explicit intersections found for the top elements of these attributes.")
-            else:
-                st.info("No co-occurring data coordinates available for this configuration.")
