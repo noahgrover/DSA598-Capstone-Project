@@ -866,7 +866,7 @@ if df is not None:
             st.markdown("---")
 
             # empirical model benchmarks
-            st.caption("Pipeline evaluation resulted compared to a human-annotated set of records.")
+            st.caption("Extraction and linking pipeline evaluation metrics compared to a human-annotated set of records.")
 
             benchmark_data = [
                 {
