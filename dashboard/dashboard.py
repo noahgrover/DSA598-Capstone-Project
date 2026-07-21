@@ -633,139 +633,64 @@ if df is not None:
                             wd_url = f"https://www.wikidata.org/wiki/{selected_row['Entity ID'].replace('wd:', '')}"
                             st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
                             
-   # --- Tab 5: Pipeline Quality Diagnostics ---
-    with tab5:
-        st.subheader("📈 Pipeline Quality Diagnostics & NIL Cluster Analytics")
-        st.markdown("""
-        Assess structural accuracy, resolution efficacy, and metadata completeness across the extraction pipeline.
-        This includes deep-dive metrics into **NIL (Not-In-Lexicon) clustering**—grouping local, unlinked entities across the archive.
-        """)
+   
 
-        if df_filtered.empty:
-            st.info("No data available for quality diagnostics based on current filters.")
-        else:
-            # 1. High-Level Quality & NIL Metrics
-            df_nil = df_filtered[df_filtered["Resolution Type"] == "NIL Clustered"]
-            df_resolved = df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"]
-            df_unlinked = df_filtered[df_filtered["Resolution Type"] == "Unlinked Entity"]
-            
-            total_mentions = len(df_filtered)
-            nil_mentions_count = len(df_nil)
-            unique_nil_clusters = df_nil["Entity ID"].nunique()
-            
-            # Clustering Efficiency: % of non-Wikidata entities successfully grouped into local clusters
-            total_non_wikidata = nil_mentions_count + len(df_unlinked)
-            nil_cluster_efficiency = (nil_mentions_count / total_non_wikidata * 100) if total_non_wikidata > 0 else 0
-            
-            avg_conf = df_filtered["Confidence"].mean() if "Confidence" in df_filtered and not df_filtered["Confidence"].isna().all() else 0.0
+Scope / Cohort
+Candidate Recall@5
+In-KB Precision
+In-KB Recall
+In-KB F1
+NIL Precision
+NIL Recall
+NIL F1
+0
+GLOBAL BASELINE (All Cohorts)
+72.06%
+92.54%
+72.37%
+81.22%
+84.06%
+84.06%
+84.06%
 
-            with st.container(border=True):
-                q1, q2, q3, q4, q5 = st.columns(5)
-                with q1: st.metric("Wikidata Linking Rate", f"{(len(df_resolved)/total_mentions*100):.1f}%")
-                with q2: st.metric("Total NIL Mentions", nil_mentions_count)
-                with q3: st.metric("Unique NIL Clusters", unique_nil_clusters)
-                with q4: st.metric("NIL Clustering Efficiency", f"{nil_cluster_efficiency:.1f}%")
-                with q5: st.metric("Avg NER Confidence", f"{avg_conf:.2f}")
+[RESULTS SEGMENTED BY ARCHIVAL COHORT]
 
-            st.markdown("---")
 
-            # 2. Section 1: Resolution Breakdown & NIL Cluster Deep-Dive
-            res_col1, res_col2 = st.columns(2)
 
-            # EXTENDED IBM CARBON PALETTE (Distinct Diagnostic Shades)
-            RESOLUTION_COLOR_MAP = {
-                "Wikidata Resolved": "#009D9A",  # IBM Carbon Teal 40
-                "NIL Clustered": "#4589FF",      # IBM Carbon Cerulean / Blue 40
-                "Unlinked Entity": "#8D8D8D"     # IBM Carbon Cool Gray 50
-            }
+Scope / Cohort
+Candidate Recall@5
+In-KB Precision
+In-KB Recall
+In-KB F1
+NIL Precision
+NIL Recall
+NIL F1
+1
+Cohort B (LGBTQIA+ Histories)
+86.59%
+94.59%
+89.74%
+92.11%
+80.70%
+80.70%
+80.70%
+0
+Cohort A (Racial/Ethnic Minorities)
+66.29%
+94.92%
+65.12%
+77.24%
+84.21%
+84.21%
+84.21%
+2
+Cohort C (Indigenous Populations)
+65.35%
+88.24%
+64.52%
+74.53%
+91.67%
+91.67%
+91.67%
 
-            with res_col1:
-                st.markdown("#### Entity Resolution Distribution")
-                res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
-                fig_res = px.pie(
-                    res_counts, 
-                    values="count", 
-                    names="Resolution Type", 
-                    color="Resolution Type",
-                    color_discrete_map=RESOLUTION_COLOR_MAP,
-                    hole=0.4
-                )
-                fig_res.update_traces(textposition='inside', textinfo='percent+label')
-                fig_res.update_layout(showlegend=False, margin=dict(t=30, b=10, l=10, r=10))
-                st.plotly_chart(fig_res, use_container_width=True)
 
-            with res_col2:
-                st.markdown("#### Largest NIL Entity Clusters")
-                if not df_nil.empty:
-                    top_nil = df_nil.groupby("Official Name").agg(
-                        mentions=("Entity ID", "count"),
-                        cohort_span=("Cohort", "nunique")
-                    ).reset_index().sort_values("mentions", ascending=False).head(8)
-
-                    # IBM Carbon Deep Teal (#005D5D) for cluster representation
-                    fig_nil = px.bar(
-                        top_nil,
-                        x="mentions",
-                        y="Official Name",
-                        orientation="h",
-                        color_discrete_sequence=["#005D5D"],
-                        hover_data=["cohort_span"]
-                    )
-                    fig_nil.update_layout(
-                        yaxis={'categoryorder':'total ascending'},
-                        xaxis_title="Mentions in Cluster",
-                        yaxis_title="NIL Cluster Entity",
-                        margin=dict(t=30, b=10, l=10, r=10)
-                    )
-                    st.plotly_chart(fig_nil, use_container_width=True)
-                else:
-                    st.info("No NIL clustered entities present in current selection.")
-
-            st.markdown("---")
-
-            # 3. Section 2: Model Confidence & Data Completeness
-            diag_col1, diag_col2 = st.columns(2)
-
-            with diag_col1:
-                st.markdown("#### NER Model Confidence Distribution")
-                # IBM Carbon Deep Violet (#491D8B) for confidence modeling
-                fig_conf = px.histogram(
-                    df_filtered, 
-                    x="Confidence", 
-                    nbins=20, 
-                    color_discrete_sequence=["#491D8B"]
-                )
-                fig_conf.update_layout(
-                    yaxis_title="Entity Count", 
-                    xaxis_title="Confidence Score (0.0 - 1.0)",
-                    margin=dict(t=30, b=10, l=10, r=10)
-                )
-                st.plotly_chart(fig_conf, use_container_width=True)
-
-            with diag_col2:
-                st.markdown("#### Semantic Metadata Fill Rate (%)")
-                attributes = [
-                    "Occupation", "Political Ideology", "Member Of", 
-                    "Participant In", "Gender Identity", "Ethnic Group/Tribe", 
-                    "Religion", "Country", "VIAF Link"
-                ]
-                completeness = [
-                    (df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 
-                    for col in attributes
-                ]
-                
-                df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
-                # IBM Carbon Forest Green (#198038) for completeness metrics
-                fig_comp = px.bar(
-                    df_comp, 
-                    x="Fill Rate (%)", 
-                    y="Attribute", 
-                    orientation='h', 
-                    color_discrete_sequence=["#198038"]
-                )
-                fig_comp.update_xaxes(range=[0, 100])
-                fig_comp.update_layout(
-                    yaxis={'categoryorder':'total ascending'},
-                    margin=dict(t=30, b=10, l=10, r=10)
-                )
-                st.plotly_chart(fig_comp, use_container_width=True)
