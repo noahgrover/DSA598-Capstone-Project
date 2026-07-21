@@ -501,7 +501,7 @@ if df is not None:
                 res_options = ["All Resolutions"] + list(df_filtered["Resolution Type"].dropna().unique())
                 selected_res = st.selectbox("Filter Explorer by Resolution:", options=res_options)
 
-            # Apply Search Filters First
+            # Apply Search Filters
             df_exp = df_filtered.copy()
             if search_query:
                 df_exp = df_exp[
@@ -523,9 +523,12 @@ if df is not None:
                 df_nodes["Mentions"] = df_nodes["Entity ID"].map(mention_counts)
                 df_nodes = df_nodes.sort_values(by="Mentions", ascending=False)
 
-                # 3. Split Master-Detail Layout
-                master_col, detail_col = st.columns([3, 2])
+                # =========================================================
+                # 3. REORDERED SPLIT LAYOUT (Entity Card First - 60% Width)
+                # =========================================================
+                detail_col, master_col = st.columns([3, 2])
 
+                # Process selection on the right column first to obtain `selected_row`
                 with master_col:
                     st.markdown(f"**Unique Graph Nodes ({len(df_nodes)})**")
                     
@@ -547,14 +550,14 @@ if df is not None:
                     st.dataframe(
                         df_table_view, 
                         use_container_width=True, 
-                        height=400,
+                        height=520,
                         hide_index=True
                     )
 
+                # Render the detailed Entity Profile Card on the left (first position)
                 with detail_col:
                     selected_row = df_nodes[df_nodes["Select Label"] == selected_label].iloc[0]
 
-                    # 4. Render the Selected Entity Profile Card
                     with st.container(border=True):
                         # Title Header Block
                         st.markdown(f"### {selected_row['Icon']} {selected_row['Official Name']}")
@@ -583,7 +586,7 @@ if df is not None:
                         st.markdown("---")
                         st.markdown("**Graph Attributes & Linked Assertions:**")
 
-                        # Attribute display grid
+                        # Metadata display grid
                         metadata_fields = {
                             "Primary Mention Text": selected_row["Surface Text"],
                             "Timeline Active Bounds": f"{selected_row['Target Year'] or '???'} – {selected_row['End Year'] or '???'}",
@@ -603,13 +606,10 @@ if df is not None:
                             if pd.notna(val) and str(val).strip() and val != "??? – ???":
                                 st.markdown(f"**{label}:** {val}")
 
-                        # =========================================================
-                        # 5. NEW: CORPUS OCCURRENCES & PROVENANCE BREAKDOWN
-                        # =========================================================
                         st.markdown("---")
                         st.markdown("**📄 Corpus Mentions & Provenance:**")
 
-                        # Look up all mentions in the active cohort dataset for this Entity ID
+                        # Look up all mentions in active cohort dataset for this Entity ID
                         all_mentions = df_filtered[df_filtered["Entity ID"] == selected_row["Entity ID"]]
 
                         # Surface text variations across documents
