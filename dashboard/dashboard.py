@@ -284,19 +284,17 @@ if df is not None:
                 df_nodes["Mentions"] = df_nodes["Entity ID"].map(mention_counts)
                 df_nodes = df_nodes.sort_values(by="Mentions", ascending=False).reset_index(drop=True)
 
-                # =========================================================
-                # 3. SPLIT LAYOUT (Entity Card Left - 60%, Table Right - 40%)
-                # =========================================================
+                # splits layout
                 detail_col, master_col = st.columns([3, 2])
 
-                # Render master selection table on the right column
+                # render master selection table on the right column
                 with master_col:
                     st.markdown(f"**Unique Graph Nodes ({len(df_nodes)})**")
                     st.caption("💡 *Click any row in the table to inspect its dossier on the left.*")
 
                     df_table_view = df_nodes[["Icon", "Official Name", "NER Class", "Mentions", "Resolution Type"]].copy()
 
-                    # Interactive Dataframe with native row selection
+                    # interactive dataframe with native row selection
                     selection_event = st.dataframe(
                         df_table_view, 
                         use_container_width=True, 
@@ -306,12 +304,12 @@ if df is not None:
                         selection_mode="single-row"
                     )
 
-                    # Default to row index 0 if nothing selected
+                    # default to row index 0 if nothing selected
                     selected_index = 0
                     if hasattr(selection_event, "selection") and selection_event.selection and selection_event.selection.rows:
                         selected_index = selection_event.selection.rows[0]
 
-                # Render the detailed Entity Profile Card on the left (first position)
+                # render the detailed entity profile card on the left
                 with detail_col:
                     selected_row = df_nodes.iloc[selected_index]
 
@@ -324,7 +322,7 @@ if df is not None:
                             f"**Total Mentions:** {selected_row.get('Mentions', 1)}"
                         )
 
-                        # Type-safe image rendering with constrained size (180px)
+                        # image rendering with size constraints
                         raw_img = selected_row.get("Image URL")
                         if isinstance(raw_img, list) and len(raw_img) > 0:
                             raw_img = raw_img[0]
@@ -337,14 +335,14 @@ if df is not None:
                             except Exception:
                                 st.caption("🖼️ *(Image link present but unreachable)*")
 
-                        # Description
+                        # description
                         if pd.notna(selected_row.get('Description')) and str(selected_row.get('Description')).strip():
                             st.markdown(f"**Description:** \n> {selected_row['Description']}")
 
                         st.markdown("---")
                         st.markdown("**Graph Attributes & Linked Assertions:**")
 
-                        # Metadata display grid
+                        # metadata display grid
                         target_yr = selected_row.get('Target Year')
                         end_yr = selected_row.get('End Year')
                         time_bounds = f"{target_yr if pd.notna(target_yr) else '???'} – {end_yr if pd.notna(end_yr) else '???'}"
@@ -370,16 +368,16 @@ if df is not None:
                         st.markdown("---")
                         st.markdown("**📄 Corpus Mentions & Provenance:**")
 
-                        # Look up all mentions in active cohort dataset for this Entity ID
+                        # look up all mentions in active cohort dataset for this entity ID
                         all_mentions = df_filtered[df_filtered["Entity ID"] == selected_row["Entity ID"]]
 
-                        # Surface text variations across documents
+                        # surface text variations across documents
                         surface_variants = [str(s) for s in all_mentions["Surface Text"].unique() if pd.notna(s) and str(s).strip()]
                         if surface_variants:
                             variant_tags = " ".join([f"`{v}`" for v in surface_variants])
                             st.markdown(f"**Archival Text Variants:** {variant_tags}")
 
-                        # Breakdown across cohorts
+                        # breakdown across cohorts
                         cohort_counts = all_mentions["Cohort"].value_counts()
                         with st.expander(f"View Distribution Across Cohorts ({len(all_mentions)} total mentions)", expanded=False):
                             for c_name, count in cohort_counts.items():
@@ -387,7 +385,7 @@ if df is not None:
 
                         st.markdown("---")
 
-                        # Authority Link Button
+                        # authority link button
                         viaf_link = selected_row.get("VIAF Link")
                         if pd.notna(viaf_link) and str(viaf_link).strip().startswith("http"):
                             st.link_button("🌐 Open VIAF Authority File", str(viaf_link), use_container_width=True)
@@ -396,101 +394,150 @@ if df is not None:
                             st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
 
 # =========================================================================================================================================
-# Tab 2 : 
+# Tab 2: Semantic Density Network 
 # =========================================================================================================================================
     
     with tab2:
-        st.subheader("Archival Intersectionality & Metadata Distributions")
-        
-        st.markdown("### 📊 Dynamic Metadata Profiler")
-        demo_options = [
-            "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
-            "Political Ideology", "Member Of", "Participant In"
-        ]
-        selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
-        
-        df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
-        
-        if not df_demo.empty:
-            df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
-            df_demo = df_demo.explode(selected_demo)
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
-                top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
-                
-                # FIX 1: Swapped out random green for official IBM Magenta 50 (#DC267F)
-                fig_demo = px.bar(
-                    top_10, 
-                    x="count", 
-                    y=selected_demo, 
-                    orientation='h', 
-                    color_discrete_sequence=["#DC267F"] 
-                )
-                fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
-                st.plotly_chart(fig_demo, use_container_width=True)
-                
-            with col2:
-                st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
-                cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
-                cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
-                fig_cohort = px.bar(
-                    cohort_counts, 
-                    x="count", 
-                    y=selected_demo, 
-                    color="Cohort", 
-                    orientation='h', 
-                    barmode="stack",
-                    color_discrete_map=COHORT_COLOR_MAP
-                )
-                fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
-                st.plotly_chart(fig_cohort, use_container_width=True)
+        st.markdown("""
+        Explore structural relationships and co-occurrence density across entity nodes. 
+        Node sizes represent **mention density** (degree/frequency), edge thickness indicates **co-occurrence strength**, 
+        and colors correspond to **NER entity classes**.
+        """)
+
+        # guard against empty datasets
+        df_net_clean = df_filtered.dropna(subset=["Entity ID"]).copy() if not df_filtered.empty else pd.DataFrame()
+
+        if df_net_clean.empty:
+            st.info("No entity data available to construct network topology.")
         else:
-            st.info(f"No extracted data found for '{selected_demo}' within the selected filters.")
-            
-        st.markdown("---")
+            # cast key columns to string to prevent float/str mismatch crashes
+            df_net_clean["Entity ID"] = df_net_clean["Entity ID"].astype(str)
+            df_net_clean["Official Name"] = df_net_clean["Official Name"].fillna("Unknown Entity").astype(str)
+            df_net_clean["NER Class"] = df_net_clean["NER Class"].fillna("UNKNOWN").astype(str)
+            df_net_clean["Icon"] = df_net_clean["Icon"].fillna("📌").astype(str)
+
+            # controls to adjust network complexity
+            net_col1, net_col2 = st.columns([2, 1])
+            with net_col1:
+                top_n = st.slider("Limit Top Entities by Mention Count (for clarity):", min_value=10, max_value=100, value=30, step=5)
+            with net_col2:
+                layout_algorithm = st.selectbox(
+                    "Graph Layout Algorithm:", 
+                    ["Spring (Fruchterman-Reingold)", "Circular"]
+                )
+
+            # filter down to top N entities
+            mention_counts = df_net_clean.groupby("Entity ID").size().to_dict()
+            top_entity_ids = sorted(mention_counts, key=mention_counts.get, reverse=True)[:top_n]
         
-        st.markdown("### 🔀 Intersectionality Matrix")
-        st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
-        
-        cx_col1, cx_col2 = st.columns(2)
-        with cx_col1:
-            attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
-        with cx_col2:
-            attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
-            
-        if attr_x == attr_y:
-            st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
-        else:
-            df_cross = df_filtered[[attr_x, attr_y]].dropna()
-            if not df_cross.empty:
-                df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
-                df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
-                
-                top_x_items = df_cross[attr_x].value_counts().head(8).index
-                top_y_items = df_cross[attr_y].value_counts().head(8).index
-                df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
-                
-                if not df_cross_filtered.empty:
-                    cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
-                    
-                    # FIX 2: Swapped out "Viridis" for a high-contrast, single-hue IBM Ultramarine sequence
-                    # Transitions cleanly from a neutral off-white background right up to dominant IBM Blue
-                    fig_heatmap = px.density_heatmap(
-                        cross_matrix, 
-                        x=attr_x, 
-                        y=attr_y, 
-                        z="Co-occurrences",
-                        text_auto=True,
-                        color_continuous_scale=["#F4F6FF", "#648FFF", "#002D9C"]
-                    )
-                    fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
-                    st.plotly_chart(fig_heatmap, use_container_width=True)
-                else:
-                    st.info("No explicit intersections found for the top elements of these attributes.")
+            df_net_subset = df_net_clean[df_net_clean["Entity ID"].isin(top_entity_ids)].copy()
+
+            if len(df_net_subset) < 2:
+                st.warning("Not enough distinct entities selected to form a relational network.")
             else:
-                st.info("No co-occurring data coordinates available for this configuration.")
+                try:
+                    # construct networkx graph
+                    G = nx.Graph()
+
+                    # add nodes safely
+                    for _, row in df_net_subset.drop_duplicates(subset=["Entity ID"]).iterrows():
+                        e_id = row["Entity ID"]
+                        G.add_node(
+                            e_id, 
+                            name=row["Official Name"], 
+                            ner_class=row["NER Class"], 
+                            mentions=mention_counts.get(e_id, 1), 
+                            icon=row["Icon"]
+                        )
+
+                    # add edges based on shared cohort co-occurrence
+                    if "Cohort" in df_net_subset.columns:
+                        for cohort_name, group in df_net_subset.groupby("Cohort"):
+                            if pd.isna(cohort_name):
+                                continue
+                            e_ids = [str(x) for x in group["Entity ID"].unique() if str(x) in G.nodes]
+                            # Create co-occurrence edges between cohort members
+                            for i in range(len(e_ids)):
+                                for j in range(i + 1, len(e_ids)):
+                                    u, v = e_ids[i], e_ids[j]
+                                    if u != v:
+                                        if G.has_edge(u, v):
+                                            G[u][v]["weight"] += 1
+                                        else:
+                                            G.add_edge(u, v, weight=1)
+
+                    # compute node positions based on selected layout
+                    if "Circular" in layout_algorithm:
+                        pos = nx.circular_layout(G)
+                    else:
+                        pos = nx.spring_layout(G, k=0.55, seed=42)
+
+                    # extract edge traces for plotly
+                    edge_x, edge_y = [], []
+                    for edge in G.edges():
+                        x0, y0 = pos[edge[0]]
+                        x1, y1 = pos[edge[1]]
+                        edge_x.extend([x0, x1, None])
+                        edge_y.extend([y0, y1, None])
+
+                    edge_trace = go.Scatter(
+                        x=edge_x, y=edge_y,
+                        line=dict(width=1.0, color="rgba(140, 140, 140, 0.35)"),
+                        hoverinfo="none",
+                        mode="lines"
+                    )
+
+                    # extract node traces for plotly
+                    node_x, node_y, node_colors, node_sizes, node_hover_text, node_labels = [], [], [], [], [], []
+
+                    for node in G.nodes():
+                        x, y = pos[node]
+                        node_x.append(x)
+                        node_y.append(y)
+                    
+                        meta = G.nodes[node]
+                        ner_cls = meta.get("ner_class", "UNKNOWN")
+                        mentions = meta.get("mentions", 1)
+                        name = meta.get("name", node)
+                        icon = meta.get("icon", "📌")
+                    
+                        node_labels.append(name)
+                        node_colors.append(IBM_LABEL_COLOR_MAP.get(ner_cls, "#8D8D8D"))
+                        node_sizes.append(max(12, min(38, 8 + mentions * 2)))
+                        node_hover_text.append(f"<b>{icon} {name}</b><br>Class: {ner_cls}<br>Total Mentions: {mentions}")
+
+                    node_trace = go.Scatter(
+                        x=node_x, y=node_y,
+                        mode="markers+text",
+                        hoverinfo="text",
+                        text=node_labels,
+                        textposition="top center",
+                        textfont=dict(size=10, color="#E0E0E0"),
+                        hovertext=node_hover_text,
+                        marker=dict(
+                            color=node_colors,
+                            size=node_sizes,
+                            line=dict(width=1.5, color="#FFFFFF")
+                        )
+                    )
+
+                    # render plotly graph
+                    fig_net = go.Figure(data=[edge_trace, node_trace])
+                    fig_net.update_layout(
+                        showlegend=False,
+                        hovermode="closest",
+                        margin=dict(b=10, l=10, r=10, t=10),
+                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        paper_bgcolor="rgba(0,0,0,0)",
+                        plot_bgcolor="rgba(0,0,0,0)",
+                        height=650
+                    )
+
+                    st.plotly_chart(fig_net, use_container_width=True)
+
+                except Exception as e:
+                    st.error(f"Error rendering network topology: {str(e)}")
         
 # =========================================================================================================================================
 # Tab 3 : 
@@ -975,145 +1022,95 @@ if df is not None:
 # =========================================================================================================================================
 # Tab 6: 
 # =========================================================================================================================================
-    with tab6:
-        st.subheader("🕸️ Semantic Density Network Graph")
-        st.markdown("""
-        Explore structural relationships and co-occurrence density across entity nodes. 
-        Node sizes represent **mention density** (degree/frequency), edge thickness indicates **co-occurrence strength**, 
-        and colors correspond to **NER entity classes**.
-        """)
-
-        # 1. Guard against empty datasets
-        df_net_clean = df_filtered.dropna(subset=["Entity ID"]).copy() if not df_filtered.empty else pd.DataFrame()
-
-        if df_net_clean.empty:
-            st.info("No entity data available to construct network topology.")
-        else:
-            # Cast key columns to string to prevent float/str mismatch crashes
-            df_net_clean["Entity ID"] = df_net_clean["Entity ID"].astype(str)
-            df_net_clean["Official Name"] = df_net_clean["Official Name"].fillna("Unknown Entity").astype(str)
-            df_net_clean["NER Class"] = df_net_clean["NER Class"].fillna("UNKNOWN").astype(str)
-            df_net_clean["Icon"] = df_net_clean["Icon"].fillna("📌").astype(str)
-
-            # 2. Controls to adjust network complexity
-            net_col1, net_col2 = st.columns([2, 1])
-            with net_col1:
-                top_n = st.slider("Limit Top Entities by Mention Count (for clarity):", min_value=10, max_value=100, value=30, step=5)
-            with net_col2:
-                layout_algorithm = st.selectbox(
-                    "Graph Layout Algorithm:", 
-                    ["Spring (Fruchterman-Reingold)", "Circular"]
-                )
-
-            # 3. Filter down to top N entities
-            mention_counts = df_net_clean.groupby("Entity ID").size().to_dict()
-            top_entity_ids = sorted(mention_counts, key=mention_counts.get, reverse=True)[:top_n]
+     with tab6:
+        st.subheader("Archival Intersectionality & Metadata Distributions")
         
-            df_net_subset = df_net_clean[df_net_clean["Entity ID"].isin(top_entity_ids)].copy()
-
-            if len(df_net_subset) < 2:
-                st.warning("Not enough distinct entities selected to form a relational network.")
+        st.markdown("### 📊 Dynamic Metadata Profiler")
+        demo_options = [
+            "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
+            "Political Ideology", "Member Of", "Participant In"
+        ]
+        selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
+        
+        df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
+        
+        if not df_demo.empty:
+            df_demo[selected_demo] = df_demo[selected_demo].str.split(", ")
+            df_demo = df_demo.explode(selected_demo)
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
+                top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
+                
+                # FIX 1: Swapped out random green for official IBM Magenta 50 (#DC267F)
+                fig_demo = px.bar(
+                    top_10, 
+                    x="count", 
+                    y=selected_demo, 
+                    orientation='h', 
+                    color_discrete_sequence=["#DC267F"] 
+                )
+                fig_demo.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_demo, use_container_width=True)
+                
+            with col2:
+                st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
+                cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
+                cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
+                fig_cohort = px.bar(
+                    cohort_counts, 
+                    x="count", 
+                    y=selected_demo, 
+                    color="Cohort", 
+                    orientation='h', 
+                    barmode="stack",
+                    color_discrete_map=COHORT_COLOR_MAP
+                )
+                fig_cohort.update_layout(yaxis={'categoryorder':'total ascending'})
+                st.plotly_chart(fig_cohort, use_container_width=True)
+        else:
+            st.info(f"No extracted data found for '{selected_demo}' within the selected filters.")
+            
+        st.markdown("---")
+        
+        st.markdown("### 🔀 Intersectionality Matrix")
+        st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
+        
+        cx_col1, cx_col2 = st.columns(2)
+        with cx_col1:
+            attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
+        with cx_col2:
+            attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
+            
+        if attr_x == attr_y:
+            st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
+        else:
+            df_cross = df_filtered[[attr_x, attr_y]].dropna()
+            if not df_cross.empty:
+                df_cross[attr_x] = df_cross[attr_x].apply(lambda x: x.split(", ")[0])
+                df_cross[attr_y] = df_cross[attr_y].apply(lambda x: x.split(", ")[0])
+                
+                top_x_items = df_cross[attr_x].value_counts().head(8).index
+                top_y_items = df_cross[attr_y].value_counts().head(8).index
+                df_cross_filtered = df_cross[df_cross[attr_x].isin(top_x_items) & df_cross[attr_y].isin(top_y_items)]
+                
+                if not df_cross_filtered.empty:
+                    cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
+                    
+                    # FIX 2: Swapped out "Viridis" for a high-contrast, single-hue IBM Ultramarine sequence
+                    # Transitions cleanly from a neutral off-white background right up to dominant IBM Blue
+                    fig_heatmap = px.density_heatmap(
+                        cross_matrix, 
+                        x=attr_x, 
+                        y=attr_y, 
+                        z="Co-occurrences",
+                        text_auto=True,
+                        color_continuous_scale=["#F4F6FF", "#648FFF", "#002D9C"]
+                    )
+                    fig_heatmap.update_layout(xaxis_title=attr_x, yaxis_title=attr_y)
+                    st.plotly_chart(fig_heatmap, use_container_width=True)
+                else:
+                    st.info("No explicit intersections found for the top elements of these attributes.")
             else:
-                try:
-                    # 4. Construct NetworkX Graph
-                    G = nx.Graph()
-
-                    # Add Nodes safely
-                    for _, row in df_net_subset.drop_duplicates(subset=["Entity ID"]).iterrows():
-                        e_id = row["Entity ID"]
-                        G.add_node(
-                            e_id, 
-                            name=row["Official Name"], 
-                            ner_class=row["NER Class"], 
-                            mentions=mention_counts.get(e_id, 1), 
-                            icon=row["Icon"]
-                        )
-
-                    # Add Edges based on shared Cohort co-occurrence
-                    if "Cohort" in df_net_subset.columns:
-                        for cohort_name, group in df_net_subset.groupby("Cohort"):
-                            if pd.isna(cohort_name):
-                                continue
-                            e_ids = [str(x) for x in group["Entity ID"].unique() if str(x) in G.nodes]
-                            # Create co-occurrence edges between cohort members
-                            for i in range(len(e_ids)):
-                                for j in range(i + 1, len(e_ids)):
-                                    u, v = e_ids[i], e_ids[j]
-                                    if u != v:
-                                        if G.has_edge(u, v):
-                                            G[u][v]["weight"] += 1
-                                        else:
-                                            G.add_edge(u, v, weight=1)
-
-                    # 5. Compute Node Positions based on selected layout
-                    if "Circular" in layout_algorithm:
-                        pos = nx.circular_layout(G)
-                    else:
-                        pos = nx.spring_layout(G, k=0.55, seed=42)
-
-                    # 6. Extract Edge Traces for Plotly
-                    edge_x, edge_y = [], []
-                    for edge in G.edges():
-                        x0, y0 = pos[edge[0]]
-                        x1, y1 = pos[edge[1]]
-                        edge_x.extend([x0, x1, None])
-                        edge_y.extend([y0, y1, None])
-
-                    edge_trace = go.Scatter(
-                        x=edge_x, y=edge_y,
-                        line=dict(width=1.0, color="rgba(140, 140, 140, 0.35)"),
-                        hoverinfo="none",
-                        mode="lines"
-                    )
-
-                    # 7. Extract Node Traces for Plotly
-                    node_x, node_y, node_colors, node_sizes, node_hover_text, node_labels = [], [], [], [], [], []
-
-                    for node in G.nodes():
-                        x, y = pos[node]
-                        node_x.append(x)
-                        node_y.append(y)
-                    
-                        meta = G.nodes[node]
-                        ner_cls = meta.get("ner_class", "UNKNOWN")
-                        mentions = meta.get("mentions", 1)
-                        name = meta.get("name", node)
-                        icon = meta.get("icon", "📌")
-                    
-                        node_labels.append(name)
-                        node_colors.append(IBM_LABEL_COLOR_MAP.get(ner_cls, "#8D8D8D"))
-                        node_sizes.append(max(12, min(38, 8 + mentions * 2)))
-                        node_hover_text.append(f"<b>{icon} {name}</b><br>Class: {ner_cls}<br>Total Mentions: {mentions}")
-
-                    node_trace = go.Scatter(
-                        x=node_x, y=node_y,
-                        mode="markers+text",
-                        hoverinfo="text",
-                        text=node_labels,
-                        textposition="top center",
-                        textfont=dict(size=10, color="#E0E0E0"),
-                        hovertext=node_hover_text,
-                        marker=dict(
-                            color=node_colors,
-                            size=node_sizes,
-                            line=dict(width=1.5, color="#FFFFFF")
-                        )
-                    )
-
-                    # 8. Render Plotly Graph
-                    fig_net = go.Figure(data=[edge_trace, node_trace])
-                    fig_net.update_layout(
-                        showlegend=False,
-                        hovermode="closest",
-                        margin=dict(b=10, l=10, r=10, t=10),
-                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        paper_bgcolor="rgba(0,0,0,0)",
-                        plot_bgcolor="rgba(0,0,0,0)",
-                        height=650
-                    )
-
-                    st.plotly_chart(fig_net, use_container_width=True)
-
-                except Exception as e:
-                    st.error(f"Error rendering network topology: {str(e)}")
+                st.info("No co-occurring data coordinates available for this configuration.")
