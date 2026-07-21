@@ -150,7 +150,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "Longitude": lon,
                 "Image URL": ent.get("image"),
                 
-                # Relational Lists
+                # relational Lists
                 "Occupation": occ,
                 "Gender Identity": gender,
                 "Ethnic Group/Tribe": ethnic,
@@ -540,14 +540,12 @@ if df is not None:
 # =========================================================================================================================================
     
     with tab3:
-        st.subheader("Archival Intersectionality & Metadata Distributions")
-        
-        st.markdown("### 📊 Dynamic Metadata Profiler")
+        st.caption("Explore the distribution and intersection of demographic metadata from linked entities.")
         demo_options = [
             "Occupation", "Ethnic Group/Tribe", "Gender Identity", "Religion", "Country", 
             "Political Ideology", "Member Of", "Participant In"
         ]
-        selected_demo = st.selectbox("Select Target Attribute Profile:", options=demo_options, index=0)
+        selected_demo = st.selectbox("SELECT ATTRIBUTE:", options=demo_options, index=0)
         
         df_demo = df_filtered[[selected_demo, "Cohort"]].dropna()
         
@@ -557,10 +555,9 @@ if df is not None:
             
             col1, col2 = st.columns(2)
             with col1:
-                st.markdown(f"#### Top 10 {selected_demo}s (Overall)")
+                st.markdown(f"#### Most Common: {selected_demo} (Overall)")
                 top_10 = df_demo[selected_demo].value_counts().reset_index().head(10)
                 
-                # FIX 1: Swapped out random green for official IBM Magenta 50 (#DC267F)
                 fig_demo = px.bar(
                     top_10, 
                     x="count", 
@@ -572,7 +569,7 @@ if df is not None:
                 st.plotly_chart(fig_demo, use_container_width=True)
                 
             with col2:
-                st.markdown(f"#### {selected_demo} Distribution by Historical Cohort")
+                st.markdown(f"#### Most Common : {selected_demo} (By Cohort)")
                 cohort_counts = df_demo.groupby(["Cohort", selected_demo]).size().reset_index(name="count")
                 cohort_counts = cohort_counts[cohort_counts[selected_demo].isin(top_10[selected_demo])]
                 fig_cohort = px.bar(
@@ -591,14 +588,14 @@ if df is not None:
             
         st.markdown("---")
         
-        st.markdown("### 🔀 Intersectionality Matrix")
-        st.markdown("Cross-reference any two vectors below to locate structural overlaps hidden across your semantic metadata graph.")
+        st.markdown("### Intersectionality Matrix")
+        st.caption("Cross-reference any two demographics below to locate structural overlaps in the semantic metadata graph.")
         
         cx_col1, cx_col2 = st.columns(2)
         with cx_col1:
-            attr_x = st.selectbox("Select X-Axis Intersection Attribute:", options=demo_options, index=0)
+            attr_x = st.selectbox("SELECT X-AXIS ATTRIBUTE:", options=demo_options, index=0)
         with cx_col2:
-            attr_y = st.selectbox("Select Y-Axis Intersection Attribute:", options=demo_options, index=5)
+            attr_y = st.selectbox("SELECT Y-AXIS ATTRIBUTE:", options=demo_options, index=5)
             
         if attr_x == attr_y:
             st.error("⚠️ Cross-analysis requires selecting two distinct demographic vectors.")
@@ -615,8 +612,7 @@ if df is not None:
                 if not df_cross_filtered.empty:
                     cross_matrix = df_cross_filtered.groupby([attr_x, attr_y]).size().reset_index(name="Co-occurrences")
                     
-                    # FIX 2: Swapped out "Viridis" for a high-contrast, single-hue IBM Ultramarine sequence
-                    # Transitions cleanly from a neutral off-white background right up to dominant IBM Blue
+                    # color scale for matrix
                     fig_heatmap = px.density_heatmap(
                         cross_matrix, 
                         x=attr_x, 
