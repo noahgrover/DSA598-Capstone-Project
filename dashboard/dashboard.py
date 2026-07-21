@@ -204,8 +204,8 @@ if df is not None:
     "Select historical cohort(s)",
     options=unique_cohorts,
     default=unique_cohorts,
-    selection_mode="multi"  # Allows selecting multiple cohort buttons
-)
+    selection_mode="multi"  # allows selecting multiple cohort buttons
+    )
 
     # apply filter mask to data
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
@@ -231,99 +231,170 @@ if df is not None:
             st.metric("Paths / Record", f"{avg_paths:.2f}x")
 
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "| Geospatial Map",
-        "| Demographic Analysis",
-        "| Timeline",
         "| Entity Explorer",
-        "| Pipeline Quality Diagnostics",
-        "| Semantic Density Network"
+        "| Semantic Density Network",
+        "| Demographic Analysis",
+        "| Geospatial Map",
+        "| Timeline",
+        "| Pipeline Quality Diagnostics"
     ])
 
 # =========================================================================================================================================
-# Tab 1: 
+# Tab 1: Entity Explorer
 # =========================================================================================================================================
     
     with tab1:
-        st.subheader("🌐 Geospatial Entity Distribution & Spatial Density")
         st.markdown("""
-        Inspect the geographical footprint of resolved entity nodes across your archival corpus. 
-        Toggle between **Weighted Markers** to inspect individual entity locations and categories, 
-        or **Density Heatmap** to identify broader historical epicenters and spatial concentrations.
+        Search, filter, and inspect specific semantic nodes within your graph. Selecting an entity 
+        will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.
         """)
-        
-        df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
-        
-        if not df_geo.empty:
-            # 1. Aggregate mention counts per unique geospatial entity node
-            geo_mention_counts = df_geo.groupby("Entity ID").size().to_dict()
-            df_geo_nodes = df_geo.drop_duplicates(subset=["Entity ID"]).copy()
-            df_geo_nodes["Mentions"] = df_geo_nodes["Entity ID"].map(geo_mention_counts)
-            
-            # 2. Build detailed hover labels with mention counts
-            df_geo_nodes["Hover Title"] = (
-                df_geo_nodes["Icon"] + " " + 
-                df_geo_nodes["Official Name"] + 
-                " (" + df_geo_nodes["Mentions"].astype(str) + " mention" + 
-                df_geo_nodes["Mentions"].apply(lambda x: "s" if x > 1 else "") + ")"
-            )
-            
-            # 3. View Switcher Control
-            map_view = st.radio(
-                "Select Map Display Mode:", 
-                options=["Weighted Markers", "Density Heatmap"], 
-                horizontal=True
-            )
-            
-            # 4. Conditional Map Rendering
-            if map_view == "Weighted Markers":
-                fig_map = px.scatter_mapbox(
-                    df_geo_nodes,
-                    lat="Latitude",
-                    lon="Longitude",
-                    hover_name="Hover Title",
-                    hover_data={
-                        "Mentions": True,
-                        "NER Class": True,
-                        "Cohort": True,
-                        "Country": True,
-                        "Latitude": False,
-                        "Longitude": False
-                    },
-                    color="NER Class",
-                    color_discrete_map=IBM_LABEL_COLOR_MAP,
-                    size="Mentions",
-                    size_max=28,
-                    zoom=2,
-                    height=600
-                )
-            else:
-                # Custom IBM Ultramarine sequential gradient for dark theme map
-                fig_map = px.density_mapbox(
-                    df_geo_nodes,
-                    lat="Latitude",
-                    lon="Longitude",
-                    z="Mentions",
-                    hover_name="Hover Title",
-                    hover_data={
-                        "Mentions": True,
-                        "Country": True,
-                        "Latitude": False,
-                        "Longitude": False
-                    },
-                    radius=22,
-                    zoom=2,
-                    height=600,
-                    color_continuous_scale=["#161616", "#648FFF", "#785EF0", "#DC267F"]
-                )
-            
-            # Hardcoded to carto-darkmatter tile style
-            fig_map.update_layout(
-                mapbox_style="carto-darkmatter",
-                margin=dict(l=0, r=0, t=10, b=0)
-            )
-            st.plotly_chart(fig_map, use_container_width=True)
+
+        if df_filtered.empty:
+            st.info("No entities match your active cohort filters to explore.")
         else:
-            st.info("No geospatial coordinates found for the selected entity filters.")
+            # 1. Top Search and Filter Bar
+            exp_col1, exp_col2, exp_col3 = st.columns([2, 1, 1])
+            with exp_col1:
+                search_query = st.text_input("🔍 Search by Entity Name or Surface Text:", value="")
+            with exp_col2:
+                class_options = ["All Categories"] + list(df_filtered["NER Class"].dropna().unique())
+                selected_class = st.selectbox("Filter Explorer by Class:", options=class_options)
+            with exp_col3:
+                res_options = ["All Resolutions"] + list(df_filtered["Resolution Type"].dropna().unique())
+                selected_res = st.selectbox("Filter Explorer by Resolution:", options=res_options)
+
+            # Apply Search Filters
+            df_exp = df_filtered.copy()
+            if search_query:
+                df_exp = df_exp[
+                    df_exp["Official Name"].str.contains(search_query, case=False, na=False) |
+                    df_exp["Surface Text"].str.contains(search_query, case=False, na=False)
+                ]
+            if selected_class != "All Categories":
+                df_exp = df_exp[df_exp["NER Class"] == selected_class]
+            if selected_res != "All Resolutions":
+                df_exp = df_exp[df_exp["Resolution Type"] == selected_res]
+
+            if df_exp.empty:
+                st.warning("No records match your specific search criteria.")
+            else:
+                # 2. Deduplication & Mention Aggregation
+                mention_counts = df_exp.groupby("Entity ID").size().to_dict()
+                df_nodes = df_exp.drop_duplicates(subset=["Entity ID"]).copy()
+                df_nodes["Mentions"] = df_nodes["Entity ID"].map(mention_counts)
+                df_nodes = df_nodes.sort_values(by="Mentions", ascending=False).reset_index(drop=True)
+
+                # =========================================================
+                # 3. SPLIT LAYOUT (Entity Card Left - 60%, Table Right - 40%)
+                # =========================================================
+                detail_col, master_col = st.columns([3, 2])
+
+                # Render master selection table on the right column
+                with master_col:
+                    st.markdown(f"**Unique Graph Nodes ({len(df_nodes)})**")
+                    st.caption("💡 *Click any row in the table to inspect its dossier on the left.*")
+
+                    df_table_view = df_nodes[["Icon", "Official Name", "NER Class", "Mentions", "Resolution Type"]].copy()
+
+                    # Interactive Dataframe with native row selection
+                    selection_event = st.dataframe(
+                        df_table_view, 
+                        use_container_width=True, 
+                        height=520,
+                        hide_index=True,
+                        on_select="rerun",
+                        selection_mode="single-row"
+                    )
+
+                    # Default to row index 0 if nothing selected
+                    selected_index = 0
+                    if hasattr(selection_event, "selection") and selection_event.selection and selection_event.selection.rows:
+                        selected_index = selection_event.selection.rows[0]
+
+                # Render the detailed Entity Profile Card on the left (first position)
+                with detail_col:
+                    selected_row = df_nodes.iloc[selected_index]
+
+                    with st.container(border=True):
+                        # Title Header Block
+                        st.markdown(f"### {selected_row.get('Icon', '📌')} {selected_row.get('Official Name', 'Unknown')}")
+                        st.caption(
+                            f"**ID:** `{selected_row.get('Entity ID', 'N/A')}` | "
+                            f"**Class:** {selected_row.get('NER Class', 'N/A')} | "
+                            f"**Total Mentions:** {selected_row.get('Mentions', 1)}"
+                        )
+
+                        # Type-safe image rendering with constrained size (180px)
+                        raw_img = selected_row.get("Image URL")
+                        if isinstance(raw_img, list) and len(raw_img) > 0:
+                            raw_img = raw_img[0]
+                        if isinstance(raw_img, dict):
+                            raw_img = raw_img.get("schema:url", raw_img.get("@id", ""))
+
+                        if isinstance(raw_img, str) and raw_img.strip() and raw_img.strip().lower() not in ("none", "nan"):
+                            try:
+                                st.image(raw_img.strip(), width=180, caption=selected_row.get('Official Name'))
+                            except Exception:
+                                st.caption("🖼️ *(Image link present but unreachable)*")
+
+                        # Description
+                        if pd.notna(selected_row.get('Description')) and str(selected_row.get('Description')).strip():
+                            st.markdown(f"**Description:** \n> {selected_row['Description']}")
+
+                        st.markdown("---")
+                        st.markdown("**Graph Attributes & Linked Assertions:**")
+
+                        # Metadata display grid
+                        target_yr = selected_row.get('Target Year')
+                        end_yr = selected_row.get('End Year')
+                        time_bounds = f"{target_yr if pd.notna(target_yr) else '???'} – {end_yr if pd.notna(end_yr) else '???'}"
+
+                        metadata_fields = {
+                            "Primary Mention Text": selected_row.get("Surface Text"),
+                            "Timeline Active Bounds": time_bounds,
+                            "Resolution Link Status": selected_row.get("Resolution Type"),
+                            "Primary Cohort": selected_row.get("Cohort"),
+                            "Occupation/Role": selected_row.get("Occupation"),
+                            "Affiliated Country": selected_row.get("Country"),
+                            "Member Of": selected_row.get("Member Of"),
+                            "Participant In": selected_row.get("Participant In"),
+                            "Political Ideology": selected_row.get("Political Ideology"),
+                            "Ethnic Group/Tribe": selected_row.get("Ethnic Group/Tribe"),
+                            "Stated Religion": selected_row.get("Religion"),
+                            "Gender Identity": selected_row.get("Gender Identity"),
+                        }
+
+                        for label, val in metadata_fields.items():
+                            if pd.notna(val) and str(val).strip() and val != "??? – ???":
+                                st.markdown(f"**{label}:** {val}")
+
+                        st.markdown("---")
+                        st.markdown("**📄 Corpus Mentions & Provenance:**")
+
+                        # Look up all mentions in active cohort dataset for this Entity ID
+                        all_mentions = df_filtered[df_filtered["Entity ID"] == selected_row["Entity ID"]]
+
+                        # Surface text variations across documents
+                        surface_variants = [str(s) for s in all_mentions["Surface Text"].unique() if pd.notna(s) and str(s).strip()]
+                        if surface_variants:
+                            variant_tags = " ".join([f"`{v}`" for v in surface_variants])
+                            st.markdown(f"**Archival Text Variants:** {variant_tags}")
+
+                        # Breakdown across cohorts
+                        cohort_counts = all_mentions["Cohort"].value_counts()
+                        with st.expander(f"View Distribution Across Cohorts ({len(all_mentions)} total mentions)", expanded=False):
+                            for c_name, count in cohort_counts.items():
+                                st.markdown(f"• **{c_name}**: {count} mention{'s' if count > 1 else ''}")
+
+                        st.markdown("---")
+
+                        # Authority Link Button
+                        viaf_link = selected_row.get("VIAF Link")
+                        if pd.notna(viaf_link) and str(viaf_link).strip().startswith("http"):
+                            st.link_button("🌐 Open VIAF Authority File", str(viaf_link), use_container_width=True)
+                        elif pd.notna(selected_row.get("Entity ID")) and "wd:" in str(selected_row["Entity ID"]):
+                            wd_url = f"https://www.wikidata.org/wiki/{str(selected_row['Entity ID']).replace('wd:', '')}"
+                            st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
 
 # =========================================================================================================================================
 # Tab 2 : 
@@ -556,158 +627,86 @@ if df is not None:
 # =========================================================================================================================================
     
     with tab4:
-        st.subheader("🔍 Interactive Entity Explorer & Profile Graph")
+        st.subheader("🌐 Geospatial Entity Distribution & Spatial Density")
         st.markdown("""
-        Search, filter, and inspect specific semantic nodes within your graph. Selecting an entity 
-        will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.
+        Inspect the geographical footprint of resolved entity nodes across your archival corpus. 
+        Toggle between **Weighted Markers** to inspect individual entity locations and categories, 
+        or **Density Heatmap** to identify broader historical epicenters and spatial concentrations.
         """)
-
-        if df_filtered.empty:
-            st.info("No entities match your active cohort filters to explore.")
-        else:
-            # 1. Top Search and Filter Bar
-            exp_col1, exp_col2, exp_col3 = st.columns([2, 1, 1])
-            with exp_col1:
-                search_query = st.text_input("🔍 Search by Entity Name or Surface Text:", value="")
-            with exp_col2:
-                class_options = ["All Categories"] + list(df_filtered["NER Class"].dropna().unique())
-                selected_class = st.selectbox("Filter Explorer by Class:", options=class_options)
-            with exp_col3:
-                res_options = ["All Resolutions"] + list(df_filtered["Resolution Type"].dropna().unique())
-                selected_res = st.selectbox("Filter Explorer by Resolution:", options=res_options)
-
-            # Apply Search Filters
-            df_exp = df_filtered.copy()
-            if search_query:
-                df_exp = df_exp[
-                    df_exp["Official Name"].str.contains(search_query, case=False, na=False) |
-                    df_exp["Surface Text"].str.contains(search_query, case=False, na=False)
-                ]
-            if selected_class != "All Categories":
-                df_exp = df_exp[df_exp["NER Class"] == selected_class]
-            if selected_res != "All Resolutions":
-                df_exp = df_exp[df_exp["Resolution Type"] == selected_res]
-
-            if df_exp.empty:
-                st.warning("No records match your specific search criteria.")
+        
+        df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
+        
+        if not df_geo.empty:
+            # 1. Aggregate mention counts per unique geospatial entity node
+            geo_mention_counts = df_geo.groupby("Entity ID").size().to_dict()
+            df_geo_nodes = df_geo.drop_duplicates(subset=["Entity ID"]).copy()
+            df_geo_nodes["Mentions"] = df_geo_nodes["Entity ID"].map(geo_mention_counts)
+            
+            # 2. Build detailed hover labels with mention counts
+            df_geo_nodes["Hover Title"] = (
+                df_geo_nodes["Icon"] + " " + 
+                df_geo_nodes["Official Name"] + 
+                " (" + df_geo_nodes["Mentions"].astype(str) + " mention" + 
+                df_geo_nodes["Mentions"].apply(lambda x: "s" if x > 1 else "") + ")"
+            )
+            
+            # 3. View Switcher Control
+            map_view = st.radio(
+                "Select Map Display Mode:", 
+                options=["Weighted Markers", "Density Heatmap"], 
+                horizontal=True
+            )
+            
+            # 4. Conditional Map Rendering
+            if map_view == "Weighted Markers":
+                fig_map = px.scatter_mapbox(
+                    df_geo_nodes,
+                    lat="Latitude",
+                    lon="Longitude",
+                    hover_name="Hover Title",
+                    hover_data={
+                        "Mentions": True,
+                        "NER Class": True,
+                        "Cohort": True,
+                        "Country": True,
+                        "Latitude": False,
+                        "Longitude": False
+                    },
+                    color="NER Class",
+                    color_discrete_map=IBM_LABEL_COLOR_MAP,
+                    size="Mentions",
+                    size_max=28,
+                    zoom=2,
+                    height=600
+                )
             else:
-                # 2. Deduplication & Mention Aggregation
-                mention_counts = df_exp.groupby("Entity ID").size().to_dict()
-                df_nodes = df_exp.drop_duplicates(subset=["Entity ID"]).copy()
-                df_nodes["Mentions"] = df_nodes["Entity ID"].map(mention_counts)
-                df_nodes = df_nodes.sort_values(by="Mentions", ascending=False).reset_index(drop=True)
-
-                # =========================================================
-                # 3. SPLIT LAYOUT (Entity Card Left - 60%, Table Right - 40%)
-                # =========================================================
-                detail_col, master_col = st.columns([3, 2])
-
-                # Render master selection table on the right column
-                with master_col:
-                    st.markdown(f"**Unique Graph Nodes ({len(df_nodes)})**")
-                    st.caption("💡 *Click any row in the table to inspect its dossier on the left.*")
-
-                    df_table_view = df_nodes[["Icon", "Official Name", "NER Class", "Mentions", "Resolution Type"]].copy()
-
-                    # Interactive Dataframe with native row selection
-                    selection_event = st.dataframe(
-                        df_table_view, 
-                        use_container_width=True, 
-                        height=520,
-                        hide_index=True,
-                        on_select="rerun",
-                        selection_mode="single-row"
-                    )
-
-                    # Default to row index 0 if nothing selected
-                    selected_index = 0
-                    if hasattr(selection_event, "selection") and selection_event.selection and selection_event.selection.rows:
-                        selected_index = selection_event.selection.rows[0]
-
-                # Render the detailed Entity Profile Card on the left (first position)
-                with detail_col:
-                    selected_row = df_nodes.iloc[selected_index]
-
-                    with st.container(border=True):
-                        # Title Header Block
-                        st.markdown(f"### {selected_row.get('Icon', '📌')} {selected_row.get('Official Name', 'Unknown')}")
-                        st.caption(
-                            f"**ID:** `{selected_row.get('Entity ID', 'N/A')}` | "
-                            f"**Class:** {selected_row.get('NER Class', 'N/A')} | "
-                            f"**Total Mentions:** {selected_row.get('Mentions', 1)}"
-                        )
-
-                        # Type-safe image rendering with constrained size (180px)
-                        raw_img = selected_row.get("Image URL")
-                        if isinstance(raw_img, list) and len(raw_img) > 0:
-                            raw_img = raw_img[0]
-                        if isinstance(raw_img, dict):
-                            raw_img = raw_img.get("schema:url", raw_img.get("@id", ""))
-
-                        if isinstance(raw_img, str) and raw_img.strip() and raw_img.strip().lower() not in ("none", "nan"):
-                            try:
-                                st.image(raw_img.strip(), width=180, caption=selected_row.get('Official Name'))
-                            except Exception:
-                                st.caption("🖼️ *(Image link present but unreachable)*")
-
-                        # Description
-                        if pd.notna(selected_row.get('Description')) and str(selected_row.get('Description')).strip():
-                            st.markdown(f"**Description:** \n> {selected_row['Description']}")
-
-                        st.markdown("---")
-                        st.markdown("**Graph Attributes & Linked Assertions:**")
-
-                        # Metadata display grid
-                        target_yr = selected_row.get('Target Year')
-                        end_yr = selected_row.get('End Year')
-                        time_bounds = f"{target_yr if pd.notna(target_yr) else '???'} – {end_yr if pd.notna(end_yr) else '???'}"
-
-                        metadata_fields = {
-                            "Primary Mention Text": selected_row.get("Surface Text"),
-                            "Timeline Active Bounds": time_bounds,
-                            "Resolution Link Status": selected_row.get("Resolution Type"),
-                            "Primary Cohort": selected_row.get("Cohort"),
-                            "Occupation/Role": selected_row.get("Occupation"),
-                            "Affiliated Country": selected_row.get("Country"),
-                            "Member Of": selected_row.get("Member Of"),
-                            "Participant In": selected_row.get("Participant In"),
-                            "Political Ideology": selected_row.get("Political Ideology"),
-                            "Ethnic Group/Tribe": selected_row.get("Ethnic Group/Tribe"),
-                            "Stated Religion": selected_row.get("Religion"),
-                            "Gender Identity": selected_row.get("Gender Identity"),
-                        }
-
-                        for label, val in metadata_fields.items():
-                            if pd.notna(val) and str(val).strip() and val != "??? – ???":
-                                st.markdown(f"**{label}:** {val}")
-
-                        st.markdown("---")
-                        st.markdown("**📄 Corpus Mentions & Provenance:**")
-
-                        # Look up all mentions in active cohort dataset for this Entity ID
-                        all_mentions = df_filtered[df_filtered["Entity ID"] == selected_row["Entity ID"]]
-
-                        # Surface text variations across documents
-                        surface_variants = [str(s) for s in all_mentions["Surface Text"].unique() if pd.notna(s) and str(s).strip()]
-                        if surface_variants:
-                            variant_tags = " ".join([f"`{v}`" for v in surface_variants])
-                            st.markdown(f"**Archival Text Variants:** {variant_tags}")
-
-                        # Breakdown across cohorts
-                        cohort_counts = all_mentions["Cohort"].value_counts()
-                        with st.expander(f"View Distribution Across Cohorts ({len(all_mentions)} total mentions)", expanded=False):
-                            for c_name, count in cohort_counts.items():
-                                st.markdown(f"• **{c_name}**: {count} mention{'s' if count > 1 else ''}")
-
-                        st.markdown("---")
-
-                        # Authority Link Button
-                        viaf_link = selected_row.get("VIAF Link")
-                        if pd.notna(viaf_link) and str(viaf_link).strip().startswith("http"):
-                            st.link_button("🌐 Open VIAF Authority File", str(viaf_link), use_container_width=True)
-                        elif pd.notna(selected_row.get("Entity ID")) and "wd:" in str(selected_row["Entity ID"]):
-                            wd_url = f"https://www.wikidata.org/wiki/{str(selected_row['Entity ID']).replace('wd:', '')}"
-                            st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
+                # Custom IBM Ultramarine sequential gradient for dark theme map
+                fig_map = px.density_mapbox(
+                    df_geo_nodes,
+                    lat="Latitude",
+                    lon="Longitude",
+                    z="Mentions",
+                    hover_name="Hover Title",
+                    hover_data={
+                        "Mentions": True,
+                        "Country": True,
+                        "Latitude": False,
+                        "Longitude": False
+                    },
+                    radius=22,
+                    zoom=2,
+                    height=600,
+                    color_continuous_scale=["#161616", "#648FFF", "#785EF0", "#DC267F"]
+                )
+            
+            # Hardcoded to carto-darkmatter tile style
+            fig_map.update_layout(
+                mapbox_style="carto-darkmatter",
+                margin=dict(l=0, r=0, t=10, b=0)
+            )
+            st.plotly_chart(fig_map, use_container_width=True)
+        else:
+            st.info("No geospatial coordinates found for the selected entity filters.")
 
 # =========================================================================================================================================
 # Tab 5 : 
