@@ -726,16 +726,33 @@ if df is not None:
                     value_name="Score (%)"
                 )
                 
-                # Uses IBM Carbon Ultramarine (#0043CE), Teal (#009D9A), and Magenta (#9F1853)
+                # Dedicated, distinct IBM Carbon Palette for benchmarks
+                BENCHMARK_COLOR_MAP = {
+                    "Candidate Recall@5": "#8A3FFC",  # IBM Carbon Purple 60
+                    "In-KB F1":           "#1192E8",  # IBM Carbon Cyan 50
+                    "NIL F1":             "#FA4D56"   # IBM Carbon Red 50
+                }
+
                 fig_bench = px.bar(
                     df_bench_melted,
                     x="Scope / Cohort",
                     y="Score (%)",
                     color="Metric",
                     barmode="group",
-                    color_discrete_sequence=["#0043CE", "#009D9A", "#9F1853"],
+                    color_discrete_map=BENCHMARK_COLOR_MAP,
                     height=320
                 )
+                
+                # Add horizontal reference line at 75%
+                fig_bench.add_hline(
+                    y=75,
+                    line_dash="dash",
+                    line_color="#6F6F6F",
+                    annotation_text="75% Baseline Threshold",
+                    annotation_position="bottom right",
+                    annotation_font=dict(size=11, color="#6F6F6F")
+                )
+
                 fig_bench.update_layout(
                     xaxis_title="",
                     yaxis_title="Score (%)",
