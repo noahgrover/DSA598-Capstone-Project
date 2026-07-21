@@ -245,25 +245,25 @@ if df is not None:
     
     with tab1:
         st.markdown("""
-        Search, filter, and inspect specific semantic nodes within the graph. Selecting an entity 
+        Search, filter, and inspect specific semantic nodes within the graph. Selecting an entity from the list of unique nodes on the right
         will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.
         """)
 
         if df_filtered.empty:
             st.info("No entities match your active cohort filters to explore.")
         else:
-            # 1. Top Search and Filter Bar
+            # top search and filter bar
             exp_col1, exp_col2, exp_col3 = st.columns([2, 1, 1])
             with exp_col1:
-                search_query = st.text_input("🔍 Search by Entity Name or Surface Text:", value="")
+                search_query = st.text_input("🔍 SEARCH (NAME OR SURFACE TEXT):", value="")
             with exp_col2:
                 class_options = ["All Categories"] + list(df_filtered["NER Class"].dropna().unique())
-                selected_class = st.selectbox("Filter Explorer by Class:", options=class_options)
+                selected_class = st.selectbox("FILTER ENTITIES (CLASS):", options=class_options)
             with exp_col3:
                 res_options = ["All Resolutions"] + list(df_filtered["Resolution Type"].dropna().unique())
-                selected_res = st.selectbox("Filter Explorer by Resolution:", options=res_options)
+                selected_res = st.selectbox("FILTER ENTITIES (RESOLUTION):", options=res_options)
 
-            # Apply Search Filters
+            # apply search filters
             df_exp = df_filtered.copy()
             if search_query:
                 df_exp = df_exp[
