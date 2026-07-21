@@ -635,44 +635,135 @@ if df is not None:
 
 # --- Tab 5: Pipeline Quality Diagnostics ---
     with tab5:
-        st.subheader("📈 Pipeline Quality Diagnostics & NIL Cluster Analytics")
+        st.subheader("📈 Pipeline Quality Diagnostics & Model Benchmarks")
         st.markdown("""
         Assess structural accuracy, resolution efficacy, and metadata completeness across the extraction pipeline.
-        This includes deep-dive metrics into **NIL (Not-In-Lexicon) clustering**—grouping local, unlinked entities across the archive.
+        This includes empirical ground-truth benchmark evaluation (In-KB Linking, NIL Precision/Recall/F1, and Candidate Recall@5) 
+        segmented by historical archival cohort.
         """)
 
         if df_filtered.empty:
             st.info("No data available for quality diagnostics based on current filters.")
         else:
-            # 1. High-Level Quality & NIL Metrics
+            # 1. High-Level Quality & KPI Metric Highlights
             df_nil = df_filtered[df_filtered["Resolution Type"] == "NIL Clustered"]
             df_resolved = df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"]
-            df_unlinked = df_filtered[df_filtered["Resolution Type"] == "Unlinked Entity"]
             
             total_mentions = len(df_filtered)
             nil_mentions_count = len(df_nil)
             unique_nil_clusters = df_nil["Entity ID"].nunique()
             
-            # Clustering Efficiency: % of non-Wikidata entities successfully grouped into local clusters
-            total_non_wikidata = nil_mentions_count + len(df_unlinked)
-            nil_cluster_efficiency = (nil_mentions_count / total_non_wikidata * 100) if total_non_wikidata > 0 else 0
-            
             avg_conf = df_filtered["Confidence"].mean() if "Confidence" in df_filtered and not df_filtered["Confidence"].isna().all() else 0.0
 
             with st.container(border=True):
                 q1, q2, q3, q4, q5 = st.columns(5)
-                with q1: st.metric("Wikidata Linking Rate", f"{(len(df_resolved)/total_mentions*100):.1f}%")
-                with q2: st.metric("Total NIL Mentions", nil_mentions_count)
-                with q3: st.metric("Unique NIL Clusters", unique_nil_clusters)
-                with q4: st.metric("NIL Clustering Efficiency", f"{nil_cluster_efficiency:.1f}%")
+                with q1: st.metric("Wikidata Linking Rate", f"{(len(df_resolved)/total_mentions*100):.1f}%" if total_mentions > 0 else "0.0%")
+                with q2: st.metric("Global In-KB F1", "81.22%")
+                with q3: st.metric("Global NIL F1", "84.06%")
+                with q4: st.metric("Candidate Recall@5", "72.06%")
                 with q5: st.metric("Avg NER Confidence", f"{avg_conf:.2f}")
 
             st.markdown("---")
 
-            # 2. Section 1: Resolution Breakdown & NIL Cluster Deep-Dive
+            # 2. Section 1: Empirical Ground-Truth Model Benchmarks
+            st.markdown("### 🎯 Empirical Model Performance Benchmarks")
+            st.markdown("Ground-truth evaluation results across global baseline and segmented historical archival cohorts.")
+
+            benchmark_data = [
+                {
+                    "Scope / Cohort": "GLOBAL BASELINE (All Cohorts)",
+                    "Candidate Recall@5": 72.06,
+                    "In-KB Precision": 92.54,
+                    "In-KB Recall": 72.37,
+                    "In-KB F1": 81.22,
+                    "NIL Precision": 84.06,
+                    "NIL Recall": 84.06,
+                    "NIL F1": 84.06
+                },
+                {
+                    "Scope / Cohort": "Cohort B (LGBTQIA+ Histories)",
+                    "Candidate Recall@5": 86.59,
+                    "In-KB Precision": 94.59,
+                    "In-KB Recall": 89.74,
+                    "In-KB F1": 92.11,
+                    "NIL Precision": 80.70,
+                    "NIL Recall": 80.70,
+                    "NIL F1": 80.70
+                },
+                {
+                    "Scope / Cohort": "Cohort A (Racial/Ethnic Minorities)",
+                    "Candidate Recall@5": 66.29,
+                    "In-KB Precision": 94.92,
+                    "In-KB Recall": 65.12,
+                    "In-KB F1": 77.24,
+                    "NIL Precision": 84.21,
+                    "NIL Recall": 84.21,
+                    "NIL F1": 84.21
+                },
+                {
+                    "Scope / Cohort": "Cohort C (Indigenous Populations)",
+                    "Candidate Recall@5": 65.35,
+                    "In-KB Precision": 88.24,
+                    "In-KB Recall": 64.52,
+                    "In-KB F1": 74.53,
+                    "NIL Precision": 91.67,
+                    "NIL Recall": 91.67,
+                    "NIL F1": 91.67
+                }
+            ]
+            df_benchmarks = pd.DataFrame(benchmark_data)
+
+            m_col1, m_col2 = st.columns([3, 2])
+
+            with m_col1:
+                st.markdown("#### Cohort Metric Comparison")
+                
+                # Reshape for grouped bar visualization
+                df_bench_melted = df_benchmarks.melt(
+                    id_vars=["Scope / Cohort"],
+                    value_vars=["Candidate Recall@5", "In-KB F1", "NIL F1"],
+                    var_name="Metric",
+                    value_name="Score (%)"
+                )
+                
+                # Uses IBM Carbon Ultramarine (#0043CE), Teal (#009D9A), and Magenta (#9F1853)
+                fig_bench = px.bar(
+                    df_bench_melted,
+                    x="Scope / Cohort",
+                    y="Score (%)",
+                    color="Metric",
+                    barmode="group",
+                    color_discrete_sequence=["#0043CE", "#009D9A", "#9F1853"],
+                    height=320
+                )
+                fig_bench.update_layout(
+                    xaxis_title="",
+                    yaxis_title="Score (%)",
+                    yaxis=dict(range=[0, 100]),
+                    margin=dict(t=20, b=10, l=10, r=10),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                )
+                st.plotly_chart(fig_bench, use_container_width=True)
+
+            with m_col2:
+                st.markdown("#### Full Performance Matrix")
+                df_display = df_benchmarks.copy()
+                for col in df_display.columns:
+                    if col != "Scope / Cohort":
+                        df_display[col] = df_display[col].apply(lambda x: f"{x:.2f}%")
+                
+                st.dataframe(
+                    df_display,
+                    use_container_width=True,
+                    hide_index=True,
+                    height=320
+                )
+
+            st.markdown("---")
+
+            # 3. Section 2: Resolution Breakdown & NIL Cluster Deep-Dive
             res_col1, res_col2 = st.columns(2)
 
-            # EXTENDED IBM CARBON PALETTE (Distinct Diagnostic Shades)
             RESOLUTION_COLOR_MAP = {
                 "Wikidata Resolved": "#009D9A",  # IBM Carbon Teal 40
                 "NIL Clustered": "#4589FF",      # IBM Carbon Cerulean / Blue 40
@@ -702,7 +793,7 @@ if df is not None:
                         cohort_span=("Cohort", "nunique")
                     ).reset_index().sort_values("mentions", ascending=False).head(8)
 
-                    # IBM Carbon Deep Teal (#005D5D) for cluster representation
+                    # IBM Carbon Deep Teal (#005D5D)
                     fig_nil = px.bar(
                         top_nil,
                         x="mentions",
@@ -720,3 +811,52 @@ if df is not None:
                     st.plotly_chart(fig_nil, use_container_width=True)
                 else:
                     st.info("No NIL clustered entities present in current selection.")
+
+            st.markdown("---")
+
+            # 4. Section 3: Model Confidence & Data Completeness
+            diag_col1, diag_col2 = st.columns(2)
+
+            with diag_col1:
+                st.markdown("#### NER Model Confidence Distribution")
+                # IBM Carbon Deep Violet (#491D8B)
+                fig_conf = px.histogram(
+                    df_filtered, 
+                    x="Confidence", 
+                    nbins=20, 
+                    color_discrete_sequence=["#491D8B"]
+                )
+                fig_conf.update_layout(
+                    yaxis_title="Entity Count", 
+                    xaxis_title="Confidence Score (0.0 - 1.0)",
+                    margin=dict(t=30, b=10, l=10, r=10)
+                )
+                st.plotly_chart(fig_conf, use_container_width=True)
+
+            with diag_col2:
+                st.markdown("#### Semantic Metadata Fill Rate (%)")
+                attributes = [
+                    "Occupation", "Political Ideology", "Member Of", 
+                    "Participant In", "Gender Identity", "Ethnic Group/Tribe", 
+                    "Religion", "Country", "VIAF Link"
+                ]
+                completeness = [
+                    (df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 
+                    for col in attributes
+                ]
+                
+                df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
+                # IBM Carbon Forest Green (#198038)
+                fig_comp = px.bar(
+                    df_comp, 
+                    x="Fill Rate (%)", 
+                    y="Attribute", 
+                    orientation='h', 
+                    color_discrete_sequence=["#198038"]
+                )
+                fig_comp.update_xaxes(range=[0, 100])
+                fig_comp.update_layout(
+                    yaxis={'categoryorder':'total ascending'},
+                    margin=dict(t=30, b=10, l=10, r=10)
+                )
+                st.plotly_chart(fig_comp, use_container_width=True)
