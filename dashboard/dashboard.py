@@ -217,12 +217,12 @@ if df is not None:
         m1, m2, m3, m4, m5, m6 = st.columns(6)
         with m1: st.metric("Total Records", filtered_records_count)
         with m2:
+            relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "Political Ideology", "Member Of", "Participant In"]
+            populated_count = df_filtered[relational_columns].notna().sum().sum()
             avg_paths = populated_count / filtered_records_count if filtered_records_count > 0 else 0
             st.metric("Paths / Record", f"{avg_paths:.2f}x")    
         with m3: st.metric("Entity Mentions", len(df_filtered))
         with m4:
-            relational_columns = ["Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "Political Ideology", "Member Of", "Participant In"]
-            populated_count = df_filtered[relational_columns].notna().sum().sum()
             avg_demo = populated_count / len(df_filtered) if len(df_filtered) > 0 else 0
             st.metric("Metadata / Mention", f"{avg_demo:.2f}x")
         with m5: st.metric("Unique Entity Nodes", df_filtered["Entity ID"].nunique())
