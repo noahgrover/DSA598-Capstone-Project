@@ -633,43 +633,139 @@ if df is not None:
                             wd_url = f"https://www.wikidata.org/wiki/{selected_row['Entity ID'].replace('wd:', '')}"
                             st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
                             
-    # --- Tab 5: Pipeline Quality Diagnostics ---
+   # --- Tab 5: Pipeline Quality Diagnostics ---
     with tab5:
-        st.subheader("Pipeline Quality & Resolution Diagnostics")
-        
-        # Top Row: Resolution & Confidence
-        d_col1, d_col2 = st.columns(2)
-        
-        with d_col1:
-            st.markdown("#### Entity Resolution Types")
-            res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
-            fig_res = px.pie(res_counts, values="count", names="Resolution Type", color_discrete_map={"Wikidata Resolved": "#2ECC71", "NIL Clustered": "#3498DB", "Unlinked Entity": "#E74C3C"})
-            st.plotly_chart(fig_res, use_container_width=True)
-            
-        with d_col2:
-            st.markdown("#### NER Confidence Scores")
-            fig_conf = px.histogram(df_filtered, x="Confidence", nbins=20, color_discrete_sequence=["#3498DB"])
-            fig_conf.update_layout(yaxis_title="Entity Count", xaxis_title="Confidence Score")
-            st.plotly_chart(fig_conf, use_container_width=True)
+        st.subheader("📈 Pipeline Quality Diagnostics & NIL Cluster Analytics")
+        st.markdown("""
+        Assess structural accuracy, resolution efficacy, and metadata completeness across the extraction pipeline.
+        This includes deep-dive metrics into **NIL (Not-In-Lexicon) clustering**—grouping local, unlinked entities across the archive.
+        """)
 
-        st.markdown("---")
-        
-        # Bottom Row: Classes & Completeness
-        d_col3, d_col4 = st.columns(2)
-        
-        with d_col3:
-            st.markdown("#### Extracted NER Classes")
-            class_counts = df_filtered["NER Class"].value_counts().reset_index()
-            fig_class = px.bar(class_counts, x="count", y="NER Class", orientation='h', color_discrete_sequence=["#F1C40F"])
-            st.plotly_chart(fig_class, use_container_width=True)
+        if df_filtered.empty:
+            st.info("No data available for quality diagnostics based on current filters.")
+        else:
+            # 1. High-Level Quality & NIL Metrics
+            df_nil = df_filtered[df_filtered["Resolution Type"] == "NIL Clustered"]
+            df_resolved = df_filtered[df_filtered["Resolution Type"] == "Wikidata Resolved"]
+            df_unlinked = df_filtered[df_filtered["Resolution Type"] == "Unlinked Entity"]
             
-        with d_col4:
-            st.markdown("#### Metadata Completeness (Fill Rate)")
-            attributes = ["Occupation", "Political Ideology", "Member Of", "Participant In", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", "VIAF Link"]
-            completeness = [(df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 for col in attributes]
+            total_mentions = len(df_filtered)
+            nil_mentions_count = len(df_nil)
+            unique_nil_clusters = df_nil["Entity ID"].nunique()
             
-            df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
-            fig_comp = px.bar(df_comp, x="Fill Rate (%)", y="Attribute", orientation='h', color_discrete_sequence=["#9B59B6"])
-            fig_comp.update_xaxes(range=[0, 100])
-            fig_comp.update_layout(yaxis={'categoryorder':'total ascending'})
-            st.plotly_chart(fig_comp, use_container_width=True)
+            # Clustering Efficiency: % of non-Wikidata entities successfully grouped into local clusters
+            total_non_wikidata = nil_mentions_count + len(df_unlinked)
+            nil_cluster_efficiency = (nil_mentions_count / total_non_wikidata * 100) if total_non_wikidata > 0 else 0
+            
+            avg_conf = df_filtered["Confidence"].mean() if "Confidence" in df_filtered and not df_filtered["Confidence"].isna().all() else 0.0
+
+            with st.container(border=True):
+                q1, q2, q3, q4, q5 = st.columns(5)
+                with q1: st.metric("Wikidata Linking Rate", f"{(len(df_resolved)/total_mentions*100):.1f}%")
+                with q2: st.metric("Total NIL Mentions", nil_mentions_count)
+                with q3: st.metric("Unique NIL Clusters", unique_nil_clusters)
+                with q4: st.metric("NIL Clustering Efficiency", f"{nil_cluster_efficiency:.1f}%")
+                with q5: st.metric("Avg NER Confidence", f"{avg_conf:.2f}")
+
+            st.markdown("---")
+
+            # 2. Section 1: Resolution Breakdown & NIL Cluster Deep-Dive
+            res_col1, res_col2 = st.columns(2)
+
+            # IBM Color Map specifically for entity resolution statuses
+            RESOLUTION_COLOR_MAP = {
+                "Wikidata Resolved": "#648FFF",  # IBM Ultramarine
+                "NIL Clustered": "#785EF0",      # IBM Indigo
+                "Unlinked Entity": "#FE6100"     # IBM Orange
+            }
+
+            with res_col1:
+                st.markdown("#### Entity Resolution Distribution")
+                res_counts = df_filtered["Resolution Type"].value_counts().reset_index()
+                fig_res = px.pie(
+                    res_counts, 
+                    values="count", 
+                    names="Resolution Type", 
+                    color="Resolution Type",
+                    color_discrete_map=RESOLUTION_COLOR_MAP,
+                    hole=0.4
+                )
+                fig_res.update_traces(textposition='inside', textinfo='percent+label')
+                fig_res.update_layout(showlegend=False, margin=dict(t=30, b=10, l=10, r=10))
+                st.plotly_chart(fig_res, use_container_width=True)
+
+            with res_col2:
+                st.markdown("#### Largest NIL Entity Clusters")
+                if not df_nil.empty:
+                    top_nil = df_nil.groupby("Official Name").agg(
+                        mentions=("Entity ID", "count"),
+                        cohort_span=("Cohort", "nunique")
+                    ).reset_index().sort_values("mentions", ascending=False).head(8)
+
+                    # Used IBM Magenta (#DC267F) for cluster representation
+                    fig_nil = px.bar(
+                        top_nil,
+                        x="mentions",
+                        y="Official Name",
+                        orientation="h",
+                        color_discrete_sequence=["#DC267F"],
+                        hover_data=["cohort_span"]
+                    )
+                    fig_nil.update_layout(
+                        yaxis={'categoryorder':'total ascending'},
+                        xaxis_title="Mentions in Cluster",
+                        yaxis_title="NIL Cluster Entity",
+                        margin=dict(t=30, b=10, l=10, r=10)
+                    )
+                    st.plotly_chart(fig_nil, use_container_width=True)
+                else:
+                    st.info("No NIL clustered entities present in current selection.")
+
+            st.markdown("---")
+
+            # 3. Section 2: Model Confidence & Data Completeness
+            diag_col1, diag_col2 = st.columns(2)
+
+            with diag_col1:
+                st.markdown("#### NER Model Confidence Distribution")
+                # Used IBM Deep Blue (#002D9C) for model diagnostics
+                fig_conf = px.histogram(
+                    df_filtered, 
+                    x="Confidence", 
+                    nbins=20, 
+                    color_discrete_sequence=["#002D9C"]
+                )
+                fig_conf.update_layout(
+                    yaxis_title="Entity Count", 
+                    xaxis_title="Confidence Score (0.0 - 1.0)",
+                    margin=dict(t=30, b=10, l=10, r=10)
+                )
+                st.plotly_chart(fig_conf, use_container_width=True)
+
+            with diag_col2:
+                st.markdown("#### Semantic Metadata Fill Rate (%)")
+                attributes = [
+                    "Occupation", "Political Ideology", "Member Of", 
+                    "Participant In", "Gender Identity", "Ethnic Group/Tribe", 
+                    "Religion", "Country", "VIAF Link"
+                ]
+                completeness = [
+                    (df_filtered[col].notna().sum() / len(df_filtered) * 100) if len(df_filtered) > 0 else 0 
+                    for col in attributes
+                ]
+                
+                df_comp = pd.DataFrame({"Attribute": attributes, "Fill Rate (%)": completeness})
+                # Used IBM Gold (#FFB000) for metadata completeness
+                fig_comp = px.bar(
+                    df_comp, 
+                    x="Fill Rate (%)", 
+                    y="Attribute", 
+                    orientation='h', 
+                    color_discrete_sequence=["#FFB000"]
+                )
+                fig_comp.update_xaxes(range=[0, 100])
+                fig_comp.update_layout(
+                    yaxis={'categoryorder':'total ascending'},
+                    margin=dict(t=30, b=10, l=10, r=10)
+                )
+                st.plotly_chart(fig_comp, use_container_width=True)
