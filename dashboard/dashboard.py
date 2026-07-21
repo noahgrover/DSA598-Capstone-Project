@@ -198,13 +198,6 @@ if df is not None:
         "Thing": "#A3A8B8"          # fallback slate gray
     }
 
-
-    with st.popover("📊 Filter Historical Cohorts", use_container_width=True):
-    selected_cohorts = st.multiselect(
-        "Select Active Cohorts:",
-        options=unique_cohorts,
-        default=unique_cohorts
-    )
     # sidebar filters
     '''st.sidebar.header("Global Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
