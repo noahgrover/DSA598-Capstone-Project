@@ -20,7 +20,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("Marginalized Metadata Enrichment: Dashboard")
+st.title("MARGINALIZED METADATA ENRICHMENT: DASHBOARD")
 st.markdown("""
 This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:
 - Extracts title and description fields from digital records stored in DPLA;
