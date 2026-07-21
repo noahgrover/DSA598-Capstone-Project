@@ -956,7 +956,7 @@ if df is not None:
                 st.plotly_chart(fig_comp, use_container_width=True)
 
     # TAB 6
-    with tab6:
+with tab6:
     st.subheader("🕸️ Semantic Density Network Graph")
     st.markdown("""
     Explore structural relationships and co-occurrence density across entity nodes. 
