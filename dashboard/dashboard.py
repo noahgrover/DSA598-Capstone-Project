@@ -244,9 +244,7 @@ if df is not None:
 # =========================================================================================================================================
     
     with tab1:
-        st.markdown("---")
-        st.markdown("""
-        Search, filter, and inspect specific semantic nodes within the graph. Selecting an entity from the list of unique nodes on the right
+        st.caption("""Search, filter, and inspect specific semantic nodes within the graph. Selecting an entity from the list of unique nodes on the right
         will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.""")
 
         if df_filtered.empty:
@@ -398,13 +396,9 @@ if df is not None:
 # =========================================================================================================================================
     
     with tab2:
-        st.markdown("---")
-        st.markdown("""
-        Explore structural relationships and co-occurrence density across entity nodes. 
+        st.caption("""Explore structural relationships and co-occurrence density across entity nodes. 
         Node sizes represent **mention density** (degree/frequency), edge thickness indicates **co-occurrence strength**, 
-        and colors correspond to **NER entity classes**.
-        """)
-        st.markdown("---")
+        and colors correspond to **NER entity classes**.""")
         
         # guard against empty datasets
         df_net_clean = df_filtered.dropna(subset=["Entity ID"]).copy() if not df_filtered.empty else pd.DataFrame()
