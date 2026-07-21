@@ -233,23 +233,24 @@ if df is not None:
         "📈 Pipeline Quality Diagnostics"
     ])
     
-    # --- GIS Map ---
+    # --- Tab 1: Geospatial & Geographic Analysis ---
     with tab1:
-        st.subheader("Geospatial Entity Distribution & Mention Density")
+        st.subheader("🌐 Geospatial Entity Distribution & Spatial Density")
         st.markdown("""
-        Geographic footprint of resolved entity nodes across archival sources. 
-        Marker **color** represents the entity category, while marker **size** scales with total mention frequency.
+        Inspect the geographical footprint of resolved entity nodes across your archival corpus. 
+        Toggle between **Weighted Markers** to inspect individual entity locations and categories, 
+        or **Density Heatmap** to identify broader historical epicenters and spatial concentrations.
         """)
         
         df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
-       
-        if len(df_geo) > 0:
+        
+        if not df_geo.empty:
             # 1. Aggregate mention counts per unique geospatial entity node
             geo_mention_counts = df_geo.groupby("Entity ID").size().to_dict()
             df_geo_nodes = df_geo.drop_duplicates(subset=["Entity ID"]).copy()
             df_geo_nodes["Mentions"] = df_geo_nodes["Entity ID"].map(geo_mention_counts)
             
-            # 2. Build hover labels with mention counts
+            # 2. Build detailed hover labels with mention counts
             df_geo_nodes["Hover Title"] = (
                 df_geo_nodes["Icon"] + " " + 
                 df_geo_nodes["Official Name"] + 
@@ -257,30 +258,66 @@ if df is not None:
                 df_geo_nodes["Mentions"].apply(lambda x: "s" if x > 1 else "") + ")"
             )
             
-            # 3. Render Map with Weighted Point Sizes
-            fig_map = px.scatter_mapbox(
-                df_geo_nodes,
-                lat="Latitude",
-                lon="Longitude",
-                hover_name="Hover Title",
-                hover_data={
-                    "Mentions": True,
-                    "NER Class": True,
-                    "Cohort": True,
-                    "Country": True,
-                    "Latitude": False,
-                    "Longitude": False
-                },
-                color="NER Class",                      # Enforced global IBM NER class palette
-                color_discrete_map=IBM_LABEL_COLOR_MAP,
-                size="Mentions",                        # Scales marker size by mention volume
-                size_max=28,                            # Prevents huge dots from swallowing regional nodes
-                zoom=2,
-                height=600
-            )
+            # 3. Interactive Map View Controls
+            ctrl_col1, ctrl_col2 = st.columns([2, 1])
+            with ctrl_col1:
+                map_view = st.radio(
+                    "Select Map Display Mode:", 
+                    options=["Weighted Markers", "Density Heatmap"], 
+                    horizontal=True
+                )
+            with ctrl_col2:
+                map_style = st.selectbox(
+                    "Base Map Tile Style:", 
+                    options=["open-street-map", "carto-positron", "carto-darkmatter"],
+                    index=0
+                )
+            
+            # 4. Conditional Map Rendering
+            if map_view == "Weighted Markers":
+                fig_map = px.scatter_mapbox(
+                    df_geo_nodes,
+                    lat="Latitude",
+                    lon="Longitude",
+                    hover_name="Hover Title",
+                    hover_data={
+                        "Mentions": True,
+                        "NER Class": True,
+                        "Cohort": True,
+                        "Country": True,
+                        "Latitude": False,
+                        "Longitude": False
+                    },
+                    color="NER Class",
+                    color_discrete_map=IBM_LABEL_COLOR_MAP,
+                    size="Mentions",
+                    size_max=28,
+                    zoom=2,
+                    height=600
+                )
+            else:
+                # Custom IBM Ultramarine sequential gradient for density display
+                fig_map = px.density_mapbox(
+                    df_geo_nodes,
+                    lat="Latitude",
+                    lon="Longitude",
+                    z="Mentions",
+                    hover_name="Hover Title",
+                    hover_data={
+                        "Mentions": True,
+                        "Country": True,
+                        "Latitude": False,
+                        "Longitude": False
+                    },
+                    radius=22,
+                    zoom=2,
+                    height=600,
+                    color_continuous_scale=["#F4F6FF", "#648FFF", "#002D9C"]
+                )
+            
             fig_map.update_layout(
-                mapbox_style="open-street-map",
-                margin=dict(l=0, r=0, t=20, b=0)
+                mapbox_style=map_style,
+                margin=dict(l=0, r=0, t=10, b=0)
             )
             st.plotly_chart(fig_map, use_container_width=True)
         else:
