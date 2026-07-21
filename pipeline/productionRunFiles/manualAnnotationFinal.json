@@ -1,0 +1,3953 @@
+[
+    {
+        "local_id": "12446f152c4858564048a394fb73a842",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Asian American history\" OR \"Asian-American history\" OR \"Asian American\"",
+        "title": "[Flyer: Houston Asian-American Festival, 1986]",
+        "description": "Flyer for the 7th annual Asian American Festival held in Houston, including information about dates and locations, a schedule of events, sponsorships, and contact information. 1 pamphlet : ill. ; 28 x 44 cm., folded to 28 x 22 cm.",
+        "entities": [
+            {
+                "start": 57,
+                "end": 64,
+                "label": "GPE",
+                "entity_span": "Houston",
+                "wikidata_id": "Q16555"
+            },
+            {
+                "start": 25,
+                "end": 48,
+                "label": "EVENT",
+                "entity_span": "Asian American Festival",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "afe8b2482e2b66210510d30d51ada310",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Asian American history\" OR \"Asian-American history\" OR \"Asian American\"",
+        "title": "[Flyer: Houston Asian-American Festival, 1989]",
+        "description": "Flyer for the 10th annual Asian American Festival held in Houston, including information about dates and locations, sponsorships, and contact information. 1 pamphlet : ill. ; 28 x 44 cm., folded to 28 x 22 cm.",
+        "entities": [
+            {
+                "start": 58,
+                "end": 65,
+                "label": "GPE",
+                "entity_span": "Houston",
+                "wikidata_id": "Q16555"
+            },
+            {
+                "start": 26,
+                "end": 49,
+                "label": "EVENT",
+                "entity_span": "Asian American Festival",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "b43875ead1051416a46c0063ab6f379c",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Civil Rights\" OR \"Civil Rights Movement\"",
+        "title": "[Program: Black Music and the Civil Rights Movement]",
+        "description": "Program for the Black Music and Civil Rights Movement Concert held on January 20, 1985. The program lists the performers and provides details about the production teams. 1 pamphlet ; 22 x 28 cm., folded to 22 x 14 cm.",
+        "entities": [
+            {
+                "start": 16,
+                "end": 61,
+                "label": "EVENT",
+                "entity_span": "Black Music and Civil Rights Movement Concert",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "2b40e1fa4b5da2bdf2c1a2c94487c6b0",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Asian American history\" OR \"Asian-American history\" OR \"Asian American\"",
+        "title": "The Asian American Connection newsletters",
+        "description": "Incomplete run. Newsletter name changes to Asian/Pacific American Connection at volume 14 issue 1, September 1994. Name changes to A/PASS Connection in September 2000.",
+        "entities": [
+            {
+                "start": 43,
+                "end": 76,
+                "label": "ORG",
+                "entity_span": "Asian/Pacific American Connection",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 131,
+                "end": 148,
+                "label": "ORG",
+                "entity_span": "A/PASS Connection",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "881f474b0b9d412e7669eec2737c7078",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Asian American history\" OR \"Asian-American history\" OR \"Asian American\"",
+        "title": "Asian American Authors exhibit display case",
+        "description": "Library display case featuring books and materials by Asian American authors, with sections for periodicals and reference materials visible above the exhibit Descriptive metadata for this item has been generated in part using AI (artificial intelligence) technologies and may be incomplete, misleading, or inaccurate. Please contact the Kenneth Spencer Research Library with specific questions or concerns.",
+        "entities": [
+            {
+                "start": 54,
+                "end": 68,
+                "label": "NORP",
+                "entity_span": "Asian American",
+                "wikidata_id": "Q727928"
+            },
+            {
+                "start": 337,
+                "end": 369,
+                "label": "ORG",
+                "entity_span": "Kenneth Spencer Research Library",
+                "wikidata_id": "Q48977616"
+            }
+        ]
+    },
+    {
+        "local_id": "4b2c5b7f621699ffe8a4932cc7bf25da",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Civil Rights\" OR \"Civil Rights Movement\"",
+        "title": "The Civil Rights Movement : Maryland in the 1960's",
+        "description": "Oral history interview with Mr. Thomas Dukehart by St. Andrew's Episcopal School student Jamie Fowler. In this interview Mr. Dukehart, a news photographer who spent much of his career covering various Civil Rights events, describes his experiences at riots, sit-ins, and rallies.",
+        "entities": [
+            {
+                "start": 32,
+                "end": 47,
+                "label": "PERSON",
+                "entity_span": "Thomas Dukehart",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 51,
+                "end": 80,
+                "label": "ORG",
+                "entity_span": "St. Andrew's Episcopal School",
+                "wikidata_id": "Q7586874"
+            },
+            {
+                "start": 89,
+                "end": 101,
+                "label": "PERSON",
+                "entity_span": "Jamie Fowler",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 125,
+                "end": 133,
+                "label": "PERSON",
+                "entity_span": "Dukehart",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "445894e0c913f389091cc5bdaadf5ad6",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Chicano movement\" OR \"Chicana movement\" OR \"El Movimiento\"",
+        "title": "John Nava Oral History Video",
+        "description": "John Nava discusses growing up in Pueblo, Colorado on \"Goat Hill\" in the 1940's and 1950's. This interview covers his time in the Navy, his educational journey, career, and his experiences with discrimination. Mr. Nava was an educator for over fifty years. His past experiences helped him decide what kind of teacher he would become to best support his students. He taught several subjects including Chicano Studies and was instrumental in founding the Central High School Spanish Club and the Student Exchange Program to Hermosillo, Mexico.",
+        "entities": [
+            {
+                "start": 0,
+                "end": 9,
+                "label": "PERSON",
+                "entity_span": "John Nava",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 34,
+                "end": 40,
+                "label": "GPE",
+                "entity_span": "Pueblo",
+                "wikidata_id": "Q675576"
+            },
+            {
+                "start": 42,
+                "end": 50,
+                "label": "GPE",
+                "entity_span": "Colorado",
+                "wikidata_id": "Q1261"
+            },
+            {
+                "start": 130,
+                "end": 134,
+                "label": "ORG",
+                "entity_span": "Navy",
+                "wikidata_id": "Q11220"
+            },
+            {
+                "start": 214,
+                "end": 218,
+                "label": "PERSON",
+                "entity_span": "Nava",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 400,
+                "end": 407,
+                "label": "NORP",
+                "entity_span": "Chicano",
+                "wikidata_id": "Q1307911"
+            },
+            {
+                "start": 453,
+                "end": 485,
+                "label": "ORG",
+                "entity_span": "Central High School Spanish Club",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 494,
+                "end": 518,
+                "label": "ORG",
+                "entity_span": "Student Exchange Program",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 522,
+                "end": 532,
+                "label": "GPE",
+                "entity_span": "Hermosillo",
+                "wikidata_id": "Q189138"
+            },
+            {
+                "start": 534,
+                "end": 540,
+                "label": "GPE",
+                "entity_span": "Mexico",
+                "wikidata_id": "Q96"
+            },
+            {
+                "start": 55,
+                "end": 64,
+                "label": "GPE",
+                "entity_span": "Goat Hill",
+                "wikidata_id": "Q49031736"
+            }
+        ]
+    },
+    {
+        "local_id": "1bc0f3ca4262743fa6079cb488c06da8",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Racial segregation\" OR \"Jim Crow\" OR \"Desegregation\"",
+        "title": "\"The Strange Career of Jim Crow\"",
+        "description": "Window display for Central Library, Window 4, titled \"'The Strange Career of Jim Crow'\". On display from June 14 - June 30, 1955. Display for book by Johns Hopkins University historian Dr. C. Vann Woodward.",
+        "entities": [
+            {
+                "start": 19,
+                "end": 34,
+                "label": "ORG",
+                "entity_span": "Central Library",
+                "wikidata_id": "Q69776380"
+            },
+            {
+                "start": 150,
+                "end": 174,
+                "label": "ORG",
+                "entity_span": "Johns Hopkins University",
+                "wikidata_id": "Q193727"
+            },
+            {
+                "start": 189,
+                "end": 205,
+                "label": "PERSON",
+                "entity_span": "C. Vann Woodward",
+                "wikidata_id": "Q612410"
+            }
+        ]
+    },
+    {
+        "local_id": "7167876254b17d1937c7ed7f1eb53c99",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Civil Rights\" OR \"Civil Rights Movement\"",
+        "title": "[Black Music and the Civil Rights Movement concert tape]",
+        "description": "Audio cassette from The Black Academy of Arts and Letters recorded during an annual Black Music and the Civil Rights concert held at the Meyerson Symphony Center in Dallas Texas. The tape includes various singers and a large choir singing gospel and spiritual music. The tape concludes with an audience applauding the performers. 1 sound recording (31 min., 53 sec.) ; cassette.",
+        "entities": [
+            {
+                "start": 24,
+                "end": 57,
+                "label": "ORG",
+                "entity_span": "Black Academy of Arts and Letters",
+                "wikidata_id": "Q85747481"
+            },
+            {
+                "start": 165,
+                "end": 171,
+                "label": "GPE",
+                "entity_span": "Dallas",
+                "wikidata_id": "Q16557"
+            },
+            {
+                "start": 172,
+                "end": 177,
+                "label": "GPE",
+                "entity_span": "Texas",
+                "wikidata_id": "Q1439"
+            },
+            {
+                "start": 84,
+                "end": 124,
+                "label": "EVENT",
+                "entity_span": "Black Music and the Civil Rights concert",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "97bf5e53b87ba0d6d2b41c1bfd1989c2",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Chicano movement\" OR \"Chicana movement\" OR \"El Movimiento\"",
+        "title": "Becky Hobbs at Conferencia - Chicanas en El Movimiento, Seattle, August 22, 1974",
+        "description": "In this image of Rebecca \"Becky\" Hobbs, the University of Washington Minority Affairs Office staff assistant discusses the first annual Conferencia - Chicanas en El Movimiento (Women in the Movement conference), held over three days at El Centro de La Raza on Beacon Hill. The event was an initial step in establishing a state-wide network for job listings, education opportunities, legislative lobbying, and support. Ms. Hobbs was quoted as saying, \"Employers don't seem to think there are any Chicanas in Seattle. We know others are out there and don't want to lose them. We want to keep Chicana talent here. But first we must provide some job-skill training, a log of information on day care, resume writing workshops - whatever is needed to get the Chicana out of the background.\" Another hope for the conference was to bridge the gap between Chicanas in Eastern and Western Washington. Amalia Garza, an attendee, said, \"Since we are so different, we can tap that many more talents. If we solve the practical problems, we can deal with the philosophical.\" The event was hosted by the Chicano Division and MECHA at the University of Washington, and funded by the Chicano Mobile Institute through the University of Utah. Caption information source: \"Chicanas: 'Now It's Our Turn,'\" Seattle Post-Intelligence, August 23, 1974, page 44.",
+        "entities": [
+            {
+                "start": 17,
+                "end": 38,
+                "label": "PERSON",
+                "entity_span": "Rebecca \"Becky\" Hobbs",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 44,
+                "end": 92,
+                "label": "ORG",
+                "entity_span": "University of Washington Minority Affairs Office",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 260,
+                "end": 271,
+                "label": "GPE",
+                "entity_span": "Beacon Hill",
+                "wikidata_id": "Q4875945"
+            },
+            {
+                "start": 422,
+                "end": 427,
+                "label": "PERSON",
+                "entity_span": "Hobbs",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 507,
+                "end": 514,
+                "label": "GPE",
+                "entity_span": "Seattle",
+                "wikidata_id": "Q5083"
+            },
+            {
+                "start": 495,
+                "end": 503,
+                "label": "NORP",
+                "entity_span": "Chicanas",
+                "wikidata_id": "Q105836574"
+            },
+            {
+                "start": 590,
+                "end": 597,
+                "label": "NORP",
+                "entity_span": "Chicana",
+                "wikidata_id": "Q105836574"
+            },
+            {
+                "start": 753,
+                "end": 760,
+                "label": "NORP",
+                "entity_span": "Chicana",
+                "wikidata_id": "Q105836574"
+            },
+            {
+                "start": 847,
+                "end": 855,
+                "label": "NORP",
+                "entity_span": "Chicanas",
+                "wikidata_id": "Q105836574"
+            },
+            {
+                "start": 879,
+                "end": 889,
+                "label": "GPE",
+                "entity_span": "Washington",
+                "wikidata_id": "Q1223"
+            },
+            {
+                "start": 891,
+                "end": 903,
+                "label": "PERSON",
+                "entity_span": "Amalia Garza",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 1088,
+                "end": 1104,
+                "label": "ORG",
+                "entity_span": "Chicano Division",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 1109,
+                "end": 1114,
+                "label": "ORG",
+                "entity_span": "MECHA",
+                "wikidata_id": "Q6715273"
+            },
+            {
+                "start": 1122,
+                "end": 1146,
+                "label": "ORG",
+                "entity_span": "University of Washington",
+                "wikidata_id": "Q219563"
+            },
+            {
+                "start": 1166,
+                "end": 1190,
+                "label": "ORG",
+                "entity_span": "Chicano Mobile Institute",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 1203,
+                "end": 1221,
+                "label": "ORG",
+                "entity_span": "University of Utah",
+                "wikidata_id": "Q168515"
+            },
+            {
+                "start": 1284,
+                "end": 1309,
+                "label": "ORG",
+                "entity_span": "Seattle Post-Intelligence",
+                "wikidata_id": "Q286261"
+            },
+            {
+                "start": 150,
+                "end": 158,
+                "label": "NORP",
+                "entity_span": "Chicanas",
+                "wikidata_id": "Q105836574"
+            },
+            {
+                "start": 1252,
+                "end": 1260,
+                "label": "NORP",
+                "entity_span": "Chicanas",
+                "wikidata_id": "Q105836574"
+            },
+            {
+                "start": 236,
+                "end": 256,
+                "label": "ORG",
+                "entity_span": "El Centro de La Raza",
+                "wikidata_id": "Q5350989"
+            }
+        ]
+    },
+    {
+        "local_id": "cb9c44716bab3623d3bfbe756c2c19bc",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"African American history\" OR \"African-American history\" OR \"Black history\"",
+        "title": "National Museum of African American History and Culture",
+        "description": "Original post: Good morning, #NMAAHC! Watched you rise up over years. Now it's time. Help us to know what was And is And can be pic.twitter.com/cYW1OEKoFd",
+        "entities": [
+            {
+                "start": 29,
+                "end": 36,
+                "label": "ORG",
+                "entity_span": "#NMAAHC",
+                "wikidata_id": "Q3073495"
+            }
+        ]
+    },
+    {
+        "local_id": "48812f4adb71fe11a1785c4fbc835515",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Racial segregation\" OR \"Jim Crow\" OR \"Desegregation\"",
+        "title": "\"Jim Crow pickets at F.W. Woolworth store\"",
+        "description": "Students from various area schools protest afront the F.W. Woolworth store on the 4000 block of Lancaster Avenue, under the auspices of the Philadelphia Youth Committee Against Segregation. They are demonstrating in protest against eating places closed to blacks throughout the southern states. Title from verso of photograph",
+        "entities": [
+            {
+                "start": 140,
+                "end": 188,
+                "label": "ORG",
+                "entity_span": "Philadelphia Youth Committee Against Segregation",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 54,
+                "end": 68,
+                "label": "ORG",
+                "entity_span": "F.W. Woolworth",
+                "wikidata_id": "Q642212"
+            },
+            {
+                "start": 256,
+                "end": 262,
+                "label": "NORP",
+                "entity_span": "blacks",
+                "wikidata_id": "Q817393"
+            }
+        ]
+    },
+    {
+        "local_id": "8f28b257dca105a3322b1839b063678a",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Asian American history\" OR \"Asian-American history\" OR \"Asian American\"",
+        "title": "[Flyer: Houston Asian-American Festival, 1981]",
+        "description": "Flyer for the 2nd annual Asian American Festival held in Houston, including brief information about dates and locations, and an illustration of exhibitions and performers. 1 flyer : ill. ; 28 x 22 cm.",
+        "entities": [
+            {
+                "start": 57,
+                "end": 64,
+                "label": "GPE",
+                "entity_span": "Houston",
+                "wikidata_id": "Q16555"
+            },
+            {
+                "start": 25,
+                "end": 48,
+                "label": "EVENT",
+                "entity_span": "Asian American Festival",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "df7571060055e20e1ca655efae165f9e",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Asian American history\" OR \"Asian-American history\" OR \"Asian American\"",
+        "title": "[Program: Houston Asian-American Festival, 1981]",
+        "description": "Program for the 2nd annual Asian American Festival held in Houston, including information about dates and locations, a schedule of events, festival organizers and sponsors, letters from public figures, and local advertisements. [56] p. : ill. ; 22 cm.",
+        "entities": [
+            {
+                "start": 59,
+                "end": 66,
+                "label": "GPE",
+                "entity_span": "Houston",
+                "wikidata_id": "Q16555"
+            },
+            {
+                "start": 27,
+                "end": 50,
+                "label": "EVENT",
+                "entity_span": "Asian American Festival",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "68af1250aa1ced8319176069855c8fbd",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Chicano movement\" OR \"Chicana movement\" OR \"El Movimiento\"",
+        "title": "Oral history of Charlie J. Jaquez Jr.",
+        "description": "Description of content: Jaquez talks about his activism in the Chicano movement. , Physical description: 1 digital file in transcript form only. , Project Description: As part of the advisory committee for the exhibit El Movimiento, Daniel Salazar interviewed Carlos Santistevan on August 13, 2014. This oral history was the genesis for the 2018-2019 Movimiento Elders Project. The Movimiento Elders Project, per Salazar, was open to all interested in participating. The interviews began by asking each participant \"When did you become Chicano?\" with discussion following aimed to document the history of the Chicano Movement in Colorado. Organized by Salazar, himself a Colorado native and descendent of Hispanic and Mexican immigrants, the project included Salazar photographing each participant and transcribing each interview. The Movimiento Elders Project was an independent documentation project, conducted by Salazar and donated to History Colorado in 2021.",
+        "entities": [
+            {
+                "start": 24,
+                "end": 30,
+                "label": "PERSON",
+                "entity_span": "Jaquez",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 63,
+                "end": 70,
+                "label": "NORP",
+                "entity_span": "Chicano",
+                "wikidata_id": "Q1307911"
+            },
+            {
+                "start": 233,
+                "end": 247,
+                "label": "PERSON",
+                "entity_span": "Daniel Salazar",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 260,
+                "end": 278,
+                "label": "PERSON",
+                "entity_span": "Carlos Santistevan",
+                "wikidata_id": "Q110140476"
+            },
+            {
+                "start": 413,
+                "end": 420,
+                "label": "PERSON",
+                "entity_span": "Salazar",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 536,
+                "end": 543,
+                "label": "NORP",
+                "entity_span": "Chicano",
+                "wikidata_id": "Q1307911"
+            },
+            {
+                "start": 629,
+                "end": 637,
+                "label": "GPE",
+                "entity_span": "Colorado",
+                "wikidata_id": "Q1261"
+            },
+            {
+                "start": 652,
+                "end": 659,
+                "label": "PERSON",
+                "entity_span": "Salazar",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 671,
+                "end": 679,
+                "label": "GPE",
+                "entity_span": "Colorado",
+                "wikidata_id": "Q1261"
+            },
+            {
+                "start": 705,
+                "end": 713,
+                "label": "NORP",
+                "entity_span": "Hispanic",
+                "wikidata_id": "Q1211934"
+            },
+            {
+                "start": 718,
+                "end": 725,
+                "label": "NORP",
+                "entity_span": "Mexican",
+                "wikidata_id": "Q1209676"
+            },
+            {
+                "start": 759,
+                "end": 766,
+                "label": "PERSON",
+                "entity_span": "Salazar",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 916,
+                "end": 923,
+                "label": "PERSON",
+                "entity_span": "Salazar",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 939,
+                "end": 955,
+                "label": "ORG",
+                "entity_span": "History Colorado",
+                "wikidata_id": "Q5774674"
+            },
+            {
+                "start": 351,
+                "end": 376,
+                "label": "ORG",
+                "entity_span": "Movimiento Elders Project",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 382,
+                "end": 407,
+                "label": "ORG",
+                "entity_span": "Movimiento Elders Project",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 835,
+                "end": 860,
+                "label": "ORG",
+                "entity_span": "Movimiento Elders Project",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 609,
+                "end": 616,
+                "label": "NORP",
+                "entity_span": "Chicano",
+                "wikidata_id": "Q1307911"
+            }
+        ]
+    },
+    {
+        "local_id": "16c72d65940c688d9dd991859c0f8ccc",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Racial segregation\" OR \"Jim Crow\" OR \"Desegregation\"",
+        "title": "2016 Residential racial segregation index by county, Oregon",
+        "description": "This archived document is maintained by the State Library of Oregon as part of the Oregon Documents Depository Program. It is for informational purposes and may not be suitable for legal purposes. Mode of access: Internet from the Oregon Government Publications Collection. Text in English.",
+        "entities": [
+            {
+                "start": 44,
+                "end": 67,
+                "label": "ORG",
+                "entity_span": "State Library of Oregon",
+                "wikidata_id": "Q7101363"
+            },
+            {
+                "start": 83,
+                "end": 118,
+                "label": "ORG",
+                "entity_span": "Oregon Documents Depository Program",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 231,
+                "end": 237,
+                "label": "GPE",
+                "entity_span": "Oregon",
+                "wikidata_id": "Q824"
+            }
+        ]
+    },
+    {
+        "local_id": "9d0cafd8dda5ec5ccd159cca25634f61",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Asian American history\" OR \"Asian-American history\" OR \"Asian American\"",
+        "title": "[Program: Houston Asian-American Festival, 1984]",
+        "description": "Program for the 5th annual Asian American Festival held in Houston, including information about dates and locations, a schedule of events, festival organizers and sponsors, letters from public figures, and local advertisements. [44] p. : ill. ; 22 cm.",
+        "entities": [
+            {
+                "start": 59,
+                "end": 66,
+                "label": "GPE",
+                "entity_span": "Houston",
+                "wikidata_id": "Q16555"
+            },
+            {
+                "start": 27,
+                "end": 50,
+                "label": "EVENT",
+                "entity_span": "Asian American Festival",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "ce26fa359b3d1789b98042bbb7287bcd",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"African American history\" OR \"African-American history\" OR \"Black history\"",
+        "title": "African American History Library site plan",
+        "description": "Site plans for the proposed African American Research Library branch of the Denver Public Library created by Oz Architecture, 1580 Lincoln Street, Suite 1200, Denver, Colorado.",
+        "entities": [
+            {
+                "start": 28,
+                "end": 61,
+                "label": "ORG",
+                "entity_span": "African American Research Library",
+                "wikidata_id": "Q4924033"
+            },
+            {
+                "start": 76,
+                "end": 97,
+                "label": "ORG",
+                "entity_span": "Denver Public Library",
+                "wikidata_id": "Q5259775"
+            },
+            {
+                "start": 109,
+                "end": 124,
+                "label": "ORG",
+                "entity_span": "Oz Architecture",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 159,
+                "end": 165,
+                "label": "GPE",
+                "entity_span": "Denver",
+                "wikidata_id": "Q16554"
+            },
+            {
+                "start": 167,
+                "end": 175,
+                "label": "GPE",
+                "entity_span": "Colorado",
+                "wikidata_id": "Q1261"
+            }
+        ]
+    },
+    {
+        "local_id": "f90565b33c1515e2975579c87cc42993",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Civil Rights\" OR \"Civil Rights Movement\"",
+        "title": "Civil Rights Movement scrapbooks. Mississippi events volume 1",
+        "description": "Topics covered: segregation \"watchdog\" committee; Parker lynching; \"Freedom Riders\"; Philadelphia black church burned; voting registration disputes; James H. Meredith; contempt of court charges sought against University of Mississippi officials; Governor Ross Barnett bars Meredith from \"Ole Miss\". These scrapbooks, compiled by librarians at the Birmingham Public Library, contain newspaper clippings relating to the Civil Rights Movement. The clippings are arranged in three subject areas: national civil rights events, Alabama events, and Mississippi events. The clippings are arranged chronologically within the subject areas.",
+        "entities": [
+            {
+                "start": 50,
+                "end": 56,
+                "label": "PERSON",
+                "entity_span": "Parker",
+                "wikidata_id": "Q6724198"
+            },
+            {
+                "start": 85,
+                "end": 97,
+                "label": "GPE",
+                "entity_span": "Philadelphia",
+                "wikidata_id": "Q1435"
+            },
+            {
+                "start": 98,
+                "end": 103,
+                "label": "NORP",
+                "entity_span": "black",
+                "wikidata_id": "Q817393"
+            },
+            {
+                "start": 149,
+                "end": 166,
+                "label": "PERSON",
+                "entity_span": "James H. Meredith",
+                "wikidata_id": "Q5040"
+            },
+            {
+                "start": 209,
+                "end": 234,
+                "label": "ORG",
+                "entity_span": "University of Mississippi",
+                "wikidata_id": "Q1138384"
+            },
+            {
+                "start": 255,
+                "end": 267,
+                "label": "PERSON",
+                "entity_span": "Ross Barnett",
+                "wikidata_id": "Q881524"
+            },
+            {
+                "start": 273,
+                "end": 281,
+                "label": "PERSON",
+                "entity_span": "Meredith",
+                "wikidata_id": "Q5040"
+            },
+            {
+                "start": 288,
+                "end": 296,
+                "label": "ORG",
+                "entity_span": "Ole Miss",
+                "wikidata_id": "Q1138384"
+            },
+            {
+                "start": 347,
+                "end": 372,
+                "label": "ORG",
+                "entity_span": "Birmingham Public Library",
+                "wikidata_id": "Q4916783"
+            },
+            {
+                "start": 522,
+                "end": 529,
+                "label": "GPE",
+                "entity_span": "Alabama",
+                "wikidata_id": "Q173"
+            },
+            {
+                "start": 542,
+                "end": 553,
+                "label": "GPE",
+                "entity_span": "Mississippi",
+                "wikidata_id": "Q1494"
+            },
+            {
+                "start": 68,
+                "end": 82,
+                "label": "NORP",
+                "entity_span": "Freedom Riders",
+                "wikidata_id": "Q538790"
+            }
+        ]
+    },
+    {
+        "local_id": "719363dd1d8958b16d72ff45f4437735",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Racial segregation\" OR \"Jim Crow\" OR \"Desegregation\"",
+        "title": "Jim Crow joke book",
+        "description": "\"April 3, 1875.\"--Johannsen, A. House of Beadle and Adams and its dime and nickel novels, volume 1, Joke Books, no. 2. Illustrated paper wrappers in colors. NIU Copy: \"The New York News Co., 18 Beekman St. N. Y.\"--Cover.",
+        "entities": [
+            {
+                "start": 172,
+                "end": 188,
+                "label": "ORG",
+                "entity_span": "New York News Co",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 157,
+                "end": 160,
+                "label": "ORG",
+                "entity_span": "NIU",
+                "wikidata_id": "Q1191344"
+            },
+            {
+                "start": 32,
+                "end": 57,
+                "label": "ORG",
+                "entity_span": "House of Beadle and Adams",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 206,
+                "end": 211,
+                "label": "GPE",
+                "entity_span": "N. Y.",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 18,
+                "end": 31,
+                "label": "PERSON",
+                "entity_span": "Johannsen, A.",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "bbcab73cb2689c36e336e92464dd6142",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Civil Rights\" OR \"Civil Rights Movement\"",
+        "title": "Catholicism and the Civil Rights Movement",
+        "description": "Encyclopedia article about the Catholic Church's involvement with the civil rights movement in Alabama. Most of Alabama's white Catholics shared white southerners' racism and initially opposed the goals of the movement. They preferred order and stability instead of activism for integration and racial justice. Catholic teaching clearly opposed racial discrimination, however, and after the mid-1960s there was little sympathy for segregation. For most of the civil rights movement, the Catholic Church in Alabama remained on the margins of the debates over integration and focused on internal Church affairs. It took the 1965 Selma to Montgomery march for voting rights to draw the Church from the margins into the mainstream of the movement. The Civil Rights Digital Library received support from a National Leadership Grant for Libraries awarded to the University of Georgia by the Institute of Museum and Library Services for the aggregation and enhancement of partner metadata.",
+        "entities": [
+            {
+                "start": 31,
+                "end": 46,
+                "label": "ORG",
+                "entity_span": "Catholic Church",
+                "wikidata_id": "Q9592"
+            },
+            {
+                "start": 95,
+                "end": 102,
+                "label": "GPE",
+                "entity_span": "Alabama",
+                "wikidata_id": "Q173"
+            },
+            {
+                "start": 112,
+                "end": 119,
+                "label": "GPE",
+                "entity_span": "Alabama",
+                "wikidata_id": "Q173"
+            },
+            {
+                "start": 122,
+                "end": 127,
+                "label": "NORP",
+                "entity_span": "white",
+                "wikidata_id": "Q235155"
+            },
+            {
+                "start": 128,
+                "end": 137,
+                "label": "NORP",
+                "entity_span": "Catholics",
+                "wikidata_id": "Q17549077"
+            },
+            {
+                "start": 145,
+                "end": 150,
+                "label": "NORP",
+                "entity_span": "white",
+                "wikidata_id": "Q235155"
+            },
+            {
+                "start": 311,
+                "end": 319,
+                "label": "NORP",
+                "entity_span": "Catholic",
+                "wikidata_id": "Q17549077"
+            },
+            {
+                "start": 487,
+                "end": 502,
+                "label": "ORG",
+                "entity_span": "Catholic Church",
+                "wikidata_id": "Q9592"
+            },
+            {
+                "start": 506,
+                "end": 513,
+                "label": "GPE",
+                "entity_span": "Alabama",
+                "wikidata_id": "Q173"
+            },
+            {
+                "start": 748,
+                "end": 776,
+                "label": "ORG",
+                "entity_span": "Civil Rights Digital Library",
+                "wikidata_id": "Q76000858"
+            },
+            {
+                "start": 856,
+                "end": 877,
+                "label": "ORG",
+                "entity_span": "University of Georgia",
+                "wikidata_id": "Q761534"
+            },
+            {
+                "start": 885,
+                "end": 925,
+                "label": "ORG",
+                "entity_span": "Institute of Museum and Library Services",
+                "wikidata_id": "Q6040649"
+            },
+            {
+                "start": 151,
+                "end": 162,
+                "label": "NORP",
+                "entity_span": "southerners",
+                "wikidata_id": "Q101221292"
+            },
+            {
+                "start": 627,
+                "end": 652,
+                "label": "EVENT",
+                "entity_span": "Selma to Montgomery march",
+                "wikidata_id": "Q1061891"
+            }
+        ]
+    },
+    {
+        "local_id": "0178e75117600e8e7cbf97bcb894b075",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"African American history\" OR \"African-American history\" OR \"Black history\"",
+        "title": "African American History Lecture:Nathan McCall",
+        "description": "Handout for a lecture given by Nathan McCall. The event took place June 2, 1996 at the Ashantii Room. 1529 North Alabama",
+        "entities": [
+            {
+                "start": 31,
+                "end": 44,
+                "label": "PERSON",
+                "entity_span": "Nathan McCall",
+                "wikidata_id": "Q6969234"
+            }
+        ]
+    },
+    {
+        "local_id": "7a1b5639af81bbfe32948fa1cb42bd2b",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"African American history\" OR \"African-American history\" OR \"Black history\"",
+        "title": "A Selected Bibliography of African-American History, 1820-1920",
+        "description": "Broderick, Francis L. W. E. B. Du Bois: Negro Leader in a Time of Crisis. Stanford, CA: Stanford University Press, 1959. Harlan, Louis R. BookerT. Washington. New York: Oxford University Press, 1983. Marable, Manning. W. E. B. DuBois: Black Radical Democrat. Boston: Twayne, 1986. McFeely, William S. Frederick Douglass. New York: Norton, 1991. Thornbrough, Emma Lou. T. Thomas Fortune: Militant Journalist. Chicago: University of...",
+        "entities": [
+            {
+                "start": 22,
+                "end": 38,
+                "label": "PERSON",
+                "entity_span": "W. E. B. Du Bois",
+                "wikidata_id": "Q158060"
+            },
+            {
+                "start": 40,
+                "end": 45,
+                "label": "NORP",
+                "entity_span": "Negro",
+                "wikidata_id": "Q1130557"
+            },
+            {
+                "start": 74,
+                "end": 82,
+                "label": "GPE",
+                "entity_span": "Stanford",
+                "wikidata_id": "Q173813"
+            },
+            {
+                "start": 84,
+                "end": 86,
+                "label": "GPE",
+                "entity_span": "CA",
+                "wikidata_id": "Q99"
+            },
+            {
+                "start": 88,
+                "end": 113,
+                "label": "ORG",
+                "entity_span": "Stanford University Press",
+                "wikidata_id": "Q1479937"
+            },
+            {
+                "start": 121,
+                "end": 137,
+                "label": "PERSON",
+                "entity_span": "Harlan, Louis R.",
+                "wikidata_id": "Q6688019"
+            },
+            {
+                "start": 0,
+                "end": 21,
+                "label": "PERSON",
+                "entity_span": "Broderick, Francis L.",
+                "wikidata_id": "Q133522377"
+            },
+            {
+                "start": 138,
+                "end": 157,
+                "label": "PERSON",
+                "entity_span": "BookerT. Washington",
+                "wikidata_id": "Q319871"
+            },
+            {
+                "start": 159,
+                "end": 167,
+                "label": "GPE",
+                "entity_span": "New York",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 169,
+                "end": 192,
+                "label": "ORG",
+                "entity_span": "Oxford University Press",
+                "wikidata_id": "Q217595"
+            },
+            {
+                "start": 200,
+                "end": 216,
+                "label": "PERSON",
+                "entity_span": "Marable, Manning",
+                "wikidata_id": "Q977425"
+            },
+            {
+                "start": 218,
+                "end": 233,
+                "label": "PERSON",
+                "entity_span": "W. E. B. DuBois",
+                "wikidata_id": "Q158060"
+            },
+            {
+                "start": 235,
+                "end": 240,
+                "label": "NORP",
+                "entity_span": "Black",
+                "wikidata_id": "Q817393"
+            },
+            {
+                "start": 249,
+                "end": 257,
+                "label": "NORP",
+                "entity_span": "Democrat",
+                "wikidata_id": "Q29552"
+            },
+            {
+                "start": 259,
+                "end": 265,
+                "label": "GPE",
+                "entity_span": "Boston",
+                "wikidata_id": "Q100"
+            },
+            {
+                "start": 267,
+                "end": 273,
+                "label": "ORG",
+                "entity_span": "Twayne",
+                "wikidata_id": "Q123760140"
+            },
+            {
+                "start": 281,
+                "end": 300,
+                "label": "PERSON",
+                "entity_span": "McFeely, William S.",
+                "wikidata_id": "Q8017981"
+            },
+            {
+                "start": 301,
+                "end": 319,
+                "label": "PERSON",
+                "entity_span": "Frederick Douglass",
+                "wikidata_id": "Q215562"
+            },
+            {
+                "start": 321,
+                "end": 329,
+                "label": "GPE",
+                "entity_span": "New York",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 331,
+                "end": 337,
+                "label": "ORG",
+                "entity_span": "Norton",
+                "wikidata_id": "Q1282208"
+            },
+            {
+                "start": 345,
+                "end": 366,
+                "label": "PERSON",
+                "entity_span": "Thornbrough, Emma Lou",
+                "wikidata_id": "Q5372892"
+            },
+            {
+                "start": 368,
+                "end": 385,
+                "label": "PERSON",
+                "entity_span": "T. Thomas Fortune",
+                "wikidata_id": "Q7807563"
+            },
+            {
+                "start": 408,
+                "end": 415,
+                "label": "GPE",
+                "entity_span": "Chicago",
+                "wikidata_id": "Q1297"
+            }
+        ]
+    },
+    {
+        "local_id": "9bdba44483856b9cb27d31d7648255f7",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Racial segregation\" OR \"Jim Crow\" OR \"Desegregation\"",
+        "title": "[Floyd Arnold \"Jim\" Crow and Football Team]",
+        "description": "Photograph of Floyd Arnold \"Jim\" Crow and a football team. The men in the first row, sitting cross legged, are, from left to right, unidentified, Ben Dean Sheats, Jack Southern, Garland Fawcett, and a man known as \"Cheetah\". The men in the second row are marked as Cook, Baughman, Curtis, La Grone, Marrs McLean, and Barney Hamm. Those in the last row are Jim Crow, a man known as \"Deacon\", Vasey, Goolachek, Mouser, Kazanas, and Lyday. Crow wears a jacket with the letter \"B\" on it, and Jack Southern holds a football in his lap. 1 photograph : b&w ; 21 x 26 cm.",
+        "entities": [
+            {
+                "start": 14,
+                "end": 37,
+                "label": "PERSON",
+                "entity_span": "Floyd Arnold \"Jim\" Crow",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 146,
+                "end": 161,
+                "label": "PERSON",
+                "entity_span": "Ben Dean Sheats",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 163,
+                "end": 176,
+                "label": "PERSON",
+                "entity_span": "Jack Southern",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 178,
+                "end": 193,
+                "label": "PERSON",
+                "entity_span": "Garland Fawcett",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 215,
+                "end": 222,
+                "label": "PERSON",
+                "entity_span": "Cheetah",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 265,
+                "end": 269,
+                "label": "PERSON",
+                "entity_span": "Cook",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 271,
+                "end": 279,
+                "label": "PERSON",
+                "entity_span": "Baughman",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 281,
+                "end": 287,
+                "label": "PERSON",
+                "entity_span": "Curtis",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 289,
+                "end": 297,
+                "label": "PERSON",
+                "entity_span": "La Grone",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 299,
+                "end": 311,
+                "label": "PERSON",
+                "entity_span": "Marrs McLean",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 317,
+                "end": 328,
+                "label": "PERSON",
+                "entity_span": "Barney Hamm",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 356,
+                "end": 364,
+                "label": "PERSON",
+                "entity_span": "Jim Crow",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 382,
+                "end": 388,
+                "label": "PERSON",
+                "entity_span": "Deacon",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 391,
+                "end": 396,
+                "label": "PERSON",
+                "entity_span": "Vasey",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 398,
+                "end": 407,
+                "label": "PERSON",
+                "entity_span": "Goolachek",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 409,
+                "end": 415,
+                "label": "PERSON",
+                "entity_span": "Mouser",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 417,
+                "end": 424,
+                "label": "PERSON",
+                "entity_span": "Kazanas",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 430,
+                "end": 435,
+                "label": "PERSON",
+                "entity_span": "Lyday",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 437,
+                "end": 441,
+                "label": "PERSON",
+                "entity_span": "Crow",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 488,
+                "end": 501,
+                "label": "PERSON",
+                "entity_span": "Jack Southern",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "f8f20050723fd126862e7909fcdfb9ee",
+        "cohort": "Cohort A (Racial/Ethnic Minorities)",
+        "theme": "\"Civil Rights\" OR \"Civil Rights Movement\"",
+        "title": "Civil Rights Movement scrapbooks. Mississippi events volume 3",
+        "description": "Topics covered: Memphis to Jackson march; Philadelphia slayings reopened by Justice Department; eighteen charged with slayings; seven found guilty. These scrapbooks, compiled by librarians at the Birmingham Public Library, contain newspaper clippings relating to the Civil Rights Movement. The clippings are arranged in three subject areas: national civil rights events, Alabama events, and Mississippi events. The clippings are arranged chronologically within the subject areas.",
+        "entities": [
+            {
+                "start": 16,
+                "end": 40,
+                "label": "EVENT",
+                "entity_span": "Memphis to Jackson march",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 42,
+                "end": 54,
+                "label": "GPE",
+                "entity_span": "Philadelphia",
+                "wikidata_id": "Q1345"
+            },
+            {
+                "start": 76,
+                "end": 94,
+                "label": "ORG",
+                "entity_span": "Justice Department",
+                "wikidata_id": "Q1553390"
+            },
+            {
+                "start": 196,
+                "end": 221,
+                "label": "ORG",
+                "entity_span": "Birmingham Public Library",
+                "wikidata_id": "Q4916783"
+            },
+            {
+                "start": 391,
+                "end": 402,
+                "label": "GPE",
+                "entity_span": "Mississippi",
+                "wikidata_id": "Q1494"
+            },
+            {
+                "start": 371,
+                "end": 378,
+                "label": "GPE",
+                "entity_span": "Alabama",
+                "wikidata_id": "Q173"
+            }
+        ]
+    },
+    {
+        "local_id": "d0a0c3905a6b61f6e21a117f2c1bf6a4",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"LGBTQ history\" OR \"LGBT history\" OR \"Gay and lesbian history\"",
+        "title": "August 10, 1989 Bay Area Reporter Event Calendar for August 13",
+        "description": "Text document crop of page 38 Sunday 13 part of the \"This Week\" section of the Bay Area Reporter Magazine Vol.19 No.32 August 10, 1989 Mentions of the San Francisco Bay Area Gay & Lesbian Historical Society & Affirmations, and Rocky O'Donovan (Connell O'Donovan) Converted from .jpg to .pdf for compatibility",
+        "entities": [
+            {
+                "start": 79,
+                "end": 105,
+                "label": "ORG",
+                "entity_span": "Bay Area Reporter Magazine",
+                "wikidata_id": "Q812061"
+            },
+            {
+                "start": 151,
+                "end": 206,
+                "label": "ORG",
+                "entity_span": "San Francisco Bay Area Gay & Lesbian Historical Society",
+                "wikidata_id": "Q5513611"
+            },
+            {
+                "start": 227,
+                "end": 242,
+                "label": "PERSON",
+                "entity_span": "Rocky O'Donovan",
+                "wikidata_id": "Q118538976"
+            },
+            {
+                "start": 244,
+                "end": 261,
+                "label": "PERSON",
+                "entity_span": "Connell O'Donovan",
+                "wikidata_id": "Q118538976"
+            },
+            {
+                "start": 209,
+                "end": 221,
+                "label": "ORG",
+                "entity_span": "Affirmations",
+                "wikidata_id": "Q20631348"
+            }
+        ]
+    },
+    {
+        "local_id": "1acc5d28b579113818792a38004be06f",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Stonewall riots\" OR \"Stonewall uprising\" OR \"Stonewall Rebellion\"",
+        "title": "American Experience; Interview with Martha Shelley, 2 of 2 Stonewall Uprising",
+        "description": "In this interview, Martha Shelley discusses repression in the 1950's, the Shelley Radio Show at Barnard College, her experience in the Daughters of Bilitis, the Mattachine Society, police brutality, bar raids, and organizing the Gay Liberation Front after the Stonewall uprising. In the early morning hours of June 28, 1969 police raided the Stonewall Inn, a popular gay bar in the Greenwich Village section of New York City. Such raids were not unusual in the late 1960s, an era when homosexual sex was illegal in every state but Illinois. That night, however, the street erupted into violent protests and street demonstrations that lasted for the next six days. The Stonewall riots, as they came to be known, marked a major turning point in the modern gay civil rights movement in the United States and around the world.",
+        "entities": [
+            {
+                "start": 19,
+                "end": 33,
+                "label": "PERSON",
+                "entity_span": "Martha Shelley",
+                "wikidata_id": "Q6774562"
+            },
+            {
+                "start": 96,
+                "end": 111,
+                "label": "ORG",
+                "entity_span": "Barnard College",
+                "wikidata_id": "Q167733"
+            },
+            {
+                "start": 135,
+                "end": 155,
+                "label": "ORG",
+                "entity_span": "Daughters of Bilitis",
+                "wikidata_id": "Q1145872"
+            },
+            {
+                "start": 161,
+                "end": 179,
+                "label": "ORG",
+                "entity_span": "Mattachine Society",
+                "wikidata_id": "Q1637438"
+            },
+            {
+                "start": 229,
+                "end": 249,
+                "label": "ORG",
+                "entity_span": "Gay Liberation Front",
+                "wikidata_id": "Q920919"
+            },
+            {
+                "start": 260,
+                "end": 278,
+                "label": "EVENT",
+                "entity_span": "Stonewall uprising",
+                "wikidata_id": "Q51402"
+            },
+            {
+                "start": 74,
+                "end": 81,
+                "label": "PERSON",
+                "entity_span": "Shelley",
+                "wikidata_id": "Q6774562"
+            },
+            {
+                "start": 382,
+                "end": 399,
+                "label": "GPE",
+                "entity_span": "Greenwich Village",
+                "wikidata_id": "Q205380"
+            },
+            {
+                "start": 411,
+                "end": 424,
+                "label": "GPE",
+                "entity_span": "New York City",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 531,
+                "end": 539,
+                "label": "GPE",
+                "entity_span": "Illinois",
+                "wikidata_id": "Q1204"
+            },
+            {
+                "start": 668,
+                "end": 683,
+                "label": "EVENT",
+                "entity_span": "Stonewall riots",
+                "wikidata_id": "Q51402"
+            },
+            {
+                "start": 787,
+                "end": 800,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            }
+        ]
+    },
+    {
+        "local_id": "5d76f3da0f67855aa0ecc1fde4adf613",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Gay liberation movement\" OR \"Gay Liberation Front\" OR \"Gay rights movement\"",
+        "title": "Kent Gay Liberation Front women's raps",
+        "description": "This is a flyer for the Kent Gay Liberation Front's Men's Raps meetings and the topics to be discussed. The meetings are held on Fridays in the student center at Kent State University in Kent, Ohio.",
+        "entities": [
+            {
+                "start": 24,
+                "end": 49,
+                "label": "ORG",
+                "entity_span": "Kent Gay Liberation Front",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 162,
+                "end": 183,
+                "label": "ORG",
+                "entity_span": "Kent State University",
+                "wikidata_id": "Q1473615"
+            },
+            {
+                "start": 187,
+                "end": 191,
+                "label": "GPE",
+                "entity_span": "Kent",
+                "wikidata_id": "Q989949"
+            },
+            {
+                "start": 193,
+                "end": 197,
+                "label": "GPE",
+                "entity_span": "Ohio",
+                "wikidata_id": "Q1397"
+            }
+        ]
+    },
+    {
+        "local_id": "4e30e1a82f6923658cb476b8e67d1a6e",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"LGBTQ history\" OR \"LGBT history\" OR \"Gay and lesbian history\"",
+        "title": "\"Seahorse Still Fighting,\" Foundation newsletter, ca. 1986",
+        "description": "Copy of a newsletter from Foundation, identified as \"Michiana's support group for gay men and women.\" The article, \"Seahorse Still Fighting,\" references the 1985-1986 challenge faced by the Seahorse II Cabaret in renewing their alcohol license.",
+        "entities": [
+            {
+                "start": 26,
+                "end": 36,
+                "label": "ORG",
+                "entity_span": "Foundation",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 190,
+                "end": 209,
+                "label": "ORG",
+                "entity_span": "Seahorse II Cabaret",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "8b54b172f8fdf688f10326fa37d5cdf0",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Stonewall riots\" OR \"Stonewall uprising\" OR \"Stonewall Rebellion\"",
+        "title": "Protester speaks on microphone",
+        "description": "Hundreds gathered in Atlanta's Midtown to march in celebration 50th anniversary of the Stonewall riot. The march also included many people displaying LGBTQ pride and political protests.",
+        "entities": [
+            {
+                "start": 21,
+                "end": 28,
+                "label": "GPE",
+                "entity_span": "Atlanta",
+                "wikidata_id": "Q23556"
+            },
+            {
+                "start": 31,
+                "end": 38,
+                "label": "GPE",
+                "entity_span": "Midtown",
+                "wikidata_id": "Q6843071"
+            },
+            {
+                "start": 87,
+                "end": 101,
+                "label": "EVENT",
+                "entity_span": "Stonewall riot",
+                "wikidata_id": "Q51402"
+            }
+        ]
+    },
+    {
+        "local_id": "414ddb655a946bb202afc0b69a3febde",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Queer oral history\" OR \"LGBTQ oral history\" OR \"Gay oral history\"",
+        "title": "Audrey, Oral History Interview, 2024",
+        "description": "In this interview a genderfluid community member named Audrey shares their experiences with Ypsi Pride, explaining that they were grateful to be there. Audrey explores their history with activism, detailing their involvement with the encampment for Palestine on U of M's diag, the work they do preserving queer history, and their radio show. They express that they want others to have compassion for themselves and those around them, and that the future is worth fighting for.",
+        "entities": [
+            {
+                "start": 55,
+                "end": 61,
+                "label": "PERSON",
+                "entity_span": "Audrey",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 152,
+                "end": 158,
+                "label": "PERSON",
+                "entity_span": "Audrey",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 249,
+                "end": 258,
+                "label": "GPE",
+                "entity_span": "Palestine",
+                "wikidata_id": "Q219060"
+            },
+            {
+                "start": 262,
+                "end": 268,
+                "label": "ORG",
+                "entity_span": "U of M",
+                "wikidata_id": "Q230492"
+            },
+            {
+                "start": 92,
+                "end": 102,
+                "label": "EVENT",
+                "entity_span": "Ypsi Pride",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "6a7e022b080846b02621b51491b8a5d9",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Queer oral history\" OR \"LGBTQ oral history\" OR \"Gay oral history\"",
+        "title": "Jere Mitchum tells about being discharged from the army for being gay, oral history excerpt, 2011 January 10",
+        "description": "Excerpt from an oral history interview with Jeremiah \"Jere\" Mitchum, conducted on January 10, 2011 by Phil Bell as part of the Brooks Fund History Project. Mitchum discusses joining the Army and receiving a general discharge after basic training for acknowledging that he was homosexual on his intake forms. Mitchum jokes that he tells people he fought in the \"battle of Fort Benning, Georgia\" and laughs about his experience. The complete interview, as well as a transcript and supplemental materials, are available in the Special Collections Division. Clip located on file BFHPMitchumJ from timecode 02:50:51 - 02:52:54. Transcript location, pages 94-95. Forms part of the Brooks Fund History Project.",
+        "entities": [
+            {
+                "start": 44,
+                "end": 67,
+                "label": "PERSON",
+                "entity_span": "Jeremiah \"Jere\" Mitchum",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 102,
+                "end": 111,
+                "label": "PERSON",
+                "entity_span": "Phil Bell",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 127,
+                "end": 154,
+                "label": "ORG",
+                "entity_span": "Brooks Fund History Project",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 156,
+                "end": 163,
+                "label": "PERSON",
+                "entity_span": "Mitchum",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 186,
+                "end": 190,
+                "label": "ORG",
+                "entity_span": "Army",
+                "wikidata_id": "Q9212"
+            },
+            {
+                "start": 308,
+                "end": 315,
+                "label": "PERSON",
+                "entity_span": "Mitchum",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 385,
+                "end": 392,
+                "label": "GPE",
+                "entity_span": "Georgia",
+                "wikidata_id": "Q1428"
+            },
+            {
+                "start": 675,
+                "end": 702,
+                "label": "ORG",
+                "entity_span": "Brooks Fund History Project",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 524,
+                "end": 552,
+                "label": "ORG",
+                "entity_span": "Special Collections Division",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "2294681253efe20eed6dd6bd59b922ce",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Stonewall riots\" OR \"Stonewall uprising\" OR \"Stonewall Rebellion\"",
+        "title": "Protester holding a sign, \"Tuck Frump\"",
+        "description": "Hundreds gathered in Atlanta's Midtown to march in celebration 50th anniversary of the Stonewall riot. The march also included many people displaying LGBTQ pride and political protests.",
+        "entities": [
+            {
+                "start": 87,
+                "end": 101,
+                "label": "EVENT",
+                "entity_span": "Stonewall riot",
+                "wikidata_id": "Q51402"
+            },
+            {
+                "start": 21,
+                "end": 28,
+                "label": "GPE",
+                "entity_span": "Atlanta",
+                "wikidata_id": "Q23556"
+            },
+            {
+                "start": 31,
+                "end": 38,
+                "label": "GPE",
+                "entity_span": "Midtown",
+                "wikidata_id": "Q6843071"
+            }
+        ]
+    },
+    {
+        "local_id": "01bff596e1fdda35a7e822b0ac580b45",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Queer oral history\" OR \"LGBTQ oral history\" OR \"Gay oral history\"",
+        "title": "Anonymous, Oral History Interview, 2023",
+        "description": "In this interview an anonymous parent and their child share their experiences with Ypsi Pride. Anon shares how they have been coming to Ypsi Pride for many years, and explains that while their child, who is autistic, does not normally like big gatherings they love pride events. Anon also explains how they did not meet another queer person until they were an adult so they want to expose their child to the beauty that exists in the queer community.",
+        "entities": [
+            {
+                "start": 83,
+                "end": 93,
+                "label": "EVENT",
+                "entity_span": "Ypsi Pride",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 136,
+                "end": 146,
+                "label": "EVENT",
+                "entity_span": "Ypsi Pride",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "73269551445008bce1b5a321bec2575d",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Transgender\" OR \"Transsexual\" OR \"Gender identity\" OR \"Gender nonconforming\" OR \"Genderqueer\" OR \"Transgender people\"",
+        "title": "En femme magazine, 1988 Sep/Oct, No. 8",
+        "description": "On item cover: \"Devoted to the world of transvestism.\" ; Contents: Letters -- Mother's little helper: short story by J. Wilson, The encapsulated life history of me: by Joanne Wilson -- Greeting from down under: column by Joanne Wilson -- In the news -- The most common mistakes made by CD's -- Article by Donna Miller -- Personals -- Classifieds.",
+        "entities": [
+            {
+                "start": 117,
+                "end": 126,
+                "label": "PERSON",
+                "entity_span": "J. Wilson",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 168,
+                "end": 181,
+                "label": "PERSON",
+                "entity_span": "Joanne Wilson",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 221,
+                "end": 234,
+                "label": "PERSON",
+                "entity_span": "Joanne Wilson",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 305,
+                "end": 317,
+                "label": "PERSON",
+                "entity_span": "Donna Miller",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "8a234a764c8665d2adae55f76720567c",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"LGBTQ history\" OR \"LGBT history\" OR \"Gay and lesbian history\"",
+        "title": "City of South Bend Human Rights Commission, discrimination form, ca. 2000s",
+        "description": "Blank form documents from the City of South Bend Human Rights Commission. If a person believed they were discriminated against, they would begin a claim by filling out this form. Although there is no date, it is presumed to be from the mid\u20102000s. As of this document, LGBTQ language was not included as a protected category.",
+        "entities": [
+            {
+                "start": 30,
+                "end": 72,
+                "label": "ORG",
+                "entity_span": "City of South Bend Human Rights Commission",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "8996d916b1ee77430bf6140c0b06c035",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Transgender\" OR \"Transsexual\" OR \"Gender identity\" OR \"Gender nonconforming\" OR \"Genderqueer\" OR \"Transgender people\"",
+        "title": "En femme fiction magazine, Vol. 1 No. 3",
+        "description": "Contents: Take away the mirror: by Susan Melanie Dale -- The spell: by Jenny -- Eliza Matthews: by Joanne Wilson -- Toni cartoon: by Angel.",
+        "entities": [
+            {
+                "start": 35,
+                "end": 53,
+                "label": "PERSON",
+                "entity_span": "Susan Melanie Dale",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 71,
+                "end": 76,
+                "label": "PERSON",
+                "entity_span": "Jenny",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 80,
+                "end": 94,
+                "label": "PERSON",
+                "entity_span": "Eliza Matthews",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 99,
+                "end": 112,
+                "label": "PERSON",
+                "entity_span": "Joanne Wilson",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 133,
+                "end": 138,
+                "label": "PERSON",
+                "entity_span": "Angel",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 116,
+                "end": 120,
+                "label": "PERSON",
+                "entity_span": "Toni",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "086edeb4428d1a7f0a0030f97a81658d",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"LGBTQ history\" OR \"LGBT history\" OR \"Gay and lesbian history\"",
+        "title": "South Bend Equality, primary voting scorecard, 2011",
+        "description": "Photocopied document published by South Bend Equality listing the results of a survey given to candidates for local office in the 2011 election. Questions focused on candidates' willingness to support amendments to South Bend's human rights ordinance to include LGBTQ language. Among the participants was Pete Buttigieg, then engaged in his first primary election for the office of South Bend Mayor.",
+        "entities": [
+            {
+                "start": 34,
+                "end": 53,
+                "label": "ORG",
+                "entity_span": "South Bend Equality",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 215,
+                "end": 225,
+                "label": "GPE",
+                "entity_span": "South Bend",
+                "wikidata_id": "Q486877"
+            },
+            {
+                "start": 305,
+                "end": 319,
+                "label": "PERSON",
+                "entity_span": "Pete Buttigieg",
+                "wikidata_id": "Q7173106"
+            },
+            {
+                "start": 382,
+                "end": 392,
+                "label": "GPE",
+                "entity_span": "South Bend",
+                "wikidata_id": "Q486877"
+            }
+        ]
+    },
+    {
+        "local_id": "5bdbf98d2d58e30d460a041479c5388e",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Gay liberation movement\" OR \"Gay Liberation Front\" OR \"Gay rights movement\"",
+        "title": "Gay Liberation Front protest the Behavior Modification Conference",
+        "description": "The Gay Liberation Front (GLF) zaps the Behavior Modification Conference in Los Angeles. Don Kilhefner speaks next to Dr. Albert Marston and Dr. M. Phillip Feldman (grabbing microphone) while Brenda Weathers (far left) looks on. May 1970.",
+        "entities": [
+            {
+                "start": 4,
+                "end": 24,
+                "label": "ORG",
+                "entity_span": "Gay Liberation Front",
+                "wikidata_id": "Q920919"
+            },
+            {
+                "start": 26,
+                "end": 29,
+                "label": "ORG",
+                "entity_span": "GLF",
+                "wikidata_id": "Q920919"
+            },
+            {
+                "start": 40,
+                "end": 72,
+                "label": "EVENT",
+                "entity_span": "Behavior Modification Conference",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 76,
+                "end": 87,
+                "label": "GPE",
+                "entity_span": "Los Angeles",
+                "wikidata_id": "Q65"
+            },
+            {
+                "start": 89,
+                "end": 102,
+                "label": "PERSON",
+                "entity_span": "Don Kilhefner",
+                "wikidata_id": "Q30501975"
+            },
+            {
+                "start": 122,
+                "end": 136,
+                "label": "PERSON",
+                "entity_span": "Albert Marston",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 145,
+                "end": 163,
+                "label": "PERSON",
+                "entity_span": "M. Phillip Feldman",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 192,
+                "end": 207,
+                "label": "PERSON",
+                "entity_span": "Brenda Weathers",
+                "wikidata_id": "Q118956584"
+            }
+        ]
+    },
+    {
+        "local_id": "4c3aadeb85ab9a0b9e7bb11eac2e2c71",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Stonewall riots\" OR \"Stonewall uprising\" OR \"Stonewall Rebellion\"",
+        "title": "American Experience; Interview with Virgina Apuzzo, 1 of 3 Stonewall Uprising",
+        "description": "In this interview, Virginia Apuzzo talks about reconciling faith and sexuality; LGBTQ oppression from political, religious, and medical institutions; the civil rights movement; and the role of bars for the gay community in New York. In the early morning hours of June 28, 1969 police raided the Stonewall Inn, a popular gay bar in the Greenwich Village section of New York City. Such raids were not unusual in the late 1960s, an era when homosexual sex was illegal in every state but Illinois. That night, however, the street erupted into violent protests and street demonstrations that lasted for the next six days. The Stonewall riots, as they came to be known, marked a major turning point in the modern gay civil rights movement in the United States and around the world.",
+        "entities": [
+            {
+                "start": 19,
+                "end": 34,
+                "label": "PERSON",
+                "entity_span": "Virginia Apuzzo",
+                "wikidata_id": "Q30315162"
+            },
+            {
+                "start": 223,
+                "end": 231,
+                "label": "GPE",
+                "entity_span": "New York",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 335,
+                "end": 352,
+                "label": "GPE",
+                "entity_span": "Greenwich Village",
+                "wikidata_id": "Q205380"
+            },
+            {
+                "start": 364,
+                "end": 377,
+                "label": "GPE",
+                "entity_span": "New York City",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 484,
+                "end": 492,
+                "label": "GPE",
+                "entity_span": "Illinois",
+                "wikidata_id": "Q1204"
+            },
+            {
+                "start": 617,
+                "end": 636,
+                "label": "EVENT",
+                "entity_span": "The Stonewall riots",
+                "wikidata_id": "Q51402"
+            },
+            {
+                "start": 740,
+                "end": 753,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            }
+        ]
+    },
+    {
+        "local_id": "830cc4501ea0266fde195d2e15fc5db6",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Stonewall riots\" OR \"Stonewall uprising\" OR \"Stonewall Rebellion\"",
+        "title": "American Experience; Interview with David Carter, 2 of 3 Stonewall Uprising",
+        "description": "This footage features an interview with David Carter, author of \"Stonewall: The Riots That Sparked the Gay Revolution\". In the early morning hours of June 28, 1969 police raided the Stonewall Inn, a popular gay bar in the Greenwich Village section of New York City. Such raids were not unusual in the late 1960s, an era when homosexual sex was illegal in every state but Illinois. That night, however, the street erupted into violent protests and street demonstrations that lasted for the next six days. The Stonewall riots, as they came to be known, marked a major turning point in the modern gay civil rights movement in the United States and around the world.",
+        "entities": [
+            {
+                "start": 40,
+                "end": 52,
+                "label": "PERSON",
+                "entity_span": "David Carter",
+                "wikidata_id": "Q105758348"
+            },
+            {
+                "start": 222,
+                "end": 239,
+                "label": "GPE",
+                "entity_span": "Greenwich Village",
+                "wikidata_id": "Q205380"
+            },
+            {
+                "start": 251,
+                "end": 264,
+                "label": "GPE",
+                "entity_span": "New York City",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 371,
+                "end": 379,
+                "label": "GPE",
+                "entity_span": "Illinois",
+                "wikidata_id": "Q1204"
+            },
+            {
+                "start": 508,
+                "end": 523,
+                "label": "EVENT",
+                "entity_span": "Stonewall riots",
+                "wikidata_id": "Q51402"
+            },
+            {
+                "start": 627,
+                "end": 640,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            }
+        ]
+    },
+    {
+        "local_id": "88270492dc18dc70450384a0581a102e",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"LGBTQ history\" OR \"LGBT history\" OR \"Gay and lesbian history\"",
+        "title": "Morris Classic Video Memories, essay, ca. 2015",
+        "description": "Essay written by Louis Jordan about Morris Classic Video, a video rental store on the north side of South Bend, Indiana. Louis shares his experience working there in the early 2000s, and how it became his first introduction to gay culture. The store had a section labeled \"Queer\" featuring titles Louis describes as \"a master class in queer film.\"",
+        "entities": [
+            {
+                "start": 17,
+                "end": 29,
+                "label": "PERSON",
+                "entity_span": "Louis Jordan",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 36,
+                "end": 56,
+                "label": "ORG",
+                "entity_span": "Morris Classic Video",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 100,
+                "end": 110,
+                "label": "GPE",
+                "entity_span": "South Bend",
+                "wikidata_id": "Q486877"
+            },
+            {
+                "start": 112,
+                "end": 119,
+                "label": "GPE",
+                "entity_span": "Indiana",
+                "wikidata_id": "Q1415"
+            },
+            {
+                "start": 121,
+                "end": 126,
+                "label": "PERSON",
+                "entity_span": "Louis",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 297,
+                "end": 302,
+                "label": "PERSON",
+                "entity_span": "Louis",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "4e676a921c21c50af3267405c4610b4a",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Gay liberation movement\" OR \"Gay Liberation Front\" OR \"Gay rights movement\"",
+        "title": "Gay Liberation Front protest the Behavior Modification Conference",
+        "description": "The Gay Liberation Front (GLF), including Steve Beckwith (jacket and tie) and Del Whan, zaps the Behavior Modification Conference in Los Angeles. May 1970.",
+        "entities": [
+            {
+                "start": 4,
+                "end": 24,
+                "label": "ORG",
+                "entity_span": "Gay Liberation Front",
+                "wikidata_id": "Q920919"
+            },
+            {
+                "start": 26,
+                "end": 29,
+                "label": "ORG",
+                "entity_span": "GLF",
+                "wikidata_id": "Q920919"
+            },
+            {
+                "start": 42,
+                "end": 56,
+                "label": "PERSON",
+                "entity_span": "Steve Beckwith",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 78,
+                "end": 86,
+                "label": "PERSON",
+                "entity_span": "Del Whan",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 97,
+                "end": 129,
+                "label": "EVENT",
+                "entity_span": "Behavior Modification Conference",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 133,
+                "end": 144,
+                "label": "GPE",
+                "entity_span": "Los Angeles",
+                "wikidata_id": "Q65"
+            }
+        ]
+    },
+    {
+        "local_id": "059b98b2d1a0828d45253cf0e7c7e93a",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Stonewall riots\" OR \"Stonewall uprising\" OR \"Stonewall Rebellion\"",
+        "title": "American Experience; Interview with Lucian Truscott, IV, 1 of 3 Stonewall Uprising",
+        "description": "This footage features an interview with Lucian Truscott IV, a reporter for The Village Voice. In the early morning hours of June 28, 1969 police raided the Stonewall Inn, a popular gay bar in the Greenwich Village section of New York City. Such raids were not unusual in the late 1960s, an era when homosexual sex was illegal in every state but Illinois. That night, however, the street erupted into violent protests and street demonstrations that lasted for the next six days. The Stonewall riots, as they came to be known, marked a major turning point in the modern gay civil rights movement in the United States and around the world.",
+        "entities": [
+            {
+                "start": 40,
+                "end": 58,
+                "label": "PERSON",
+                "entity_span": "Lucian Truscott IV",
+                "wikidata_id": "Q16116980"
+            },
+            {
+                "start": 75,
+                "end": 92,
+                "label": "ORG",
+                "entity_span": "The Village Voice",
+                "wikidata_id": "Q876158"
+            },
+            {
+                "start": 196,
+                "end": 213,
+                "label": "GPE",
+                "entity_span": "Greenwich Village",
+                "wikidata_id": "Q205380"
+            },
+            {
+                "start": 225,
+                "end": 238,
+                "label": "GPE",
+                "entity_span": "New York City",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 345,
+                "end": 353,
+                "label": "GPE",
+                "entity_span": "Illinois",
+                "wikidata_id": "Q1204"
+            },
+            {
+                "start": 482,
+                "end": 497,
+                "label": "EVENT",
+                "entity_span": "Stonewall riots",
+                "wikidata_id": "Q51402"
+            },
+            {
+                "start": 601,
+                "end": 614,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            }
+        ]
+    },
+    {
+        "local_id": "0daf6e594e64793fb4357888d04ba0a1",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Queer oral history\" OR \"LGBTQ oral history\" OR \"Gay oral history\"",
+        "title": "Roddy, Morgan video oral history and transcript",
+        "description": "Interviews conducted by Emma Cieslik, senior Biology and History major at Ball State University, for the Muncie LGBTQ+ Oral History Project. Cieslik began working with the project as a student in Dr. Emily Johnson's HIST303 Oral History Workshop, then continued as part of an honors undergraduate research fellowship through Ball State's Honors College. Roddy's camera turns off for approximately nine minutes around the 01:09:00 mark. This archival material has been provided for educational purposes. Ball State University Libraries recognizes that some historic items may include offensive content. Our statement regarding objectionable content is available at: https://dmr.bsu.edu/digital/about",
+        "entities": [
+            {
+                "start": 24,
+                "end": 36,
+                "label": "PERSON",
+                "entity_span": "Emma Cieslik",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 74,
+                "end": 95,
+                "label": "ORG",
+                "entity_span": "Ball State University",
+                "wikidata_id": "Q805122"
+            },
+            {
+                "start": 105,
+                "end": 139,
+                "label": "ORG",
+                "entity_span": "Muncie LGBTQ+ Oral History Project",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 141,
+                "end": 148,
+                "label": "PERSON",
+                "entity_span": "Cieslik",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 200,
+                "end": 213,
+                "label": "PERSON",
+                "entity_span": "Emily Johnson",
+                "wikidata_id": "Q113738718"
+            },
+            {
+                "start": 354,
+                "end": 359,
+                "label": "PERSON",
+                "entity_span": "Roddy",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 503,
+                "end": 534,
+                "label": "ORG",
+                "entity_span": "Ball State University Libraries",
+                "wikidata_id": "Q14688307"
+            },
+            {
+                "start": 325,
+                "end": 335,
+                "label": "ORG",
+                "entity_span": "Ball State",
+                "wikidata_id": "Q805122"
+            },
+            {
+                "start": 338,
+                "end": 352,
+                "label": "ORG",
+                "entity_span": "Honors College",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "43bc05342a7d08303b110416509b392d",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Stonewall riots\" OR \"Stonewall uprising\" OR \"Stonewall Rebellion\"",
+        "title": "American Experience; Interview with Martin Boyce, 1 of 4 Stonewall Uprising",
+        "description": "In this interview, Martin Boyce discusses homophobia and oppression in the 1950's and 1960's, as well as LGBTQ culture at the time. Topics include early gay cultural icons and literary figures; cruising, drag, and bar culture in Greenwich Village; and police brutality and bar raids. Boyce also discusses his personal experience at Stonewall and the impact and legacy of the uprising. In the early morning hours of June 28, 1969 police raided the Stonewall Inn, a popular gay bar in the Greenwich Village section of New York City. Such raids were not unusual in the late 1960s, an era when homosexual sex was illegal in every state but Illinois. That night, however, the street erupted into violent protests and street demonstrations that lasted for the next six days. The Stonewall riots, as they came to be known, marked a major turning point in the modern gay civil rights movement in the United States and around the world.",
+        "entities": [
+            {
+                "start": 19,
+                "end": 31,
+                "label": "PERSON",
+                "entity_span": "Martin Boyce",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 229,
+                "end": 246,
+                "label": "GPE",
+                "entity_span": "Greenwich Village",
+                "wikidata_id": "Q205380"
+            },
+            {
+                "start": 284,
+                "end": 289,
+                "label": "PERSON",
+                "entity_span": "Boyce",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 487,
+                "end": 504,
+                "label": "GPE",
+                "entity_span": "Greenwich Village",
+                "wikidata_id": "Q205380"
+            },
+            {
+                "start": 516,
+                "end": 529,
+                "label": "GPE",
+                "entity_span": "New York City",
+                "wikidata_id": "Q60"
+            },
+            {
+                "start": 636,
+                "end": 644,
+                "label": "GPE",
+                "entity_span": "Illinois",
+                "wikidata_id": "Q1204"
+            },
+            {
+                "start": 773,
+                "end": 788,
+                "label": "EVENT",
+                "entity_span": "Stonewall riots",
+                "wikidata_id": "Q51402"
+            },
+            {
+                "start": 892,
+                "end": 905,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            }
+        ]
+    },
+    {
+        "local_id": "7b87189755b19b241d7d3af6855c4598",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Queer oral history\" OR \"LGBTQ oral history\" OR \"Gay oral history\"",
+        "title": "Replogle, Rachel video oral history and transcript",
+        "description": "Interviews conducted by Emma Cieslik, senior Biology and History major at Ball State University, for the Muncie LGBTQ+ Oral History Project. Cieslik began working with the project as a student in Dr. Emily Johnson's HIST303 Oral History Workshop, then continued as part of an honors undergraduate research fellowship through Ball State's Honors College. This archival material has been provided for educational purposes. Ball State University Libraries recognizes that some historic items may include offensive content. Our statement regarding objectionable content is available at: https://dmr.bsu.edu/digital/about",
+        "entities": [
+            {
+                "start": 24,
+                "end": 36,
+                "label": "PERSON",
+                "entity_span": "Emma Cieslik",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 74,
+                "end": 95,
+                "label": "ORG",
+                "entity_span": "Ball State University",
+                "wikidata_id": "Q805122"
+            },
+            {
+                "start": 105,
+                "end": 139,
+                "label": "ORG",
+                "entity_span": "Muncie LGBTQ+ Oral History Project",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 141,
+                "end": 148,
+                "label": "PERSON",
+                "entity_span": "Cieslik",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 200,
+                "end": 213,
+                "label": "PERSON",
+                "entity_span": "Emily Johnson",
+                "wikidata_id": "Q113738718"
+            },
+            {
+                "start": 325,
+                "end": 335,
+                "label": "ORG",
+                "entity_span": "Ball State",
+                "wikidata_id": "Q805122"
+            },
+            {
+                "start": 338,
+                "end": 352,
+                "label": "ORG",
+                "entity_span": "Honors College",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 421,
+                "end": 452,
+                "label": "ORG",
+                "entity_span": "Ball State University Libraries",
+                "wikidata_id": "Q14688307"
+            }
+        ]
+    },
+    {
+        "local_id": "46436fb17224e719784e828db16fb008",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Queer oral history\" OR \"LGBTQ oral history\" OR \"Gay oral history\"",
+        "title": "Cincinnati LGBTQ+ oral history interviews: Scott Knox",
+        "description": "CHPL's Genealogy and Local History department is honoring the 50-year anniversary of the first Cincinnati Pride, which took place in 1973, through digital artifacts and oral history interviews with notable and elder members of the Cincinnati and Northern Kentucky LGBTQIA+ community. Scott Knox (he/him) has a Master\u2019s degree from the University of Cincinnati Medical College and a law degree from the University of Cincinnati College of Law. He practices law in his private practice, Scott E. Knox Attorneys at Law, and specializes in LGBTQ+ legal issues. He sits on several Greater Cincinnati nonprofit boards including Strategies to End Homelessness, Equality Cincinnati, the Ohio Lesbian Archives, and the Cincinnati and Hamilton County Library Foundation. He has won numerous awards for his LGBTQ+ and community legal advocacy, argued successfully at the Ohio Supreme Court, and was named Cincinnati CityBeat magazine\u2019s Best Lawyer for 2011, 2012, 2014, 2015, 2016, 2018, and 2019. Scott was the Grand Marshal for Cincinnati Pride in 2005. *This video contains adult language and content.",
+        "entities": [
+            {
+                "start": 0,
+                "end": 4,
+                "label": "ORG",
+                "entity_span": "CHPL",
+                "wikidata_id": "Q5492644"
+            },
+            {
+                "start": 7,
+                "end": 45,
+                "label": "ORG",
+                "entity_span": "Genealogy and Local History department",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 95,
+                "end": 111,
+                "label": "EVENT",
+                "entity_span": "Cincinnati Pride",
+                "wikidata_id": "Q17182912"
+            },
+            {
+                "start": 231,
+                "end": 241,
+                "label": "GPE",
+                "entity_span": "Cincinnati",
+                "wikidata_id": "Q43196"
+            },
+            {
+                "start": 255,
+                "end": 263,
+                "label": "GPE",
+                "entity_span": "Kentucky",
+                "wikidata_id": "Q1603"
+            },
+            {
+                "start": 284,
+                "end": 294,
+                "label": "PERSON",
+                "entity_span": "Scott Knox",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 335,
+                "end": 375,
+                "label": "ORG",
+                "entity_span": "University of Cincinnati Medical College",
+                "wikidata_id": "Q19465322"
+            },
+            {
+                "start": 402,
+                "end": 441,
+                "label": "ORG",
+                "entity_span": "University of Cincinnati College of Law",
+                "wikidata_id": "Q7895273"
+            },
+            {
+                "start": 485,
+                "end": 515,
+                "label": "ORG",
+                "entity_span": "Scott E. Knox Attorneys at Law",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 576,
+                "end": 594,
+                "label": "GPE",
+                "entity_span": "Greater Cincinnati",
+                "wikidata_id": "Q5120360"
+            },
+            {
+                "start": 622,
+                "end": 652,
+                "label": "ORG",
+                "entity_span": "Strategies to End Homelessness",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 654,
+                "end": 673,
+                "label": "ORG",
+                "entity_span": "Equality Cincinnati",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 679,
+                "end": 700,
+                "label": "ORG",
+                "entity_span": "Ohio Lesbian Archives",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 710,
+                "end": 759,
+                "label": "ORG",
+                "entity_span": "Cincinnati and Hamilton County Library Foundation",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 860,
+                "end": 878,
+                "label": "ORG",
+                "entity_span": "Ohio Supreme Court",
+                "wikidata_id": "Q3001112"
+            },
+            {
+                "start": 987,
+                "end": 992,
+                "label": "PERSON",
+                "entity_span": "Scott",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 1019,
+                "end": 1035,
+                "label": "EVENT",
+                "entity_span": "Cincinnati Pride",
+                "wikidata_id": "Q17182912"
+            },
+            {
+                "start": 894,
+                "end": 913,
+                "label": "ORG",
+                "entity_span": "Cincinnati CityBeat",
+                "wikidata_id": "Q5120235"
+            }
+        ]
+    },
+    {
+        "local_id": "03c72a3bac9e8fc83a4932d16537edf2",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"LGBTQ history\" OR \"LGBT history\" OR \"Gay and lesbian history\"",
+        "title": "Jennifer Brier, Professor of Gender Studies, on LGBT History, April 2013",
+        "description": "Jennifer Brier talks to Peter Shea about the exhibition she helped curate at the Chicago History Museum, entitled Out in Chicago, and about History Moves, a mobile and community-co-curated public history project.",
+        "entities": [
+            {
+                "start": 0,
+                "end": 14,
+                "label": "PERSON",
+                "entity_span": "Jennifer Brier",
+                "wikidata_id": "Q130711176"
+            },
+            {
+                "start": 24,
+                "end": 34,
+                "label": "PERSON",
+                "entity_span": "Peter Shea",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 81,
+                "end": 103,
+                "label": "ORG",
+                "entity_span": "Chicago History Museum",
+                "wikidata_id": "Q2963315"
+            },
+            {
+                "start": 121,
+                "end": 128,
+                "label": "GPE",
+                "entity_span": "Chicago",
+                "wikidata_id": "Q1297"
+            },
+            {
+                "start": 140,
+                "end": 153,
+                "label": "ORG",
+                "entity_span": "History Moves",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "475df256651c367bfdbdb3edc8caccd9",
+        "cohort": "Cohort B (LGBTQIA+ Histories)",
+        "theme": "\"Transgender\" OR \"Transsexual\" OR \"Gender identity\" OR \"Gender nonconforming\" OR \"Genderqueer\" OR \"Transgender people\"",
+        "title": "Fact sheet: Biden-Harris administration advances equality for transgender Americans",
+        "description": "\"June 30, 2021.\" In scope of the U.S. Government Publishing Office Cataloging and Indexing Program (C&I) and Federal Depository Library Program (FDLP). Description based on online resource; title from caption (White House, viewed Jan. 6, 2023).",
+        "entities": [
+            {
+                "start": 33,
+                "end": 98,
+                "label": "ORG",
+                "entity_span": "U.S. Government Publishing Office Cataloging and Indexing Program",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 109,
+                "end": 143,
+                "label": "ORG",
+                "entity_span": "Federal Depository Library Program",
+                "wikidata_id": "Q5440185"
+            },
+            {
+                "start": 100,
+                "end": 103,
+                "label": "ORG",
+                "entity_span": "C&I",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 145,
+                "end": 149,
+                "label": "ORG",
+                "entity_span": "FDLP",
+                "wikidata_id": "Q5440185"
+            },
+            {
+                "start": 210,
+                "end": 221,
+                "label": "ORG",
+                "entity_span": "White House",
+                "wikidata_id": "Q35525"
+            }
+        ]
+    },
+    {
+        "local_id": "2fba47feead558f328b61e8701e23c1e",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Trail of Tears\" OR \"Indian Removal Act\"",
+        "title": "1838 Apr. 11, Washington City [to] N[ewton] Cannon, Tennessee / Winfield Scott",
+        "description": "This is a letter from Winfield Scott, the Federal officer in charge of Cherokee Removal. It is to Governor Newton Cannon, dated April 11, 1838. Scott is asking Cannon to send him troops for his army. He details the positions he needs filled.",
+        "entities": [
+            {
+                "start": 22,
+                "end": 36,
+                "label": "PERSON",
+                "entity_span": "Winfield Scott",
+                "wikidata_id": "Q354759"
+            },
+            {
+                "start": 107,
+                "end": 120,
+                "label": "PERSON",
+                "entity_span": "Newton Cannon",
+                "wikidata_id": "Q39387"
+            },
+            {
+                "start": 144,
+                "end": 149,
+                "label": "PERSON",
+                "entity_span": "Scott",
+                "wikidata_id": "Q354759"
+            },
+            {
+                "start": 160,
+                "end": 166,
+                "label": "PERSON",
+                "entity_span": "Cannon",
+                "wikidata_id": "Q39387"
+            },
+            {
+                "start": 71,
+                "end": 87,
+                "label": "EVENT",
+                "entity_span": "Cherokee Removal",
+                "wikidata_id": "Q86661955"
+            }
+        ]
+    },
+    {
+        "local_id": "1acf1ade426b41b8f3fe5392048db0a8",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Trail of Tears\" OR \"Indian Removal Act\"",
+        "title": "Notice, 1838 Jan. 20, [to] the Cherokees / Nat[haniel] Smith",
+        "description": "This is a notice from General Nathaniel Smith, Superintendent of Cherokee emigration, to the Cherokee people, dated January 20, 1838. Smith informs the Cherokees that steam boats will be available for their transportation to a territory west of the Mississippi River, but emigrants may choose the overland route as well. He reminds the Cherokees of the sentiments of the President on the removal issue and warns them to remove early or face military force.",
+        "entities": [
+            {
+                "start": 30,
+                "end": 45,
+                "label": "PERSON",
+                "entity_span": "Nathaniel Smith",
+                "wikidata_id": "Q1966804"
+            },
+            {
+                "start": 65,
+                "end": 73,
+                "label": "NORP",
+                "entity_span": "Cherokee",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 93,
+                "end": 101,
+                "label": "NORP",
+                "entity_span": "Cherokee",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 134,
+                "end": 139,
+                "label": "PERSON",
+                "entity_span": "Smith",
+                "wikidata_id": "Q1966804"
+            },
+            {
+                "start": 152,
+                "end": 161,
+                "label": "NORP",
+                "entity_span": "Cherokees",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 336,
+                "end": 345,
+                "label": "NORP",
+                "entity_span": "Cherokees",
+                "wikidata_id": "Q105405"
+            }
+        ]
+    },
+    {
+        "local_id": "e2afddf1ad7cf969dd95945d52ae5130",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Indigenous peoples of North America\" OR \"Native American\" OR \"American Indian\"",
+        "title": "Native American Women Display Art",
+        "description": "The photo caption printed in the Sacramento Bee on June 5, 1968, states: \"Gladys Mankins, left, and Lee Worman display one of the carved articles by Blue Cloud, an Iroquois from Canada, which will be exhibited during the Indian Bear Dance on the Mankins Ranch in Janesville, Lassen County.\"",
+        "entities": [
+            {
+                "start": 33,
+                "end": 47,
+                "label": "ORG",
+                "entity_span": "Sacramento Bee",
+                "wikidata_id": "Q356300"
+            },
+            {
+                "start": 74,
+                "end": 88,
+                "label": "PERSON",
+                "entity_span": "Gladys Mankins",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 100,
+                "end": 110,
+                "label": "PERSON",
+                "entity_span": "Lee Worman",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 149,
+                "end": 159,
+                "label": "PERSON",
+                "entity_span": "Blue Cloud",
+                "wikidata_id": "Q7172861"
+            },
+            {
+                "start": 164,
+                "end": 172,
+                "label": "NORP",
+                "entity_span": "Iroquois",
+                "wikidata_id": "Q68518"
+            },
+            {
+                "start": 178,
+                "end": 184,
+                "label": "GPE",
+                "entity_span": "Canada",
+                "wikidata_id": "Q16"
+            },
+            {
+                "start": 221,
+                "end": 238,
+                "label": "EVENT",
+                "entity_span": "Indian Bear Dance",
+                "wikidata_id": "Q55605087"
+            },
+            {
+                "start": 263,
+                "end": 273,
+                "label": "GPE",
+                "entity_span": "Janesville",
+                "wikidata_id": "Q3138794"
+            },
+            {
+                "start": 275,
+                "end": 288,
+                "label": "GPE",
+                "entity_span": "Lassen County",
+                "wikidata_id": "Q156340"
+            }
+        ]
+    },
+    {
+        "local_id": "f388e11d3e548a76f98eeb0741e11613",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Indigenous peoples of North America\" OR \"Native American\" OR \"American Indian\"",
+        "title": "Voices of Minnesota - Native American Indian children and the Valentini brothers",
+        "description": "Minnesota Public Radio presents \"Voices of Minnesota.\" In this month's edition, we'll hear two accounts of American Indian children growing up under extraordinarily difficult circumstances. Later in the hour, a heartwarming account about Chisholm's eight Valentini brothers - the most members of a Minnesota family to serve in World War II.",
+        "entities": [
+            {
+                "start": 0,
+                "end": 22,
+                "label": "ORG",
+                "entity_span": "Minnesota Public Radio",
+                "wikidata_id": "Q6868408"
+            },
+            {
+                "start": 43,
+                "end": 52,
+                "label": "GPE",
+                "entity_span": "Minnesota",
+                "wikidata_id": "Q1527"
+            },
+            {
+                "start": 107,
+                "end": 122,
+                "label": "NORP",
+                "entity_span": "American Indian",
+                "wikidata_id": "Q36747"
+            },
+            {
+                "start": 238,
+                "end": 246,
+                "label": "GPE",
+                "entity_span": "Chisholm",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 255,
+                "end": 264,
+                "label": "PERSON",
+                "entity_span": "Valentini",
+                "wikidata_id": "Q28800578"
+            },
+            {
+                "start": 298,
+                "end": 307,
+                "label": "GPE",
+                "entity_span": "Minnesota",
+                "wikidata_id": "Q1527"
+            },
+            {
+                "start": 327,
+                "end": 339,
+                "label": "EVENT",
+                "entity_span": "World War II",
+                "wikidata_id": "Q362"
+            }
+        ]
+    },
+    {
+        "local_id": "4360f2bf2b5e24cd2daf16e6b4dff650",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Indigenous peoples of North America\" OR \"Native American\" OR \"American Indian\"",
+        "title": "Native American Poverty in Lake County",
+        "description": "The photo caption printed in the Sacramento Bee on October 7, 1979 states: \"Lottie Anderson sits in kitchen area of her one-room hovel in Robinson Rancheria. The house leaks, has no inside water. An outhouse is shared with the house behind them. Her husband, Ivan, was in bed, oblivious to the clutter surrounding him. Neighbors say he is dying. . . . \"",
+        "entities": [
+            {
+                "start": 33,
+                "end": 47,
+                "label": "ORG",
+                "entity_span": "Sacramento Bee",
+                "wikidata_id": "Q356300"
+            },
+            {
+                "start": 76,
+                "end": 91,
+                "label": "PERSON",
+                "entity_span": "Lottie Anderson",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 138,
+                "end": 156,
+                "label": "GPE",
+                "entity_span": "Robinson Rancheria",
+                "wikidata_id": "Q7353057"
+            },
+            {
+                "start": 259,
+                "end": 263,
+                "label": "PERSON",
+                "entity_span": "Ivan",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "abc6a4a24fb94e2afa37ba88a7d66988",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Red Power movement\" OR \"Red Power\" OR \"American Indian Movement\"",
+        "title": "Member of the American Indian Movement",
+        "description": "Written on slide: \"Amer. Indian Movement\". The United States Bicentennial was a series of festivities held during the 1970s to remember the historical events that led the United States to become an independent nation.",
+        "entities": [
+            {
+                "start": 47,
+                "end": 73,
+                "label": "EVENT",
+                "entity_span": "United States Bicentennial",
+                "wikidata_id": "Q7889582"
+            },
+            {
+                "start": 171,
+                "end": 184,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            },
+            {
+                "start": 19,
+                "end": 40,
+                "label": "ORG",
+                "entity_span": "Amer. Indian Movement",
+                "wikidata_id": "Q465140"
+            }
+        ]
+    },
+    {
+        "local_id": "b8be5654524d2d5595a686d8147829d6",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Red Power movement\" OR \"Red Power\" OR \"American Indian Movement\"",
+        "title": "On the Formation of the American Indian Movement; N.D",
+        "description": "Both sides: How and why the American Indian Movement (AIM) was formed in Minneapolis, MN. First speaker talks about the issues within his community which prompted the creation of an organization which would benefit them, unlike the US government and/or christian organizations that don\u00e2\u20ac\u0161\u00c3\u201e\u00c3 \u0301t have their best interest in mind. Created and adult education program to help minimize further exploitation by the traders who come to the reservation, their legal rights, and so on. Education to preserve their culture. Discussion is recorded in a conference type setting and some of the audio is low or inaudible. Digitization made possible through a Recordings at Risk grant from the Council of Libraries and Information Resources.",
+        "entities": [
+            {
+                "start": 28,
+                "end": 52,
+                "label": "ORG",
+                "entity_span": "American Indian Movement",
+                "wikidata_id": "Q465140"
+            },
+            {
+                "start": 54,
+                "end": 57,
+                "label": "ORG",
+                "entity_span": "AIM",
+                "wikidata_id": "Q465140"
+            },
+            {
+                "start": 73,
+                "end": 84,
+                "label": "GPE",
+                "entity_span": "Minneapolis",
+                "wikidata_id": "Q36091"
+            },
+            {
+                "start": 86,
+                "end": 88,
+                "label": "GPE",
+                "entity_span": "MN",
+                "wikidata_id": "Q1527"
+            },
+            {
+                "start": 232,
+                "end": 234,
+                "label": "GPE",
+                "entity_span": "US",
+                "wikidata_id": "Q30"
+            },
+            {
+                "start": 681,
+                "end": 727,
+                "label": "ORG",
+                "entity_span": "Council of Libraries and Information Resources",
+                "wikidata_id": "Q16952194"
+            }
+        ]
+    },
+    {
+        "local_id": "f3a30fc6057289481f6e0d03c3e417ea",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Tribal sovereignty\" OR \"Native American treaties\" OR \"Indian treaties\" OR \"Tribal government\" OR \"Indigenous land rights\" OR \"Indian self-determination\"",
+        "title": "Final Report of the Committee to Address the Recognition of the Tribal Government Representatives of Maine's Sovereign Nations in the Legislature",
+        "description": "An Umbrella Report Including The Following Specific Reports: Report A: report of full committee to the Joint Rules Committee Report B: report of the Senate subcommittee to the President of the Senate Report C: report of the House subcommittee to the Speaker of the House",
+        "entities": [
+            {
+                "start": 103,
+                "end": 124,
+                "label": "ORG",
+                "entity_span": "Joint Rules Committee",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 149,
+                "end": 155,
+                "label": "ORG",
+                "entity_span": "Senate",
+                "wikidata_id": "Q66096"
+            },
+            {
+                "start": 193,
+                "end": 199,
+                "label": "ORG",
+                "entity_span": "Senate",
+                "wikidata_id": "Q66096"
+            },
+            {
+                "start": 224,
+                "end": 229,
+                "label": "ORG",
+                "entity_span": "House",
+                "wikidata_id": "Q11701"
+            },
+            {
+                "start": 265,
+                "end": 270,
+                "label": "ORG",
+                "entity_span": "House",
+                "wikidata_id": "Q11701"
+            }
+        ]
+    },
+    {
+        "local_id": "4c45ffa7025d8146a56310925a33df84",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Indigenous peoples of North America\" OR \"Native American\" OR \"American Indian\"",
+        "title": "Native American Child at Protest",
+        "description": "A young Native American child wearing Native American attire, sits in a stroller next to a protest sign that states: \"We are being railroaded by the Bureau of Indian Affairs and the State of California.\"",
+        "entities": [
+            {
+                "start": 8,
+                "end": 23,
+                "label": "NORP",
+                "entity_span": "Native American",
+                "wikidata_id": "Q36747"
+            },
+            {
+                "start": 38,
+                "end": 53,
+                "label": "NORP",
+                "entity_span": "Native American",
+                "wikidata_id": "Q36747"
+            },
+            {
+                "start": 149,
+                "end": 173,
+                "label": "ORG",
+                "entity_span": "Bureau of Indian Affairs",
+                "wikidata_id": "Q1010563"
+            },
+            {
+                "start": 182,
+                "end": 201,
+                "label": "GPE",
+                "entity_span": "State of California",
+                "wikidata_id": "Q5589189"
+            }
+        ]
+    },
+    {
+        "local_id": "5783386e8852787b643116587407db18",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Tribal sovereignty\" OR \"Native American treaties\" OR \"Indian treaties\" OR \"Tribal government\" OR \"Indigenous land rights\" OR \"Indian self-determination\"",
+        "title": "2013 Oregon's state-tribal government-to-government key contact directory",
+        "description": "This archived document is maintained by the Oregon State Library as part of the Oregon Documents Depository Program. It is for informational purposes and may not be suitable for legal purposes. Mode of access: Internet from the Oregon Government Publications Collection.",
+        "entities": [
+            {
+                "start": 44,
+                "end": 64,
+                "label": "ORG",
+                "entity_span": "Oregon State Library",
+                "wikidata_id": "Q7101363"
+            },
+            {
+                "start": 80,
+                "end": 115,
+                "label": "ORG",
+                "entity_span": "Oregon Documents Depository Program",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 228,
+                "end": 234,
+                "label": "GPE",
+                "entity_span": "Oregon",
+                "wikidata_id": "Q824"
+            }
+        ]
+    },
+    {
+        "local_id": "a4c37b16df4ea8a3a6b1a7235900f8aa",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Tribal sovereignty\" OR \"Native American treaties\" OR \"Indian treaties\" OR \"Tribal government\" OR \"Indigenous land rights\" OR \"Indian self-determination\"",
+        "title": "2009 Oregon's state-tribal government-to-government key contact directory",
+        "description": "This archived document is maintained by the Oregon State Library as part of the Oregon Documents Depository Program. It is for informational purposes and may not be suitable for legal purposes. Mode of access: Internet from the Oregon Government Publications Collection.",
+        "entities": [
+            {
+                "start": 44,
+                "end": 64,
+                "label": "ORG",
+                "entity_span": "Oregon State Library",
+                "wikidata_id": "Q7101363"
+            },
+            {
+                "start": 80,
+                "end": 115,
+                "label": "ORG",
+                "entity_span": "Oregon Documents Depository Program",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 228,
+                "end": 234,
+                "label": "GPE",
+                "entity_span": "Oregon",
+                "wikidata_id": "Q824"
+            }
+        ]
+    },
+    {
+        "local_id": "e7aff50f2def979c10dcf2ae3279165d",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Trail of Tears\" OR \"Indian Removal Act\"",
+        "title": "Recounting the Removal: Recent Native American Literary Reconstructions of the Trail of Tears",
+        "description": "Article provides a literary analysis of four novels written by native writers about the Trail of Tears. Frederick Hale explores the ways these reconstructions elaborate on a period of time and a perspective often marginalized in U.S. historical narrative.",
+        "entities": [
+            {
+                "start": 88,
+                "end": 102,
+                "label": "EVENT",
+                "entity_span": "Trail of Tears",
+                "wikidata_id": "Q750448"
+            },
+            {
+                "start": 104,
+                "end": 118,
+                "label": "PERSON",
+                "entity_span": "Frederick Hale",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 229,
+                "end": 233,
+                "label": "GPE",
+                "entity_span": "U.S.",
+                "wikidata_id": "Q30"
+            }
+        ]
+    },
+    {
+        "local_id": "9beb773497b99c1d80cf65529eb9ef1a",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Trail of Tears\" OR \"Indian Removal Act\"",
+        "title": "[Letter] 1840 June 18, Conasauga Plains [to] W[i]l[lia]m H. Thomas, Washington D.C. / Nicholas S. Peck",
+        "description": "This is a letter, dated June 18, 1840, from Nicholas S. Peck to William H. Thomas, legal representative for the Eastern Cherokees of North Carolina. Peck states that each head of an Indian family received 640 acres of land under the treaty of 1817, but when Andrew Jackson became President, those same families were forced to remove and abandon their land (and any improvements) in June of 1838 and told they would receive payment. Peck laments that no compensation has yet been received by those families. He also discusses several land claims and attempts to receive payment. Digital image of original manuscript, scanned by the University of Georgia Libraries in 2000, as part of GALILEO, funded in part by a grant from the Institute of Museum and Library Services.",
+        "entities": [
+            {
+                "start": 44,
+                "end": 60,
+                "label": "PERSON",
+                "entity_span": "Nicholas S. Peck",
+                "wikidata_id": "Q96213814"
+            },
+            {
+                "start": 64,
+                "end": 81,
+                "label": "PERSON",
+                "entity_span": "William H. Thomas",
+                "wikidata_id": "Q23022471"
+            },
+            {
+                "start": 727,
+                "end": 767,
+                "label": "ORG",
+                "entity_span": "Institute of Museum and Library Services",
+                "wikidata_id": "Q6040649"
+            },
+            {
+                "start": 631,
+                "end": 662,
+                "label": "ORG",
+                "entity_span": "University of Georgia Libraries",
+                "wikidata_id": "Q58009573"
+            },
+            {
+                "start": 683,
+                "end": 690,
+                "label": "ORG",
+                "entity_span": "GALILEO",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 258,
+                "end": 272,
+                "label": "PERSON",
+                "entity_span": "Andrew Jackson",
+                "wikidata_id": "Q11817"
+            },
+            {
+                "start": 432,
+                "end": 436,
+                "label": "PERSON",
+                "entity_span": "Peck",
+                "wikidata_id": "Q96213814"
+            },
+            {
+                "start": 149,
+                "end": 153,
+                "label": "PERSON",
+                "entity_span": "Peck",
+                "wikidata_id": "Q96213814"
+            },
+            {
+                "start": 182,
+                "end": 188,
+                "label": "NORP",
+                "entity_span": "Indian",
+                "wikidata_id": "Q36747"
+            },
+            {
+                "start": 112,
+                "end": 129,
+                "label": "NORP",
+                "entity_span": "Eastern Cherokees",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 133,
+                "end": 147,
+                "label": "GPE",
+                "entity_span": "North Carolina",
+                "wikidata_id": "Q1454"
+            }
+        ]
+    },
+    {
+        "local_id": "7388dd100a1d089d17f855b9dd19542d",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Navajo Indians\" OR \"Navajo Nation\" OR \"Din\u00e9\" OR \"Dineh\" OR \"Navajo people\" OR \"Navajo reservation\"",
+        "title": "Navajo people at a party",
+        "description": "Navajo Black and white photograph of many people standing around a large pot over a fire. There are both Navajo and white people in the photo. One man is stirring the contents of the pot while others look on.",
+        "entities": [
+            {
+                "start": 0,
+                "end": 6,
+                "label": "NORP",
+                "entity_span": "Navajo",
+                "wikidata_id": "Q108266"
+            },
+            {
+                "start": 105,
+                "end": 111,
+                "label": "NORP",
+                "entity_span": "Navajo",
+                "wikidata_id": "Q108266"
+            },
+            {
+                "start": 116,
+                "end": 121,
+                "label": "NORP",
+                "entity_span": "white",
+                "wikidata_id": "Q235155"
+            }
+        ]
+    },
+    {
+        "local_id": "c23ffd195f0ee7f1e371ce261701aecb",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Trail of Tears\" OR \"Indian Removal Act\"",
+        "title": "B.B. Cannon Journal",
+        "description": "In 1837, B.B. Cannon oversaw a group of Cherokees who were forced from their land in Tennessee by the United States government. The group started out in Tennessee and passed through parts of Kentucky, Illinois, Missouri, Arkansas and finally reached their destination in Oklahoma. There were about 365 people at the start of the journey, and fifteen Native Americans died along the way. The journey took 77 days.",
+        "entities": [
+            {
+                "start": 9,
+                "end": 20,
+                "label": "PERSON",
+                "entity_span": "B.B. Cannon",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 40,
+                "end": 49,
+                "label": "NORP",
+                "entity_span": "Cherokees",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 85,
+                "end": 94,
+                "label": "GPE",
+                "entity_span": "Tennessee",
+                "wikidata_id": "Q1509"
+            },
+            {
+                "start": 153,
+                "end": 162,
+                "label": "GPE",
+                "entity_span": "Tennessee",
+                "wikidata_id": "Q1509"
+            },
+            {
+                "start": 191,
+                "end": 199,
+                "label": "GPE",
+                "entity_span": "Kentucky",
+                "wikidata_id": "Q1603"
+            },
+            {
+                "start": 201,
+                "end": 209,
+                "label": "GPE",
+                "entity_span": "Illinois",
+                "wikidata_id": "Q1204"
+            },
+            {
+                "start": 211,
+                "end": 219,
+                "label": "GPE",
+                "entity_span": "Missouri",
+                "wikidata_id": "Q1581"
+            },
+            {
+                "start": 221,
+                "end": 229,
+                "label": "GPE",
+                "entity_span": "Arkansas",
+                "wikidata_id": "Q1612"
+            },
+            {
+                "start": 271,
+                "end": 279,
+                "label": "GPE",
+                "entity_span": "Oklahoma",
+                "wikidata_id": "Q1649"
+            },
+            {
+                "start": 350,
+                "end": 366,
+                "label": "NORP",
+                "entity_span": "Native Americans",
+                "wikidata_id": "Q36747"
+            },
+            {
+                "start": 102,
+                "end": 115,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            }
+        ]
+    },
+    {
+        "local_id": "f1ea5e0802b02e2d8823d4c4db8ee0d1",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Indigenous peoples of North America\" OR \"Native American\" OR \"American Indian\"",
+        "title": "Celebration! The Year of the Native American",
+        "description": "Generated by \"Year of the Native American Arts and Heritage Celebration,\" a project made possible by a grant from the North Carolina Humanities Council.",
+        "entities": [
+            {
+                "start": 14,
+                "end": 71,
+                "label": "ORG",
+                "entity_span": "Year of the Native American Arts and Heritage Celebration",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 118,
+                "end": 151,
+                "label": "ORG",
+                "entity_span": "North Carolina Humanities Council",
+                "wikidata_id": "Q30258196"
+            }
+        ]
+    },
+    {
+        "local_id": "a0dcf35e54007bf39909c3675a10b21f",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Indigenous peoples of North America\" OR \"Native American\" OR \"American Indian\"",
+        "title": "Native American Dances to Raise Funds",
+        "description": "The photo caption printed in the Sacramento Bee on April 4, 1970 states: \"Richard Vigil, a Chippewa Indian from Wisconsin, performed a hoop dance last night at Sacramento State College, part of a program of tribal dances which was presented to raise funds for American Indian students.\"",
+        "entities": [
+            {
+                "start": 33,
+                "end": 47,
+                "label": "ORG",
+                "entity_span": "Sacramento Bee",
+                "wikidata_id": "Q356300"
+            },
+            {
+                "start": 74,
+                "end": 87,
+                "label": "PERSON",
+                "entity_span": "Richard Vigil",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 91,
+                "end": 106,
+                "label": "NORP",
+                "entity_span": "Chippewa Indian",
+                "wikidata_id": "Q255872"
+            },
+            {
+                "start": 112,
+                "end": 121,
+                "label": "GPE",
+                "entity_span": "Wisconsin",
+                "wikidata_id": "Q1537"
+            },
+            {
+                "start": 160,
+                "end": 184,
+                "label": "ORG",
+                "entity_span": "Sacramento State College",
+                "wikidata_id": "Q1026941"
+            },
+            {
+                "start": 260,
+                "end": 275,
+                "label": "NORP",
+                "entity_span": "American Indian",
+                "wikidata_id": "Q36747"
+            }
+        ]
+    },
+    {
+        "local_id": "61f24c1e0cde39ef9e4e606ae3102777",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Trail of Tears\" OR \"Indian Removal Act\"",
+        "title": "[Letter] 1838 Jan. 4, Cherokee Agency [to] John Ross, Washington City D.C. / Lewis Ross",
+        "description": "Letter dated January 4, 1838 from Lewis Ross to his brother John Ross, Principal Chief of the Cherokee Nation, concerning the removal of the Cherokee people and the possibility of negotiating a treaty with better terms than the Treaty of New Echota, 1835.",
+        "entities": [
+            {
+                "start": 34,
+                "end": 44,
+                "label": "PERSON",
+                "entity_span": "Lewis Ross",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 60,
+                "end": 69,
+                "label": "PERSON",
+                "entity_span": "John Ross",
+                "wikidata_id": "Q984347"
+            },
+            {
+                "start": 141,
+                "end": 149,
+                "label": "NORP",
+                "entity_span": "Cherokee",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 94,
+                "end": 109,
+                "label": "GPE",
+                "entity_span": "Cherokee Nation",
+                "wikidata_id": "Q5092177"
+            }
+        ]
+    },
+    {
+        "local_id": "6c2fa321745a8d604fd450759f28dcbe",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Navajo Indians\" OR \"Navajo Nation\" OR \"Din\u00e9\" OR \"Dineh\" OR \"Navajo people\" OR \"Navajo reservation\"",
+        "title": "2020 census tribal consultation with the Navajo Nation : final report",
+        "description": "\"Issued summer 2017.\" \"Prepared for the U.S. Census Bureau by: Kauffman & Associates, Inc.\"--Page [4] of cover. Description based on online resource, title from PDF cover (U.S. Census Bureau website, viewed Mar. 13, 2018).",
+        "entities": [
+            {
+                "start": 40,
+                "end": 58,
+                "label": "ORG",
+                "entity_span": "U.S. Census Bureau",
+                "wikidata_id": "Q637413"
+            },
+            {
+                "start": 63,
+                "end": 90,
+                "label": "ORG",
+                "entity_span": "Kauffman & Associates, Inc.",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 172,
+                "end": 190,
+                "label": "ORG",
+                "entity_span": "U.S. Census Bureau",
+                "wikidata_id": "Q637413"
+            }
+        ]
+    },
+    {
+        "local_id": "fd0b8433744b3ce01ae91f578179e255",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Tribal sovereignty\" OR \"Native American treaties\" OR \"Indian treaties\" OR \"Tribal government\" OR \"Indigenous land rights\" OR \"Indian self-determination\"",
+        "title": "Amending the Indian Self-Determination and Education Assistance Act to provide further self-governance by Indian tribes : report (to accompany S. 1715)",
+        "description": "Caption title. Distributed to some depository libraries in microfiche. Shipping list no.: 2005-0074-P. \"November 16, 2004.\" Also available via Internet from the GPO Access web site. Addresses as of 2/10/04: http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?dbname=108%5Fcong%5Freports&docid=f:sr413.108 (text version), http://frwebgate.access.gpo.gov/cgi-bin/getdoc.cgi?dbname=108%5Fcong%5Freports&docid=f:sr413.108.pdf (PDF version); current access is available via PURLs. [cat:jln]",
+        "entities": [
+            {
+                "start": 161,
+                "end": 171,
+                "label": "ORG",
+                "entity_span": "GPO Access",
+                "wikidata_id": "Q51772316"
+            }
+        ]
+    },
+    {
+        "local_id": "2f38d932e11c59e8ec0af529a1ab3e63",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Indigenous peoples of North America\" OR \"Native American\" OR \"American Indian\"",
+        "title": "Make-Shift Housing for Native American",
+        "description": "The photo caption printed in the Sacramento Bee on October 31, 1977 states: \"Kate Daniels sits in the plywood, canvas and plastic shelter (subject photo) she's been living in for the last two years; a shelter whose other provisions include cooking outdoors on a wood stove (photo 7435)\"",
+        "entities": [
+            {
+                "start": 33,
+                "end": 47,
+                "label": "ORG",
+                "entity_span": "Sacramento Bee",
+                "wikidata_id": "Q356300"
+            },
+            {
+                "start": 77,
+                "end": 89,
+                "label": "PERSON",
+                "entity_span": "Kate Daniels",
+                "wikidata_id": "NIL"
+            }
+        ]
+    },
+    {
+        "local_id": "6db536ca115c512f5babdbd6ec37358c",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Navajo Indians\" OR \"Navajo Nation\" OR \"Din\u00e9\" OR \"Dineh\" OR \"Navajo people\" OR \"Navajo reservation\"",
+        "title": "No. 49: Mariano Martinez, Chief of the Navajo Indians",
+        "description": "A black and white wash drawing on medium-weight paper by Edward Meyer Kern based on a sketch by his brother, Richard H. Kern, depicting Mariano Martinez, one of two Navajo chiefs to be signatories of an 1849 treaty with Colonel Washington of the US Army expedition. This side portrait shows Martinez in a greatcoat, head wrap, and narrow-brimmed hat. Cataloging made possible by The Getty Grant Program.",
+        "entities": [
+            {
+                "start": 57,
+                "end": 74,
+                "label": "PERSON",
+                "entity_span": "Edward Meyer Kern",
+                "wikidata_id": "Q5343924"
+            },
+            {
+                "start": 109,
+                "end": 124,
+                "label": "PERSON",
+                "entity_span": "Richard H. Kern",
+                "wikidata_id": "Q53503104"
+            },
+            {
+                "start": 136,
+                "end": 152,
+                "label": "PERSON",
+                "entity_span": "Mariano Martinez",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 165,
+                "end": 171,
+                "label": "NORP",
+                "entity_span": "Navajo",
+                "wikidata_id": "Q108266"
+            },
+            {
+                "start": 228,
+                "end": 238,
+                "label": "PERSON",
+                "entity_span": "Washington",
+                "wikidata_id": "Q1223"
+            },
+            {
+                "start": 246,
+                "end": 253,
+                "label": "ORG",
+                "entity_span": "US Army",
+                "wikidata_id": "Q9212"
+            },
+            {
+                "start": 291,
+                "end": 299,
+                "label": "PERSON",
+                "entity_span": "Martinez",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 379,
+                "end": 402,
+                "label": "ORG",
+                "entity_span": "The Getty Grant Program",
+                "wikidata_id": "Q5554709"
+            }
+        ]
+    },
+    {
+        "local_id": "7f2393fea1c372351bbc6213ec29ed1b",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Tribal sovereignty\" OR \"Native American treaties\" OR \"Indian treaties\" OR \"Tribal government\" OR \"Indigenous land rights\" OR \"Indian self-determination\"",
+        "title": "Examining 50 years of the Indian Self-Determination and Education Assistance Act in Indian Country : oversight field hearing before the Subcommittee on Indian and Insular Affairs of the Committee on Natural Resources, U.S. House of Representatives, One Hundred Nineteenth Congress, first session, Friday, April 4, 2025",
+        "description": "In scope of the U.S. Government Publishing Office Cataloging and Indexing Program (C&I) and Federal Depository Library Program (FDLP). This is a publication issued by the United States federal government or produced with federal funds. \"Serial no. 119-16.\" Includes bibliographical references (pages xi-xiii). Date of hearing: 2025-04-04. Description based on online resource; title from PDF title page (GovInfo, viewed Dec. 8, 2025).",
+        "entities": [
+            {
+                "start": 16,
+                "end": 81,
+                "label": "ORG",
+                "entity_span": "U.S. Government Publishing Office Cataloging and Indexing Program",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 83,
+                "end": 86,
+                "label": "ORG",
+                "entity_span": "C&I",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 92,
+                "end": 126,
+                "label": "ORG",
+                "entity_span": "Federal Depository Library Program",
+                "wikidata_id": "Q5440185"
+            },
+            {
+                "start": 128,
+                "end": 132,
+                "label": "ORG",
+                "entity_span": "FDLP",
+                "wikidata_id": "Q5440185"
+            },
+            {
+                "start": 171,
+                "end": 184,
+                "label": "GPE",
+                "entity_span": "United States",
+                "wikidata_id": "Q30"
+            },
+            {
+                "start": 404,
+                "end": 411,
+                "label": "ORG",
+                "entity_span": "GovInfo",
+                "wikidata_id": "Q51772877"
+            }
+        ]
+    },
+    {
+        "local_id": "86f4b4c8de09b325f653cc12cc798b7b",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Red Power movement\" OR \"Red Power\" OR \"American Indian Movement\"",
+        "title": "American Indian Movement Symposium; KUOM Lecture Series",
+        "description": "This symposium was co-sponsored by the American Indian Movement, the Department of American Indian Studies at the University of Minnesota, and the Wounded Knee Legal Offense-Defense Committee. The essence of each speaker's remarks is presented in this selection. The speakers include: Indian leader Russell Means, Vernon Bellecourt, Clyde Bellecourt, and Eddie Benton.; Dr. Roger Buffalohead from the University of Minnesota; Angela Davis, Chairperson of the National Alliance to Combat Racism and Political Oppression in America, and attorney Mark Lane, member of the Legal Offense-Defense Committee of Wounded Knee. The symposium offered interested persons a chance to come together to learn the facts about Wounded Knee, discuss the issues, and offer mutual encouragement and support. The AIM anthem is played. Speakers revieew the history and purpose of AIM, which was founded in Minneapolis in July 1968. Vernon Bellecourt offers an overview of the oppression of Indians in U.S. History.Mark Lane reviews the entire Wounded Knee Incident in detail. He strongly defends the actions of AIM leaders and bitterly criticizes the actions of the government and the news media. Speakers stress the fact that the American Indian Movement has become a spiritual movement as well as a political force.",
+        "entities": [
+            {
+                "start": 39,
+                "end": 63,
+                "label": "ORG",
+                "entity_span": "American Indian Movement",
+                "wikidata_id": "Q465140"
+            },
+            {
+                "start": 69,
+                "end": 106,
+                "label": "ORG",
+                "entity_span": "Department of American Indian Studies",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 114,
+                "end": 137,
+                "label": "ORG",
+                "entity_span": "University of Minnesota",
+                "wikidata_id": "Q238101"
+            },
+            {
+                "start": 147,
+                "end": 191,
+                "label": "ORG",
+                "entity_span": "Wounded Knee Legal Offense-Defense Committee",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 285,
+                "end": 291,
+                "label": "NORP",
+                "entity_span": "Indian",
+                "wikidata_id": "Q36747"
+            },
+            {
+                "start": 299,
+                "end": 312,
+                "label": "PERSON",
+                "entity_span": "Russell Means",
+                "wikidata_id": "Q319799"
+            },
+            {
+                "start": 314,
+                "end": 331,
+                "label": "PERSON",
+                "entity_span": "Vernon Bellecourt",
+                "wikidata_id": "Q4895984"
+            },
+            {
+                "start": 355,
+                "end": 367,
+                "label": "PERSON",
+                "entity_span": "Eddie Benton",
+                "wikidata_id": "Q87238093"
+            },
+            {
+                "start": 333,
+                "end": 349,
+                "label": "PERSON",
+                "entity_span": "Clyde Bellecourt",
+                "wikidata_id": "Q4896365"
+            },
+            {
+                "start": 374,
+                "end": 391,
+                "label": "PERSON",
+                "entity_span": "Roger Buffalohead",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 401,
+                "end": 424,
+                "label": "ORG",
+                "entity_span": "University of Minnesota",
+                "wikidata_id": "Q238101"
+            },
+            {
+                "start": 426,
+                "end": 438,
+                "label": "PERSON",
+                "entity_span": "Angela Davis",
+                "wikidata_id": "Q160456"
+            },
+            {
+                "start": 459,
+                "end": 529,
+                "label": "ORG",
+                "entity_span": "National Alliance to Combat Racism and Political Oppression in America",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 544,
+                "end": 553,
+                "label": "PERSON",
+                "entity_span": "Mark Lane",
+                "wikidata_id": "Q6768495"
+            },
+            {
+                "start": 569,
+                "end": 616,
+                "label": "ORG",
+                "entity_span": "Legal Offense-Defense Committee of Wounded Knee",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 710,
+                "end": 722,
+                "label": "GPE",
+                "entity_span": "Wounded Knee",
+                "wikidata_id": "Q509380"
+            },
+            {
+                "start": 792,
+                "end": 795,
+                "label": "ORG",
+                "entity_span": "AIM",
+                "wikidata_id": "Q465140"
+            },
+            {
+                "start": 858,
+                "end": 861,
+                "label": "ORG",
+                "entity_span": "AIM",
+                "wikidata_id": "Q465140"
+            },
+            {
+                "start": 884,
+                "end": 895,
+                "label": "GPE",
+                "entity_span": "Minneapolis",
+                "wikidata_id": "Q36091"
+            },
+            {
+                "start": 910,
+                "end": 927,
+                "label": "PERSON",
+                "entity_span": "Vernon Bellecourt",
+                "wikidata_id": "Q4895984"
+            },
+            {
+                "start": 968,
+                "end": 975,
+                "label": "NORP",
+                "entity_span": "Indians",
+                "wikidata_id": "Q36747"
+            },
+            {
+                "start": 979,
+                "end": 983,
+                "label": "GPE",
+                "entity_span": "U.S.",
+                "wikidata_id": "Q30"
+            },
+            {
+                "start": 1021,
+                "end": 1042,
+                "label": "EVENT",
+                "entity_span": "Wounded Knee Incident",
+                "wikidata_id": "Q4202299"
+            },
+            {
+                "start": 992,
+                "end": 1001,
+                "label": "PERSON",
+                "entity_span": "Mark Lane",
+                "wikidata_id": "Q6768495"
+            },
+            {
+                "start": 1089,
+                "end": 1092,
+                "label": "ORG",
+                "entity_span": "AIM",
+                "wikidata_id": "Q465140"
+            },
+            {
+                "start": 1209,
+                "end": 1233,
+                "label": "ORG",
+                "entity_span": "American Indian Movement",
+                "wikidata_id": "Q465140"
+            }
+        ]
+    },
+    {
+        "local_id": "6bb94bf5ab5e9ac96a9cac1c1c63ee84",
+        "cohort": "Cohort C (Indigenous Populations)",
+        "theme": "\"Trail of Tears\" OR \"Indian Removal Act\"",
+        "title": "Cherokee Legends and the Trail of Tears",
+        "description": "A series of Cherokee myths and legends. Also includes the John Burnett version of the Cherokee Removal better known as the Trail of Tears. Chapters include: 1. How the Earth Was Made 2. The Rattlesnake's Vengeance 3. How the Milky Way Came to Be 4. Why the Possum's Tail is Bare 5. Ataga'hi, the Magic Lake 6. The Race Between the Crane and the Hummingbird 7. Why the Buzzard's Head is Bare 8. Why the Mink Smells 9. Cherokee Indian Ball Game 10. Removal of the Cherokees 1838-39 11. They Katydid's Warning 12. The First Fire",
+        "entities": [
+            {
+                "start": 12,
+                "end": 20,
+                "label": "NORP",
+                "entity_span": "Cherokee",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 58,
+                "end": 70,
+                "label": "PERSON",
+                "entity_span": "John Burnett",
+                "wikidata_id": "NIL"
+            },
+            {
+                "start": 86,
+                "end": 102,
+                "label": "EVENT",
+                "entity_span": "Cherokee Removal",
+                "wikidata_id": "Q86661955"
+            },
+            {
+                "start": 123,
+                "end": 137,
+                "label": "EVENT",
+                "entity_span": "Trail of Tears",
+                "wikidata_id": "Q750448"
+            },
+            {
+                "start": 417,
+                "end": 432,
+                "label": "NORP",
+                "entity_span": "Cherokee Indian",
+                "wikidata_id": "Q105405"
+            },
+            {
+                "start": 462,
+                "end": 471,
+                "label": "NORP",
+                "entity_span": "Cherokees",
+                "wikidata_id": "Q105405"
+            }
+        ]
+    }
+]
