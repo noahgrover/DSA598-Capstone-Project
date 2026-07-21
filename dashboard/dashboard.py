@@ -20,6 +20,36 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+st.markdown("""
+<style>
+/* 1. Make the text labels above the filter boxes larger */
+.stSelectbox label, .stMultiSelect label, .stRadio label, .stTextInput label {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+}
+
+/* 2. Increase the height and text size inside Selectbox & Multiselect filters */
+div[data-baseweb="select"] > div {
+    min-height: 52px !important;
+    font-size: 17px !important;
+    border-radius: 8px !important;
+}
+
+/* 3. Make Radio buttons / Display toggle buttons larger with extra padding */
+div[role="radiogroup"] label {
+    font-size: 16px !important;
+    padding: 10px 16px !important;
+}
+
+/* 4. Increase button sizes */
+.stButton > button {
+    font-size: 16px !important;
+    padding: 10px 24px !important;
+    min-height: 48px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
 st.title("Marginalized Metadata Enrichment - Dashboard")
 st.markdown("""
 This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:
@@ -32,7 +62,7 @@ This dashboard analyzes the structural and qualitative improvements to archival 
 """)
 
 def extract_year_from_text(text):
-    # Helper utility to parse a numeric year out of messy strings or ISO dates.
+    # helper utility to parse a numeric year out of messy strings or ISO dates.
     if not text:
         return None
     match = re.search(r'\b(\d{3,4})\b', str(text))
@@ -57,7 +87,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
     records_per_cohort = Counter()
 
     def extract_labels(val):
-        """Extracts human-readable names from rich JSON-LD objects."""
+        # extracts human-readable names from rich JSON-LD objects.
         if isinstance(val, list):
             return [v.get("schema:name", v.get("@id", "").replace("wd:", "")) if isinstance(v, dict) else str(v) for v in val]
         elif isinstance(val, dict):
@@ -181,7 +211,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 df, records_per_cohort = load_and_parse_jsonld()
 
 if df is not None:
-    # IBM Colorblind-Safe color scheme
+    # IBM colorblind-safe color scheme
     unique_cohorts = sorted(list(df["Cohort"].unique()))
     HIGH_CONTRAST_COHORT_COLORS = ["#005AB5", "#DC3220", "#FFC20A"] 
     COHORT_COLOR_MAP = {
@@ -190,18 +220,18 @@ if df is not None:
     }
 
     IBM_LABEL_COLOR_MAP = {
-        "Person": "#648FFF",        # Cornflower Blue
-        "Organization": "#785EF0",  # Indigo/Purple
-        "Place": "#FE6100",         # High-Contrast Orange
-        "Event": "#FFB000",         # Golden Yellow
-        "NORP": "#D01C8B",          # Vivid Magenta
-        "Thing": "#A3A8B8"          # Fallback Slate Gray
+        "Person": "#648FFF",        # cornflower blue
+        "Organization": "#785EF0",  # indigo/purple
+        "Place": "#FE6100",         # high-contrast orange
+        "Event": "#FFB000",         # golden yellow
+        "NORP": "#D01C8B",          # vivid magenta
+        "Thing": "#A3A8B8"          # fallback slate gray
     }
 
     # sidebar filters
-    st.sidebar.header("Filter Controls")
+    st.sidebar.header("Global Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
-        "Select Historical Cohort(s)",
+        "Select historical cohort(s)",
         options=unique_cohorts,
         default=unique_cohorts
     )
@@ -211,7 +241,7 @@ if df is not None:
     
     filtered_records_count = sum(records_per_cohort[c] for c in selected_cohorts)
         
-    # persistent metrics Row
+    # persistent metrics row
     with st.container(border=True):
         m1, m2, m3, m4, m5, m6 = st.columns(6)
         with m1: st.metric("Total Records", filtered_records_count)
