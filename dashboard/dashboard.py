@@ -542,130 +542,113 @@ if df is not None:
     with tab4:
         st.subheader("🔍 Interactive Entity Explorer & Deep-Dive Cards")
         st.markdown("""
-        Browse entity records across the archival corpus. Click on any entity's name to display its full **Semantic Entity Card**, 
+        Browse entity records across the archival corpus. Select an entity to display its full **Semantic Entity Card**, 
         including resolved metadata, historical mention context, Wikidata links, and geospatial coordinates.
         """)
 
         if df_filtered.empty:
             st.info("No entities available based on current filters.")
         else:
-            # 1. Deduplicate dataset to unique entity level for browsing
-            df_unique_entities = df_filtered.drop_duplicates(subset=["Entity ID"]).copy()
-            
-            # Initialize session state for selected entity if not already set
-            if "selected_entity_id" not in st.session_state:
-                st.session_state["selected_entity_id"] = df_unique_entities.iloc[0]["Entity ID"]
+            # 1. Clean and deduplicate entity list safely
+            df_entities = df_filtered.dropna(subset=["Entity ID"]).drop_duplicates(subset=["Entity ID"]).copy()
 
-            # Ensure current selected entity exists in filtered set
-            current_ids = df_unique_entities["Entity ID"].tolist()
-            if st.session_state["selected_entity_id"] not in current_ids:
-                st.session_state["selected_entity_id"] = current_ids[0]
-
-            # 2. Entity Quick-Select Button Directory (Replaces Dropdown)
-            st.markdown("#### Select an Entity to Inspect:")
-            
-            # Render entity names as a clean grid of clickable buttons
-            grid_cols = st.columns(4)
-            for idx, (_, e_row) in enumerate(df_unique_entities.head(16).iterrows()):
-                col_idx = idx % 4
-                e_id = e_row["Entity ID"]
-                e_name = e_row["Official Name"]
-                e_icon = e_row["Icon"]
+            if df_entities.empty:
+                st.warning("No valid entities found in current selection.")
+            else:
+                # Format a rich dropdown option label: "👤 Jane Doe (Q12345)"
+                df_entities["Select_Label"] = (
+                    df_entities["Icon"].fillna("📌") + " " + 
+                    df_entities["Official Name"].fillna("Unknown Entity") + 
+                    " (" + df_entities["Entity ID"].astype(str) + ")"
+                )
                 
-                # Highlight active selected button
-                is_selected = (e_id == st.session_state["selected_entity_id"])
-                btn_label = f"{'▶ ' if is_selected else ''}{e_icon} {e_name}"
-                
-                with grid_cols[col_idx]:
-                    if st.button(
-                        btn_label, 
-                        key=f"btn_ent_{e_id}", 
-                        use_container_width=True,
-                        type="primary" if is_selected else "secondary"
-                    ):
-                        st.session_state["selected_entity_id"] = e_id
-                        st.rerun()
+                selected_label = st.selectbox(
+                    "Choose an Entity to Inspect:",
+                    options=df_entities["Select_Label"].tolist(),
+                    index=0
+                )
 
-            if len(df_unique_entities) > 16:
-                st.caption(f"Showing top 16 of {len(df_unique_entities)} matching entities. Use sidebar filters to refine.")
+                # Extract selected entity row
+                selected_row = df_entities[df_entities["Select_Label"] == selected_label].iloc[0]
+                selected_id = selected_row["Entity ID"]
 
-            st.markdown("---")
+                # Get all corpus mentions for this entity
+                all_mentions = df_filtered[df_filtered["Entity ID"] == selected_id]
 
-            # 3. Render Detailed Entity Card for Selected Entity
-            selected_row = df_unique_entities[
-                df_unique_entities["Entity ID"] == st.session_state["selected_entity_id"]
-            ].iloc[0]
+                st.markdown("---")
 
-            # Collect all mention instances across corpus for this entity
-            all_mentions = df_filtered[df_filtered["Entity ID"] == selected_row["Entity ID"]]
+                # 2. Render Entity Card
+                with st.container(border=True):
+                    card_col1, card_col2 = st.columns([1, 2])
 
-            with st.container(border=True):
-                card_col1, card_col2 = st.columns([1, 2])
+                    # Left Column: Fixed-size Image & Core Identifiers
+                    with card_col1:
+                        st.markdown(f"### {selected_row.get('Icon', '📌')} {selected_row.get('Official Name', 'Unknown')}")
+                        st.caption(f"**Entity ID:** `{selected_id}` | **Class:** {selected_row.get('NER Class', 'N/A')}")
 
-                # Left Column: Image (Size Restricted) & Quick Metadata
-                with card_col1:
-                    st.markdown(f"### {selected_row['Icon']} {selected_row['Official Name']}")
-                    st.caption(f"**Entity ID:** `{selected_row['Entity ID']}` | **Class:** {selected_row['NER Class']}")
+                        # Image Sizing: Hard-capped width at 180px
+                        image_url = selected_row.get("Image URL")
+                        if pd.notna(image_url) and str(image_url).strip().startswith("http"):
+                            st.image(str(image_url), width=180, caption=selected_row.get("Official Name"))
+                        else:
+                            # Dark mode placeholder box if image URL is missing or invalid
+                            st.markdown(
+                                f"""
+                                <div style="
+                                    width: 180px; 
+                                    height: 180px; 
+                                    background-color: #262626; 
+                                    display: flex; 
+                                    align-items: center; 
+                                    justify-content: center; 
+                                    border-radius: 8px; 
+                                    border: 1px solid #393939;
+                                    margin-bottom: 12px;
+                                ">
+                                    <span style="font-size: 48px;">{selected_row.get('Icon', '📌')}</span>
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
 
-                    # Restricted Image Sizing (Capped at 180px width)
-                    image_url = selected_row.get("Image URL") if pd.notna(selected_row.get("Image URL")) else None
-                    if image_url:
-                        st.image(image_url, width=180, caption=selected_row["Official Name"])
-                    else:
-                        st.markdown(
-                            f"""
-                            <div style="
-                                width: 180px; 
-                                height: 180px; 
-                                background-color: #262626; 
-                                display: flex; 
-                                align-items: center; 
-                                justify-content: center; 
-                                border-radius: 8px; 
-                                border: 1px solid #393939;
-                                margin-bottom: 10px;
-                            ">
-                                <span style="font-size: 48px;">{selected_row['Icon']}</span>
-                            </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
+                        st.markdown(f"**Resolution:** `{selected_row.get('Resolution Type', 'N/A')}`")
+                        
+                        conf_val = selected_row.get("Confidence")
+                        conf_str = f"{conf_val:.2f}" if pd.notna(conf_val) and isinstance(conf_val, (int, float)) else "N/A"
+                        st.markdown(f"**NER Confidence:** `{conf_str}`")
+                        
+                        wiki_link = selected_row.get("Wikidata Link")
+                        if pd.notna(wiki_link) and str(wiki_link).startswith("http"):
+                            st.markdown(f"🔗 [Wikidata Authority Record]({wiki_link})")
 
-                    # Quick Status Badges
-                    st.markdown(f"**Resolution:** `{selected_row['Resolution Type']}`")
-                    st.markdown(f"**NER Confidence:** `{selected_row['Confidence']:.2f}`")
-                    
-                    if pd.notna(selected_row.get("Wikidata Link")):
-                        st.markdown(f"🔗 [Wikidata Authority Record]({selected_row['Wikidata Link']})")
+                    # Right Column: Semantic Attributes & Context Mentions
+                    with card_col2:
+                        st.markdown("#### Semantic Attributes")
+                        
+                        attr_cols = st.columns(2)
+                        with attr_cols[0]:
+                            st.markdown(f"**Occupation:** {selected_row.get('Occupation', 'N/A')}")
+                            st.markdown(f"**Gender Identity:** {selected_row.get('Gender Identity', 'N/A')}")
+                            st.markdown(f"**Country:** {selected_row.get('Country', 'N/A')}")
+                        with attr_cols[1]:
+                            st.markdown(f"**Ideology:** {selected_row.get('Political Ideology', 'N/A')}")
+                            st.markdown(f"**Ethnic Group:** {selected_row.get('Ethnic Group/Tribe', 'N/A')}")
+                            st.markdown(f"**Religion:** {selected_row.get('Religion', 'N/A')}")
 
-                # Right Column: Semantic Attributes & Historical Mention Logs
-                with card_col2:
-                    st.markdown("#### Semantic Attributes")
-                    
-                    attr_cols = st.columns(2)
-                    with attr_cols[0]:
-                        st.markdown(f"**Occupation:** {selected_row.get('Occupation', 'N/A')}")
-                        st.markdown(f"**Gender Identity:** {selected_row.get('Gender Identity', 'N/A')}")
-                        st.markdown(f"**Country:** {selected_row.get('Country', 'N/A')}")
-                    with attr_cols[1]:
-                        st.markdown(f"**Ideology:** {selected_row.get('Political Ideology', 'N/A')}")
-                        st.markdown(f"**Ethnic Group:** {selected_row.get('Ethnic Group/Tribe', 'N/A')}")
-                        st.markdown(f"**Religion:** {selected_row.get('Religion', 'N/A')}")
-
-                    st.markdown("---")
-                    st.markdown(f"#### Corpus Mentions ({len(all_mentions)} total)")
-                    
-                    # Display snippet context records
-                    df_snippets = all_mentions[["Surface Text", "Cohort", "Source Document"]].dropna(how="all")
-                    if not df_snippets.empty:
-                        st.dataframe(
-                            df_snippets, 
-                            use_container_width=True, 
-                            hide_index=True, 
-                            height=180
-                        )
-                    else:
-                        st.info("No surface text snippets extracted for this entity node.")
+                        st.markdown("---")
+                        st.markdown(f"#### Corpus Mentions ({len(all_mentions)} total)")
+                        
+                        # Snippet view
+                        cols_to_show = [c for c in ["Surface Text", "Cohort", "Source Document"] if c in all_mentions.columns]
+                        if cols_to_show:
+                            st.dataframe(
+                                all_mentions[cols_to_show], 
+                                use_container_width=True, 
+                                hide_index=True, 
+                                height=180
+                            )
+                        else:
+                            st.info("No text snippets available.")
 
 # --- Tab 5: Pipeline Quality Diagnostics ---
     with tab5:
