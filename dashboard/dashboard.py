@@ -484,7 +484,7 @@ if df is not None:
         st.subheader("🔍 Interactive Entity Explorer & Profile Graph")
         st.markdown("""
         Search, filter, and inspect specific semantic nodes within your graph. Selecting an entity 
-        will pull its full relational dossier, authority records, and multi-layered attributes.
+        will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.
         """)
 
         if df_filtered.empty:
@@ -501,7 +501,7 @@ if df is not None:
                 res_options = ["All Resolutions"] + list(df_filtered["Resolution Type"].dropna().unique())
                 selected_res = st.selectbox("Filter Explorer by Resolution:", options=res_options)
 
-            # Apply Explorer Filters
+            # Apply Search Filters First
             df_exp = df_filtered.copy()
             if search_query:
                 df_exp = df_exp[
@@ -516,23 +516,34 @@ if df is not None:
             if df_exp.empty:
                 st.warning("No records match your specific search criteria.")
             else:
-                # 2. Split Master-Detail Layout
+                # 2. Deduplication & Mention Aggregation
+                mention_counts = df_exp.groupby("Entity ID").size().to_dict()
+                
+                df_nodes = df_exp.drop_duplicates(subset=["Entity ID"]).copy()
+                df_nodes["Mentions"] = df_nodes["Entity ID"].map(mention_counts)
+                df_nodes = df_nodes.sort_values(by="Mentions", ascending=False)
+
+                # 3. Split Master-Detail Layout
                 master_col, detail_col = st.columns([3, 2])
 
                 with master_col:
-                    st.markdown(f"**Matching Entity Nodes ({len(df_exp)})**")
-                    # Clean up view for the selection table
-                    df_table_view = df_exp[["Icon", "Official Name", "NER Class", "Cohort", "Resolution Type"]].copy()
+                    st.markdown(f"**Unique Graph Nodes ({len(df_nodes)})**")
                     
-                    # Create a quick selection mechanism
-                    entity_names = (df_exp["Icon"] + " " + df_exp["Official Name"]).tolist()
-                    selected_entity_str = st.selectbox(
+                    df_nodes["Select Label"] = (
+                        df_nodes["Icon"] + " " + 
+                        df_nodes["Official Name"] + 
+                        " (" + df_nodes["Mentions"].astype(str) + " mention" + 
+                        df_nodes["Mentions"].apply(lambda x: "s" if x > 1 else "") + ")"
+                    )
+
+                    selected_label = st.selectbox(
                         "Click below to select an active entity dossier:", 
-                        options=entity_names,
+                        options=df_nodes["Select Label"].tolist(),
                         label_visibility="collapsed"
                     )
                     
-                    # Display table below selector for fast general browsing
+                    df_table_view = df_nodes[["Icon", "Official Name", "NER Class", "Mentions", "Resolution Type"]].copy()
+                    
                     st.dataframe(
                         df_table_view, 
                         use_container_width=True, 
@@ -541,64 +552,87 @@ if df is not None:
                     )
 
                 with detail_col:
-                    # Parse selected entity out of the dataframe
-                    selected_name_clean = selected_entity_str.split(" ", 1)[1] if " " in selected_entity_str else selected_entity_str
-                    entity_row = df_exp[df_exp["Official Name"] == selected_name_clean].iloc[0]
+                    selected_row = df_nodes[df_nodes["Select Label"] == selected_label].iloc[0]
 
-                    # 3. Render the Selected Entity Profile Card
+                    # 4. Render the Selected Entity Profile Card
                     with st.container(border=True):
                         # Title Header Block
-                        st.markdown(f"### {entity_row['Icon']} {entity_row['Official Name']}")
-                        st.caption(f"**ID:** `{entity_row['Entity ID']}` | **Class:** {entity_row['NER Class']} | **Cohort:** {entity_row['Cohort']}")
+                        st.markdown(f"### {selected_row['Icon']} {selected_row['Official Name']}")
+                        st.caption(
+                            f"**ID:** `{selected_row['Entity ID']}` | "
+                            f"**Class:** {selected_row['NER Class']} | "
+                            f"**Total Mentions:** {selected_row['Mentions']}"
+                        )
                         
-                        # Handle Image rendering safely (handles strings, lists, dicts, or missing values)
-                        raw_img = entity_row.get("Image URL")
-                        
-                        # 1. Extract string if JSON-LD parsed image as a list or dict
+                        # Type-safe image rendering
+                        raw_img = selected_row.get("Image URL")
                         if isinstance(raw_img, list) and len(raw_img) > 0:
                             raw_img = raw_img[0]
                         if isinstance(raw_img, dict):
                             raw_img = raw_img.get("schema:url", raw_img.get("@id", ""))
 
-                        # 2. Safely check if we have a valid non-empty image URL string
                         if isinstance(raw_img, str) and raw_img.strip() and raw_img.strip().lower() not in ("none", "nan"):
                             try:
                                 st.image(raw_img.strip(), use_container_width=True)
                             except Exception:
                                 st.caption("🖼️ *(Image link present but unreachable)*")
-                        
+
                         # Description
-                        st.markdown(f"**Description:** \n> {entity_row['Description']}")
+                        st.markdown(f"**Description:** \n> {selected_row['Description']}")
                         
                         st.markdown("---")
                         st.markdown("**Graph Attributes & Linked Assertions:**")
 
-                        # Build a clean data grid for metadata attributes
+                        # Attribute display grid
                         metadata_fields = {
-                            "Mention Text": entity_row["Surface Text"],
-                            "Timeline Active Bounds": f"{entity_row['Target Year'] or '???'} – {entity_row['End Year'] or '???'}",
-                            "Resolution Link Status": entity_row["Resolution Type"],
-                            "Occupation/Role": entity_row["Occupation"],
-                            "Affiliated Country": entity_row["Country"],
-                            "Member Of": entity_row["Member Of"],
-                            "Participant In": entity_row["Participant In"],
-                            "Political Ideology": entity_row["Political Ideology"],
-                            "Ethnic Group/Tribe": entity_row["Ethnic Group/Tribe"],
-                            "Stated Religion": entity_row["Religion"],
-                            "Gender Identity": entity_row["Gender Identity"],
+                            "Primary Mention Text": selected_row["Surface Text"],
+                            "Timeline Active Bounds": f"{selected_row['Target Year'] or '???'} – {selected_row['End Year'] or '???'}",
+                            "Resolution Link Status": selected_row["Resolution Type"],
+                            "Primary Cohort": selected_row["Cohort"],
+                            "Occupation/Role": selected_row["Occupation"],
+                            "Affiliated Country": selected_row["Country"],
+                            "Member Of": selected_row["Member Of"],
+                            "Participant In": selected_row["Participant In"],
+                            "Political Ideology": selected_row["Political Ideology"],
+                            "Ethnic Group/Tribe": selected_row["Ethnic Group/Tribe"],
+                            "Stated Religion": selected_row["Religion"],
+                            "Gender Identity": selected_row["Gender Identity"],
                         }
 
-                        # Display non-null items beautifully
                         for label, val in metadata_fields.items():
                             if pd.notna(val) and str(val).strip() and val != "??? – ???":
                                 st.markdown(f"**{label}:** {val}")
 
-                        # Include Authority URL Button
-                        if pd.notna(entity_row["VIAF Link"]):
-                            st.link_button("🌐 Open VIAF Authority File", entity_row["VIAF Link"], use_container_width=True)
-                        elif "wd:" in entity_row["Entity ID"]:
-                            wd_url = f"https://www.wikidata.org/wiki/{entity_row['Entity ID'].replace('wd:', '')}"
+                        # =========================================================
+                        # 5. NEW: CORPUS OCCURRENCES & PROVENANCE BREAKDOWN
+                        # =========================================================
+                        st.markdown("---")
+                        st.markdown("**📄 Corpus Mentions & Provenance:**")
+
+                        # Look up all mentions in the active cohort dataset for this Entity ID
+                        all_mentions = df_filtered[df_filtered["Entity ID"] == selected_row["Entity ID"]]
+
+                        # Surface text variations across documents
+                        surface_variants = [str(s) for s in all_mentions["Surface Text"].unique() if pd.notna(s) and str(s).strip()]
+                        if surface_variants:
+                            variant_tags = " ".join([f"`{v}`" for v in surface_variants])
+                            st.markdown(f"**Archival Text Variants:** {variant_tags}")
+
+                        # Breakdown across cohorts
+                        cohort_counts = all_mentions["Cohort"].value_counts()
+                        with st.expander(f"View Distribution Across Cohorts ({len(all_mentions)} total mentions)", expanded=False):
+                            for c_name, count in cohort_counts.items():
+                                st.markdown(f"• **{c_name}**: {count} mention{'s' if count > 1 else ''}")
+
+                        st.markdown("---")
+
+                        # Authority Link Button
+                        if pd.notna(selected_row["VIAF Link"]):
+                            st.link_button("🌐 Open VIAF Authority File", selected_row["VIAF Link"], use_container_width=True)
+                        elif "wd:" in selected_row["Entity ID"]:
+                            wd_url = f"https://www.wikidata.org/wiki/{selected_row['Entity ID'].replace('wd:', '')}"
                             st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
+                            
     # --- Tab 5: Pipeline Quality Diagnostics ---
     with tab5:
         st.subheader("Pipeline Quality & Resolution Diagnostics")
