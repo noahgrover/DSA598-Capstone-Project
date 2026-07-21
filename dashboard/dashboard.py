@@ -20,37 +20,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown("""
-<style>
-/* 1. Make the text labels above the filter boxes larger */
-.stSelectbox label, .stMultiSelect label, .stRadio label, .stTextInput label {
-    font-size: 1.1rem !important;
-    font-weight: 600 !important;
-}
-
-/* 2. Increase the height and text size inside Selectbox & Multiselect filters */
-div[data-baseweb="select"] > div {
-    min-height: 52px !important;
-    font-size: 17px !important;
-    border-radius: 8px !important;
-}
-
-/* 3. Make Radio buttons / Display toggle buttons larger with extra padding */
-div[role="radiogroup"] label {
-    font-size: 16px !important;
-    padding: 10px 16px !important;
-}
-
-/* 4. Increase button sizes */
-.stButton > button {
-    font-size: 16px !important;
-    padding: 10px 24px !important;
-    min-height: 48px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-st.title("Marginalized Metadata Enrichment - Dashboard")
+st.title("Marginalized Metadata Enrichment: Dashboard")
 st.markdown("""
 This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:
 - Extracts title and description fields from digital records stored in DPLA;
