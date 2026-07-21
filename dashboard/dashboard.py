@@ -633,9 +633,8 @@ if df is not None:
 # =========================================================================================================================================
     
     with tab4:
-        st.subheader("🌐 Geospatial Entity Distribution & Spatial Density")
-        st.markdown("""
-        Inspect the geographical footprint of resolved entity nodes across your archival corpus. 
+        st.caption("""
+        Inspect the geographical footprint of resolved entity nodes across the semantic graph. 
         Toggle between **Weighted Markers** to inspect individual entity locations and categories, 
         or **Density Heatmap** to identify broader historical epicenters and spatial concentrations.
         """)
@@ -643,12 +642,12 @@ if df is not None:
         df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
         
         if not df_geo.empty:
-            # 1. Aggregate mention counts per unique geospatial entity node
+            # aggregate mention counts per unique geospatial entity node
             geo_mention_counts = df_geo.groupby("Entity ID").size().to_dict()
             df_geo_nodes = df_geo.drop_duplicates(subset=["Entity ID"]).copy()
             df_geo_nodes["Mentions"] = df_geo_nodes["Entity ID"].map(geo_mention_counts)
             
-            # 2. Build detailed hover labels with mention counts
+            # build detailed hover labels with mention counts
             df_geo_nodes["Hover Title"] = (
                 df_geo_nodes["Icon"] + " " + 
                 df_geo_nodes["Official Name"] + 
@@ -656,14 +655,14 @@ if df is not None:
                 df_geo_nodes["Mentions"].apply(lambda x: "s" if x > 1 else "") + ")"
             )
             
-            # 3. View Switcher Control
+            # view switcher control
             map_view = st.radio(
                 "Select Map Display Mode:", 
                 options=["Weighted Markers", "Density Heatmap"], 
                 horizontal=True
             )
             
-            # 4. Conditional Map Rendering
+            # conditional map rendering
             if map_view == "Weighted Markers":
                 fig_map = px.scatter_mapbox(
                     df_geo_nodes,
@@ -686,7 +685,6 @@ if df is not None:
                     height=600
                 )
             else:
-                # Custom IBM Ultramarine sequential gradient for dark theme map
                 fig_map = px.density_mapbox(
                     df_geo_nodes,
                     lat="Latitude",
@@ -705,7 +703,7 @@ if df is not None:
                     color_continuous_scale=["#161616", "#648FFF", "#785EF0", "#DC267F"]
                 )
             
-            # Hardcoded to carto-darkmatter tile style
+            # set map tile
             fig_map.update_layout(
                 mapbox_style="carto-darkmatter",
                 margin=dict(l=0, r=0, t=10, b=0)
@@ -719,19 +717,17 @@ if df is not None:
 # =========================================================================================================================================
     
     with tab5:
-        st.subheader("⏳ Chronological Distribution & Historical Velocity")
-        st.markdown("""
-        This layout pairs your high-level category swimlanes with macro temporal metrics 
-        and velocity tracking to show exactly where your archive aggregates in time.
+        st.caption("""
+        Explore the temporal distribution of graph entities through quantitative metrics, track cross-category historical triggers with a swimlane chart, and identify structural data gaps or historical surges with decadal node histograms.
         """)
 
-        # Filter out records without a timestamp
+        # filter out records without a timestamp
         df_time = df_filtered[df_filtered["Target Year"].notna()].copy()
 
         if df_time.empty:
             st.info("No elements with valid Wikidata timelines or local date stamps match your active filters.")
         else:
-            # Force uniform types for chronological calculations
+            # force uniform types for chronological calculations
             df_time["Target Year"] = df_time["Target Year"].astype(int)
             df_time["Timeline Label"] = df_time["Icon"] + " " + df_time["Official Name"]
             
@@ -739,12 +735,12 @@ if df is not None:
             with st.container(border=True):
                 t_col1, t_col2, t_col3, t_col4 = st.columns(4)
                 
-                # 1. Total absolute era coverage
+                # total absolute era coverage
                 start_era = int(df_time["Target Year"].min())
                 end_era = int(df_time["Target Year"].max())
                 t_col1.metric("Chronological Span", f"{start_era} – {end_era}")
                 
-                # 2. Average lifespan of historical actors (excluding events)
+                # average lifespan of historical actors (excluding events)
                 df_lifespan = df_time[df_time["End Year"].notna() & (~df_time["NER Class"].str.contains("Event", na=False))].copy()
                 if not df_lifespan.empty:
                     avg_life = int((df_lifespan["End Year"].astype(int) - df_lifespan["Target Year"]).mean())
@@ -752,7 +748,7 @@ if df is not None:
                 else:
                     t_col2.metric("Avg. Entity Lifespan", "Static / N/A")
                 
-                # 3. Mode calculation for historical density concentration
+                # mode calculation for historical density concentration
                 df_time["Decade"] = (df_time["Target Year"] // 10) * 10
                 peak_decade = df_time["Decade"].mode()
                 if not peak_decade.empty:
@@ -760,15 +756,14 @@ if df is not None:
                 else:
                     t_col3.metric("Peak Active Decade", "N/A")
                     
-                # 4. Total count of milestone incidents
+                # total count of milestone incidents
                 total_events = df_time["NER Class"].str.contains("Event", na=False).sum()
                 t_col4.metric("Point-in-Time Events", f"{total_events} Milestones")
 
             st.markdown("---")
 
             # view 1 (swimlane)
-            st.markdown("### 🗺️ Macro Density Swimlanes")
-            st.markdown("_Look for vertical alignments across tracks to identify cross-category historical triggers._")
+            st.caption("Look for vertical alignments across tracks to identify cross-category historical triggers.")
 
             fig_macro = go.Figure()
             categories = df_time["NER Class"].unique()
@@ -780,7 +775,7 @@ if df is not None:
                     for _, row in df_cat.iterrows()
                 ]
 
-                # Grab the locked color from our global master dictionary
+                # grab the locked color from our global master dictionary
                 assigned_color = IBM_LABEL_COLOR_MAP.get(cat, IBM_LABEL_COLOR_MAP["Thing"])
 
                 fig_macro.add_trace(go.Scatter(
@@ -811,10 +806,9 @@ if df is not None:
             st.markdown("---")
 
             # view 2 (historical pulse)
-            st.markdown("### 📈 Historical Velocity (Decadal Node Density)")
-            st.markdown("_Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges._")
+            st.caption("Aggregates graph initialization frequency into intervals to highlight structural data gaps or historical surges.")
             
-            # Group by decade and type to showcase stacked composition over time
+            # group by decade and type to showcase stacked composition over time
             decade_counts = df_time.groupby(["Decade", "NER Class"]).size().reset_index(name="Node Count")
             decade_counts["Decade Display"] = decade_counts["Decade"].astype(str) + "s"
             decade_counts = decade_counts.sort_values("Decade")
