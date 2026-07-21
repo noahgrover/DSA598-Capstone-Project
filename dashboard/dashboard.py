@@ -200,11 +200,12 @@ if df is not None:
 
     # sidebar filters
     st.sidebar.header("Global Dashboard Filters")
-    selected_cohorts = st.sidebar.multiselect(
-        "Select historical cohort(s)",
-        options=unique_cohorts,
-        default=unique_cohorts
-    )
+    selected_cohorts = st.sidebar.pills(
+    "Select historical cohort(s)",
+    options=unique_cohorts,
+    default=unique_cohorts,
+    selection_mode="multi"  # Allows selecting multiple cohort buttons
+)
 
     # apply filter mask to data
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
