@@ -245,7 +245,7 @@ if df is not None:
     
     with tab1:
         st.markdown("""
-        Search, filter, and inspect specific semantic nodes within your graph. Selecting an entity 
+        Search, filter, and inspect specific semantic nodes within the graph. Selecting an entity 
         will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.
         """)
 
@@ -352,7 +352,6 @@ if df is not None:
                         metadata_fields = {
                             "Primary Mention Text": selected_row.get("Surface Text"),
                             "Timeline Active Bounds": time_bounds,
-                            "Resolution Link Status": selected_row.get("Resolution Type"),
                             "Primary Cohort": selected_row.get("Cohort"),
                             "Occupation/Role": selected_row.get("Occupation"),
                             "Affiliated Country": selected_row.get("Country"),
