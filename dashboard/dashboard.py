@@ -1,5 +1,5 @@
 # =========================================================================================================================================
-# Streamlit Archival Knowledge Graph Dashboard
+# DSA 598 Capstone Project - Streamlit Dashboard - Grover
 # =========================================================================================================================================
 
 import json
@@ -12,7 +12,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import networkx as nx
 
-# Set page configurations
+# page configurations
 st.set_page_config(
     page_title="Archival Knowledge Graph Analytics",
     page_icon="🕸️",
@@ -234,8 +234,11 @@ if df is not None:
         "📈 Pipeline Quality Diagnostics",
         "Semantic Network"
     ])
+
+# =========================================================================================================================================
+# Tab 1 : 
+# =========================================================================================================================================
     
-    # --- Tab 1: Geospatial & Geographic Analysis ---
     with tab1:
         st.subheader("🌐 Geospatial Entity Distribution & Spatial Density")
         st.markdown("""
@@ -318,7 +321,10 @@ if df is not None:
         else:
             st.info("No geospatial coordinates found for the selected entity filters.")
 
-    # --- Tab 2: Enhanced Demographic Analysis ---
+# =========================================================================================================================================
+# Tab 2 : 
+# =========================================================================================================================================
+    
     with tab2:
         st.subheader("Archival Intersectionality & Metadata Distributions")
         
@@ -412,7 +418,10 @@ if df is not None:
             else:
                 st.info("No co-occurring data coordinates available for this configuration.")
         
-    # --- Tab 3: Quantitative Temporal Analytics (Unified IBM Colors) ---
+# =========================================================================================================================================
+# Tab 3 : 
+# =========================================================================================================================================
+    
     with tab3:
         st.subheader("⏳ Chronological Distribution & Historical Velocity")
         st.markdown("""
@@ -538,7 +547,10 @@ if df is not None:
             )
             st.plotly_chart(fig_pulse, use_container_width=True)
 
-    # --- Tab 4: Interactive Entity Explorer ---
+# =========================================================================================================================================
+# Tab 4 : 
+# =========================================================================================================================================
+    
     with tab4:
         st.subheader("🔍 Interactive Entity Explorer & Profile Graph")
         st.markdown("""
@@ -693,7 +705,10 @@ if df is not None:
                             wd_url = f"https://www.wikidata.org/wiki/{str(selected_row['Entity ID']).replace('wd:', '')}"
                             st.link_button("🌐 View Entity on Wikidata", wd_url, use_container_width=True)
 
-# --- Tab 5: Pipeline Quality Diagnostics ---
+# =========================================================================================================================================
+# Tab 5 : 
+# =========================================================================================================================================
+    
     with tab5:
         st.subheader("📈 Pipeline Quality Diagnostics & Model Benchmarks")
         st.markdown("""
@@ -955,147 +970,148 @@ if df is not None:
                     margin=dict(t=30, b=10, l=10, r=10)
                 )
                 st.plotly_chart(fig_comp, use_container_width=True)
+# =========================================================================================================================================
+# Tab 6: 
+# =========================================================================================================================================
+    with tab6:
+        st.subheader("🕸️ Semantic Density Network Graph")
+        st.markdown("""
+        Explore structural relationships and co-occurrence density across entity nodes. 
+        Node sizes represent **mention density** (degree/frequency), edge thickness indicates **co-occurrence strength**, 
+        and colors correspond to **NER entity classes**.
+        """)
 
-    # TAB 6
-with tab6:
-    st.subheader("🕸️ Semantic Density Network Graph")
-    st.markdown("""
-    Explore structural relationships and co-occurrence density across entity nodes. 
-    Node sizes represent **mention density** (degree/frequency), edge thickness indicates **co-occurrence strength**, 
-    and colors correspond to **NER entity classes**.
-    """)
+        # 1. Guard against empty datasets
+        df_net_clean = df_filtered.dropna(subset=["Entity ID"]).copy() if not df_filtered.empty else pd.DataFrame()
 
-    # 1. Guard against empty datasets
-    df_net_clean = df_filtered.dropna(subset=["Entity ID"]).copy() if not df_filtered.empty else pd.DataFrame()
-
-    if df_net_clean.empty:
-        st.info("No entity data available to construct network topology.")
-    else:
-        # Cast key columns to string to prevent float/str mismatch crashes
-        df_net_clean["Entity ID"] = df_net_clean["Entity ID"].astype(str)
-        df_net_clean["Official Name"] = df_net_clean["Official Name"].fillna("Unknown Entity").astype(str)
-        df_net_clean["NER Class"] = df_net_clean["NER Class"].fillna("UNKNOWN").astype(str)
-        df_net_clean["Icon"] = df_net_clean["Icon"].fillna("📌").astype(str)
-
-        # 2. Controls to adjust network complexity
-        net_col1, net_col2 = st.columns([2, 1])
-        with net_col1:
-            top_n = st.slider("Limit Top Entities by Mention Count (for clarity):", min_value=10, max_value=100, value=30, step=5)
-        with net_col2:
-            layout_algorithm = st.selectbox(
-                "Graph Layout Algorithm:", 
-                ["Spring (Fruchterman-Reingold)", "Circular"]
-            )
-
-        # 3. Filter down to top N entities
-        mention_counts = df_net_clean.groupby("Entity ID").size().to_dict()
-        top_entity_ids = sorted(mention_counts, key=mention_counts.get, reverse=True)[:top_n]
-        
-        df_net_subset = df_net_clean[df_net_clean["Entity ID"].isin(top_entity_ids)].copy()
-
-        if len(df_net_subset) < 2:
-            st.warning("Not enough distinct entities selected to form a relational network.")
+        if df_net_clean.empty:
+            st.info("No entity data available to construct network topology.")
         else:
-            try:
-                # 4. Construct NetworkX Graph
-                G = nx.Graph()
+            # Cast key columns to string to prevent float/str mismatch crashes
+            df_net_clean["Entity ID"] = df_net_clean["Entity ID"].astype(str)
+            df_net_clean["Official Name"] = df_net_clean["Official Name"].fillna("Unknown Entity").astype(str)
+            df_net_clean["NER Class"] = df_net_clean["NER Class"].fillna("UNKNOWN").astype(str)
+            df_net_clean["Icon"] = df_net_clean["Icon"].fillna("📌").astype(str)
 
-                # Add Nodes safely
-                for _, row in df_net_subset.drop_duplicates(subset=["Entity ID"]).iterrows():
-                    e_id = row["Entity ID"]
-                    G.add_node(
-                        e_id, 
-                        name=row["Official Name"], 
-                        ner_class=row["NER Class"], 
-                        mentions=mention_counts.get(e_id, 1), 
-                        icon=row["Icon"]
+            # 2. Controls to adjust network complexity
+            net_col1, net_col2 = st.columns([2, 1])
+            with net_col1:
+                top_n = st.slider("Limit Top Entities by Mention Count (for clarity):", min_value=10, max_value=100, value=30, step=5)
+            with net_col2:
+                layout_algorithm = st.selectbox(
+                    "Graph Layout Algorithm:", 
+                    ["Spring (Fruchterman-Reingold)", "Circular"]
+                )
+
+            # 3. Filter down to top N entities
+            mention_counts = df_net_clean.groupby("Entity ID").size().to_dict()
+            top_entity_ids = sorted(mention_counts, key=mention_counts.get, reverse=True)[:top_n]
+        
+            df_net_subset = df_net_clean[df_net_clean["Entity ID"].isin(top_entity_ids)].copy()
+
+            if len(df_net_subset) < 2:
+                st.warning("Not enough distinct entities selected to form a relational network.")
+            else:
+                try:
+                    # 4. Construct NetworkX Graph
+                    G = nx.Graph()
+
+                    # Add Nodes safely
+                    for _, row in df_net_subset.drop_duplicates(subset=["Entity ID"]).iterrows():
+                        e_id = row["Entity ID"]
+                        G.add_node(
+                            e_id, 
+                            name=row["Official Name"], 
+                            ner_class=row["NER Class"], 
+                            mentions=mention_counts.get(e_id, 1), 
+                            icon=row["Icon"]
+                        )
+
+                    # Add Edges based on shared Cohort co-occurrence
+                    if "Cohort" in df_net_subset.columns:
+                        for cohort_name, group in df_net_subset.groupby("Cohort"):
+                            if pd.isna(cohort_name):
+                                continue
+                            e_ids = [str(x) for x in group["Entity ID"].unique() if str(x) in G.nodes]
+                            # Create co-occurrence edges between cohort members
+                            for i in range(len(e_ids)):
+                                for j in range(i + 1, len(e_ids)):
+                                    u, v = e_ids[i], e_ids[j]
+                                    if u != v:
+                                        if G.has_edge(u, v):
+                                            G[u][v]["weight"] += 1
+                                        else:
+                                            G.add_edge(u, v, weight=1)
+
+                    # 5. Compute Node Positions based on selected layout
+                    if "Circular" in layout_algorithm:
+                        pos = nx.circular_layout(G)
+                    else:
+                        pos = nx.spring_layout(G, k=0.55, seed=42)
+
+                    # 6. Extract Edge Traces for Plotly
+                    edge_x, edge_y = [], []
+                    for edge in G.edges():
+                        x0, y0 = pos[edge[0]]
+                        x1, y1 = pos[edge[1]]
+                        edge_x.extend([x0, x1, None])
+                        edge_y.extend([y0, y1, None])
+
+                    edge_trace = go.Scatter(
+                        x=edge_x, y=edge_y,
+                        line=dict(width=1.0, color="rgba(140, 140, 140, 0.35)"),
+                        hoverinfo="none",
+                        mode="lines"
                     )
 
-                # Add Edges based on shared Cohort co-occurrence
-                if "Cohort" in df_net_subset.columns:
-                    for cohort_name, group in df_net_subset.groupby("Cohort"):
-                        if pd.isna(cohort_name):
-                            continue
-                        e_ids = [str(x) for x in group["Entity ID"].unique() if str(x) in G.nodes]
-                        # Create co-occurrence edges between cohort members
-                        for i in range(len(e_ids)):
-                            for j in range(i + 1, len(e_ids)):
-                                u, v = e_ids[i], e_ids[j]
-                                if u != v:
-                                    if G.has_edge(u, v):
-                                        G[u][v]["weight"] += 1
-                                    else:
-                                        G.add_edge(u, v, weight=1)
+                    # 7. Extract Node Traces for Plotly
+                    node_x, node_y, node_colors, node_sizes, node_hover_text, node_labels = [], [], [], [], [], []
 
-                # 5. Compute Node Positions based on selected layout
-                if "Circular" in layout_algorithm:
-                    pos = nx.circular_layout(G)
-                else:
-                    pos = nx.spring_layout(G, k=0.55, seed=42)
-
-                # 6. Extract Edge Traces for Plotly
-                edge_x, edge_y = [], []
-                for edge in G.edges():
-                    x0, y0 = pos[edge[0]]
-                    x1, y1 = pos[edge[1]]
-                    edge_x.extend([x0, x1, None])
-                    edge_y.extend([y0, y1, None])
-
-                edge_trace = go.Scatter(
-                    x=edge_x, y=edge_y,
-                    line=dict(width=1.0, color="rgba(140, 140, 140, 0.35)"),
-                    hoverinfo="none",
-                    mode="lines"
-                )
-
-                # 7. Extract Node Traces for Plotly
-                node_x, node_y, node_colors, node_sizes, node_hover_text, node_labels = [], [], [], [], [], []
-
-                for node in G.nodes():
-                    x, y = pos[node]
-                    node_x.append(x)
-                    node_y.append(y)
+                    for node in G.nodes():
+                        x, y = pos[node]
+                        node_x.append(x)
+                        node_y.append(y)
                     
-                    meta = G.nodes[node]
-                    ner_cls = meta.get("ner_class", "UNKNOWN")
-                    mentions = meta.get("mentions", 1)
-                    name = meta.get("name", node)
-                    icon = meta.get("icon", "📌")
+                        meta = G.nodes[node]
+                        ner_cls = meta.get("ner_class", "UNKNOWN")
+                        mentions = meta.get("mentions", 1)
+                        name = meta.get("name", node)
+                        icon = meta.get("icon", "📌")
                     
-                    node_labels.append(name)
-                    node_colors.append(IBM_LABEL_COLOR_MAP.get(ner_cls, "#8D8D8D"))
-                    node_sizes.append(max(12, min(38, 8 + mentions * 2)))
-                    node_hover_text.append(f"<b>{icon} {name}</b><br>Class: {ner_cls}<br>Total Mentions: {mentions}")
+                        node_labels.append(name)
+                        node_colors.append(IBM_LABEL_COLOR_MAP.get(ner_cls, "#8D8D8D"))
+                        node_sizes.append(max(12, min(38, 8 + mentions * 2)))
+                        node_hover_text.append(f"<b>{icon} {name}</b><br>Class: {ner_cls}<br>Total Mentions: {mentions}")
 
-                node_trace = go.Scatter(
-                    x=node_x, y=node_y,
-                    mode="markers+text",
-                    hoverinfo="text",
-                    text=node_labels,
-                    textposition="top center",
-                    textfont=dict(size=10, color="#E0E0E0"),
-                    hovertext=node_hover_text,
-                    marker=dict(
-                        color=node_colors,
-                        size=node_sizes,
-                        line=dict(width=1.5, color="#FFFFFF")
+                    node_trace = go.Scatter(
+                        x=node_x, y=node_y,
+                        mode="markers+text",
+                        hoverinfo="text",
+                        text=node_labels,
+                        textposition="top center",
+                        textfont=dict(size=10, color="#E0E0E0"),
+                        hovertext=node_hover_text,
+                        marker=dict(
+                            color=node_colors,
+                            size=node_sizes,
+                            line=dict(width=1.5, color="#FFFFFF")
+                        )
                     )
-                )
 
-                # 8. Render Plotly Graph
-                fig_net = go.Figure(data=[edge_trace, node_trace])
-                fig_net.update_layout(
-                    showlegend=False,
-                    hovermode="closest",
-                    margin=dict(b=10, l=10, r=10, t=10),
-                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                    paper_bgcolor="rgba(0,0,0,0)",
-                    plot_bgcolor="rgba(0,0,0,0)",
-                    height=650
-                )
+                    # 8. Render Plotly Graph
+                    fig_net = go.Figure(data=[edge_trace, node_trace])
+                    fig_net.update_layout(
+                        showlegend=False,
+                        hovermode="closest",
+                        margin=dict(b=10, l=10, r=10, t=10),
+                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        paper_bgcolor="rgba(0,0,0,0)",
+                        plot_bgcolor="rgba(0,0,0,0)",
+                        height=650
+                    )
 
-                st.plotly_chart(fig_net, use_container_width=True)
+                    st.plotly_chart(fig_net, use_container_width=True)
 
-            except Exception as e:
-                st.error(f"Error rendering network topology: {str(e)}")
+                except Exception as e:
+                    st.error(f"Error rendering network topology: {str(e)}")
