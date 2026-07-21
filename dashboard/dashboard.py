@@ -200,6 +200,17 @@ if df is not None:
         options=unique_cohorts,
         default=unique_cohorts
     )
+    # Place in sidebar or top navigation bar
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 📥 Archival Data Export")
+    csv_data = df_filtered.to_csv(index=False).encode('utf-8')
+    st.sidebar.download_button(
+        label="Export Filtered Subset (CSV)",
+        data=csv_data,
+        file_name="archival_knowledge_graph_subset.csv",
+        mime="text/csv",
+        use_container_width=True
+    )
 
     # Apply your sidebar filter mask to the main dataset
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
@@ -235,29 +246,56 @@ if df is not None:
     
     # --- GIS Map ---
     with tab1:
-        st.subheader("Geospatial Entity Distribution")
+        st.subheader("Geospatial Entity Distribution & Mention Density")
+        st.markdown("""
+        Geographic footprint of resolved entity nodes across archival sources. 
+        Marker **color** represents the entity category, while marker **size** scales with total mention frequency.
+        """)
+        
         df_geo = df_filtered[df_filtered["Latitude"].notna() & df_filtered["Longitude"].notna()].copy()
+       
         if len(df_geo) > 0:
-            df_geo["Hover Title"] = df_geo["Icon"] + " " + df_geo["Official Name"]
+            # 1. Aggregate mention counts per unique geospatial entity node
+            geo_mention_counts = df_geo.groupby("Entity ID").size().to_dict()
+            df_geo_nodes = df_geo.drop_duplicates(subset=["Entity ID"]).copy()
+            df_geo_nodes["Mentions"] = df_geo_nodes["Entity ID"].map(geo_mention_counts)
             
+            # 2. Build hover labels with mention counts
+            df_geo_nodes["Hover Title"] = (
+                df_geo_nodes["Icon"] + " " + 
+                df_geo_nodes["Official Name"] + 
+                " (" + df_geo_nodes["Mentions"].astype(str) + " mention" + 
+                df_geo_nodes["Mentions"].apply(lambda x: "s" if x > 1 else "") + ")"
+            )
+            
+            # 3. Render Map with Weighted Point Sizes
             fig_map = px.scatter_mapbox(
-                df_geo,
+                df_geo_nodes,
                 lat="Latitude",
                 lon="Longitude",
                 hover_name="Hover Title",
-                hover_data=["Surface Text", "Cohort", "Member Of", "Participant In", "Description"],
-                color="NER Class",                      # 1. Switched from 'Visual Group' to 'NER Class'
-                color_discrete_map=IBM_LABEL_COLOR_MAP, # 2. Enforced the global color blind safe palette
+                hover_data={
+                    "Mentions": True,
+                    "NER Class": True,
+                    "Cohort": True,
+                    "Country": True,
+                    "Latitude": False,
+                    "Longitude": False
+                },
+                color="NER Class",                      # Enforced global IBM NER class palette
+                color_discrete_map=IBM_LABEL_COLOR_MAP,
+                size="Mentions",                        # Scales marker size by mention volume
+                size_max=28,                            # Prevents huge dots from swallowing regional nodes
                 zoom=2,
                 height=600
             )
             fig_map.update_layout(
                 mapbox_style="open-street-map",
-                margin=dict(l=0, r=0, t=20, b=0) # Tightens up margins for a cleaner UI
+                margin=dict(l=0, r=0, t=20, b=0)
             )
             st.plotly_chart(fig_map, use_container_width=True)
         else:
-            st.info("No geospatial data coordinates found in filtered dataset.")
+            st.info("No geospatial coordinates found for the selected entity filters.")
 
     # --- Tab 2: Enhanced Demographic Analysis ---
     with tab2:
