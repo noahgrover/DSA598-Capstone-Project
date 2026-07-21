@@ -713,7 +713,7 @@ if df is not None:
             ]
             df_benchmarks = pd.DataFrame(benchmark_data)
 
-            m_col1, m_col2 = st.columns([1, 1]) # Adjusted to equal width for better table readability
+            m_col1, m_col2 = st.columns([1, 1])
 
             with m_col1:
                 st.markdown("#### Cohort Metric Comparison")
@@ -725,10 +725,11 @@ if df is not None:
                     value_name="Score (%)"
                 )
                 
+                # Dedicated, 100% unique IBM Carbon Palette for benchmark metrics
                 BENCHMARK_COLOR_MAP = {
-                    "Candidate Recall@5": "#8A3FFC",  # IBM Carbon Purple 60
-                    "In-KB F1":           "#1192E8",  # IBM Carbon Cyan 50
-                    "NIL F1":             "#FA4D56"   # IBM Carbon Red 50
+                    "Candidate Recall@5": "#EE5396",  # IBM Carbon Pink 50
+                    "In-KB F1":           "#D2A100",  # IBM Carbon Gold 30
+                    "NIL F1":             "#0F62FE"   # IBM Carbon Signature Blue 60
                 }
 
                 fig_bench = px.bar(
@@ -762,7 +763,6 @@ if df is not None:
             with m_col2:
                 st.markdown("#### Performance Matrix & Definitions")
                 
-                # 1. Define plain-English descriptions for the metrics
                 metric_descriptions = {
                     "Candidate Recall@5": "Rate at which the true entity is retrieved within the top 5 search candidates.",
                     "In-KB Precision": "Accuracy: % of pipeline-assigned Wikidata links that are historically correct.",
@@ -773,10 +773,8 @@ if df is not None:
                     "NIL F1": "Harmonic mean of NIL Precision and Recall (Overall clustering performance)."
                 }
                 
-                # 2. Transpose the dataframe: Metrics become rows, Cohorts become columns
                 df_matrix = df_benchmarks.set_index("Scope / Cohort").T.reset_index()
                 
-                # 3. Clean up the column headers for UI display
                 df_matrix.rename(columns={
                     "index": "Metric",
                     "GLOBAL BASELINE (All Cohorts)": "Global Baseline",
@@ -785,10 +783,8 @@ if df is not None:
                     "Cohort C (Indigenous Populations)": "Cohort C"
                 }, inplace=True)
                 
-                # 4. Insert descriptions right next to the Metric name
                 df_matrix.insert(1, "Description", df_matrix["Metric"].map(metric_descriptions))
                 
-                # 5. Format numerical values cleanly with percentages
                 numeric_cols = ["Global Baseline", "Cohort A", "Cohort B", "Cohort C"]
                 for col in numeric_cols:
                     if col in df_matrix.columns:
