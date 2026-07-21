@@ -22,17 +22,17 @@ st.set_page_config(
 
 st.title("Marginalized Metadata Enrichment Dashboard")
 st.markdown("""
-This dashboard visualizes the structural and qualitative improvements to flat archival metadata extracted from the Digital Publc Library of America. Our pipeline consists of the following steps:
-- Extracts the title and description fields from archival records,
-- Passes them into flattened JSON records,
-- Extracts named entities,
-- Locates viable Wikidata candidates,
-- Links correct candidate to entity
-- Produces enriched JSONLD for linked entities and clusters NIL (out-of-network) entities
+This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct cohorts. The pipeline:
+- Extracts title and description fields from digital records stored in DPLA;
+- Passes them into flattened JSON records;
+- Recognized and extracts named entities;
+- Locates viable Wikidata candidates;
+- Links correct candidate to entity;
+- Produces enriched JSONLD for linked entities and clusters NIL (out-of-network) entities.
 """)
 
 def extract_year_from_text(text):
-    """Helper utility to parse a numeric year out of messy strings or ISO dates."""
+    # Helper utility to parse a numeric year out of messy strings or ISO dates.
     if not text:
         return None
     match = re.search(r'\b(\d{3,4})\b', str(text))
@@ -66,7 +66,6 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             return [str(val).replace("wd:", "")]
         return []
 
-    # Map your string icon labels into rendering emojis for Streamlit/Plotly
     icon_mapping = {
         "person": "👤",
         "group": "🏛️",
@@ -97,30 +96,30 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
             lat = geo_data.get("latitude") if isinstance(geo_data, dict) else None
             lon = geo_data.get("longitude") if isinstance(geo_data, dict) else None
 
-            # Base Demographics
+            # base demographics
             occ = extract_labels(ent.get("occupation"))
             gender = extract_labels(ent.get("genderIdentity"))
             ethnic = extract_labels(ent.get("ethnicGroup"))
             religion = extract_labels(ent.get("religion"))
             country = extract_labels(ent.get("country"))
             
-            # Newly Mapped Rich Properties
+            # rich properties
             ideology = extract_labels(ent.get("politicalIdeology"))
             member = extract_labels(ent.get("memberOf"))
             participant = extract_labels(ent.get("participant"))
             
-            # Extract and format VIAF Link
+            # extracting and formatting VIAF links
             viaf_url = None
             same_as = ent.get("schema:sameAs")
             if same_as and isinstance(same_as, str) and same_as.startswith("viaf:"):
                 viaf_id = same_as.replace("viaf:", "")
                 viaf_url = f"https://viaf.org/viaf/{viaf_id}/"
 
-            # Parse Icon
+            # parse icons
             icon_str = ent.get("visualIcon", "help")
             emoji_icon = icon_mapping.get(icon_str, "❓")
             
-            # Handle start/end bounds dynamically
+            # dynamically handle start/end bounds
             start_keys = ["dateOfBirth", "startDate", "schema:startDate"]
             end_keys = ["dateOfDeath", "endDate", "schema:endDate"]
             
@@ -166,7 +165,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
                 "End Year": local_end
             })
 
-    # Join list attributes into simple display strings
+    # join list attributes into simple display strings
     list_fields = [
         "Occupation", "Gender Identity", "Ethnic Group/Tribe", "Religion", "Country", 
         "Political Ideology", "Member Of", "Participant In"
@@ -182,7 +181,7 @@ def load_and_parse_jsonld(filename="enriched.jsonld"):
 df, records_per_cohort = load_and_parse_jsonld()
 
 if df is not None:
-    # --- GLOBAL SYSTEM PALETTES (IBM Colorblind-Safe Framework) ---
+    # IBM Colorblind-Safe color scheme
     unique_cohorts = sorted(list(df["Cohort"].unique()))
     HIGH_CONTRAST_COHORT_COLORS = ["#005AB5", "#DC3220", "#FFC20A"] 
     COHORT_COLOR_MAP = {
@@ -199,21 +198,20 @@ if df is not None:
         "Thing": "#A3A8B8"          # Fallback Slate Gray
     }
 
-    # Sidebar Filters
-    st.sidebar.header("📊 Filter Controls")
+    # sidebar filters
+    st.sidebar.header("Filter Controls")
     selected_cohorts = st.sidebar.multiselect(
-        "Select Historical Cohorts",
+        "Select Historical Cohort(s)",
         options=unique_cohorts,
         default=unique_cohorts
     )
 
-    # Apply your sidebar filter mask to the main dataset
+    # apply filter mask to data
     df_filtered = df[df["Cohort"].isin(selected_cohorts)]
     
-    # Safely derive total documents matching active cohort filter selections
     filtered_records_count = sum(records_per_cohort[c] for c in selected_cohorts)
         
-    # Metrics Row
+    # persistent metrics Row
     with st.container(border=True):
         m1, m2, m3, m4, m5, m6 = st.columns(6)
         with m1: st.metric("Total Records", filtered_records_count)
@@ -232,16 +230,16 @@ if df is not None:
             st.metric("Paths / Record", f"{avg_paths:.2f}x")
 
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "🗺️ Archival Geospatial Map",
-        "📊 Demographic & Crossover Insights",
-        "⏳ Archival Calendar Timeline",
-        "🔍 Interactive Entity Explorer",
-        "📈 Pipeline Quality Diagnostics",
-        "Semantic Network"
+        "| Geospatial Map",
+        "| Demographic Analysis",
+        "| Timeline",
+        "| Entity Explorer",
+        "| Pipeline Quality Diagnostics",
+        "| Semantic Density Network"
     ])
 
 # =========================================================================================================================================
-# Tab 1 : 
+# Tab 1: 
 # =========================================================================================================================================
     
     with tab1:
