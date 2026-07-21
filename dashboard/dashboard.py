@@ -21,8 +21,8 @@ st.set_page_config(
 )
 
 st.title("MARGINALIZED METADATA ENRICHMENT: DASHBOARD")
-st.markdown("""
-This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:
+st.markdown("""This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:""")
+st.caption("""
 1. Extracts title and description fields from digital records stored in DPLA;
 2. Passes them into flattened JSON records;
 3. Recognizes and extracts named entities;
@@ -248,6 +248,7 @@ if df is not None:
         Search, filter, and inspect specific semantic nodes within the graph. Selecting an entity from the list of unique nodes on the right
         will pull its full relational dossier, authority records, multi-layered attributes, and corpus occurrences.
         """)
+        st.markdown("---")
 
         if df_filtered.empty:
             st.info("No entities match your active cohort filters to explore.")
@@ -403,7 +404,8 @@ if df is not None:
         Node sizes represent **mention density** (degree/frequency), edge thickness indicates **co-occurrence strength**, 
         and colors correspond to **NER entity classes**.
         """)
-
+        st.markdown("---")
+        
         # guard against empty datasets
         df_net_clean = df_filtered.dropna(subset=["Entity ID"]).copy() if not df_filtered.empty else pd.DataFrame()
 
@@ -419,10 +421,10 @@ if df is not None:
             # controls to adjust network complexity
             net_col1, net_col2 = st.columns([2, 1])
             with net_col1:
-                top_n = st.slider("Limit Top Entities by Mention Count (for clarity):", min_value=10, max_value=100, value=30, step=5)
+                top_n = st.slider("LIMIT ENTITIES (BY MENTION COUNT):", min_value=10, max_value=100, value=30, step=5)
             with net_col2:
                 layout_algorithm = st.selectbox(
-                    "Graph Layout Algorithm:", 
+                    "GRAPH LAYOUT:", 
                     ["Spring (Fruchterman-Reingold)", "Circular"]
                 )
 
