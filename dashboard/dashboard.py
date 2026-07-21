@@ -838,7 +838,7 @@ if df is not None:
     with tab6:
         st.caption("""
         Assess structural accuracy, resolution efficacy, and metadata completeness across the extraction and linking pipeline.
-        This includes empirical ground-truth benchmark evaluation (in-knowledgebase [In-KB] Linking, NIL Precision/Recall/F1, and Candidate Recall@5) 
+        This includes empirical ground-truth benchmark evaluation In-KB (in-knowledge-base) Linking, NIL Precision/Recall/F1, and Candidate Recall@5) 
         segmented by historical archival cohort.
         """)
 
