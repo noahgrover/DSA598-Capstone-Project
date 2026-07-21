@@ -955,8 +955,8 @@ if df is not None:
                 )
                 st.plotly_chart(fig_comp, use_container_width=True)
 
-    # --- Tab 3 (or New Tab): Semantic Density Network Graph ---
-with tab6: # or st.container() / new tab
+    # --- Tab 3: Semantic Density Network Graph ---
+with tab3:
     st.subheader("🕸️ Semantic Density Network Graph")
     st.markdown("""
     Explore structural relationships and co-occurrence density across entity nodes. 
@@ -972,7 +972,10 @@ with tab6: # or st.container() / new tab
         with net_col1:
             top_n = st.slider("Limit Top Entities by Mention Count (for clarity):", min_value=10, max_value=100, value=30, step=5)
         with net_col2:
-            layout_algorithm = st.selectbox("Graph Layout Algorithm:", ["Spring (Fruchterman-Reingold)", "Circular", "Kamada-Kawai"])
+            layout_algorithm = st.selectbox(
+                "Graph Layout Algorithm:", 
+                ["Spring (Fruchterman-Reingold)", "Circular", "Shell"]
+            )
 
         # 2. Get top N entities by mention count
         mention_counts = df_filtered.groupby("Entity ID").size().to_dict()
@@ -1003,8 +1006,7 @@ with tab6: # or st.container() / new tab
                     "icon": icon
                 }
 
-            # Add Edges based on shared Cohort or Country co-occurrence
-            # (Groups entities that appear together in the same historical cohort)
+            # Add Edges based on shared Cohort co-occurrence
             cohort_groups = df_net.groupby("Cohort")["Entity ID"].unique()
             for cohort, e_ids in cohort_groups.items():
                 unique_ids = list(set(e_ids))
@@ -1019,8 +1021,8 @@ with tab6: # or st.container() / new tab
             # 4. Compute Node Positions based on selected algorithm
             if "Circular" in layout_algorithm:
                 pos = nx.circular_layout(G)
-            elif "Kamada-Kawai" in layout_algorithm:
-                pos = nx.kamada_kawai_layout(G)
+            elif "Shell" in layout_algorithm:
+                pos = nx.shell_layout(G)
             else:
                 pos = nx.spring_layout(G, k=0.5, seed=42)
 
