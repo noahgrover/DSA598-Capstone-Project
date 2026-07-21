@@ -1,0 +1,11 @@
+COHORT: {cohort}
+THEME: {theme}
+HISTORICAL TEXT: {context_text}
+PEER ENTITIES IN DOCUMENT: {peer_entities}
+
+TARGET ENTITY: {target_entity}
+
+CANDIDATES FOR TARGET ENTITY:
+{candidates}
+
+Deduce if any of these candidates represent the target entity based on historical era, geographic scope, peer co-occurrences, and the overarching historical theme.

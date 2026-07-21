@@ -1,0 +1,15 @@
+HISTORICAL METADATA:
+- COHORT: {cohort}
+- THEME: {theme}
+- CONTEXT TEXT: {context}
+
+TARGET ENTITY SPAN: {entity_span}
+TARGET ENTITY LABEL (NER): {entity_label}
+
+MODEL DECISION (SELECTED QID): {decision}
+MODEL REASONING: {reasoning}
+
+WIKIDATA CANDIDATES PROVIDED TO THE MODEL:
+{candidates_list}
+
+Conduct a rigorous audit of the model's decision. Check for era compatibility, geographic alignment, and thematic consistency. If the model chose "NIL" but a candidate is an undeniable match, mark it as "False NIL (Under-linking)".
