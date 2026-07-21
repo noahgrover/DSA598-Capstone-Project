@@ -25,9 +25,9 @@ st.markdown("""
 This dashboard analyzes the structural and qualitative improvements to archival metadata extracted from the Digital Public Library of America (DPLA) for three distinct, historically marginalized cohorts. The pipeline:
 - Extracts title and description fields from digital records stored in DPLA;
 - Passes them into flattened JSON records;
-- Recognized and extracts named entities;
+- Recognizes and extracts named entities;
 - Locates viable Wikidata candidates;
-- Links correct candidate to entity;
+- Links the correct candidate to each entity;
 - Produces enriched JSONLD for linked entities and clusters NIL (out-of-network) entities.
 """)
 
