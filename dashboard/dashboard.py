@@ -231,7 +231,8 @@ if df is not None:
         "📊 Demographic & Crossover Insights",
         "⏳ Archival Calendar Timeline",
         "🔍 Interactive Entity Explorer",
-        "📈 Pipeline Quality Diagnostics"
+        "📈 Pipeline Quality Diagnostics",
+        "Semantic Network"
     ])
     
     # --- Tab 1: Geospatial & Geographic Analysis ---
