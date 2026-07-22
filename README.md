@@ -9,7 +9,7 @@ The pipeline's effectiveness is validated independently across three historicall
 - Cohort B: LGBTQIA+ Histories
 - Cohort C: Indigenous Populations
 
-An in-depth description, as well as justification, methodology, and discussion of results is located at (pipeline/`DSA598_capstoneProjectDocumentation_Grover.pdf`). 
+Full project documentation, including justification, methodology, and discussion of results is located at (pipeline/`DSA598_capstoneProjectDocumentation_Grover.pdf`). Video presentation at ("insert_yt_link_here").
 
 All data comes directly from the Digital Public Library of America (DPLA) API endpoint: (https://api.dp.la/v2/items) 
 
