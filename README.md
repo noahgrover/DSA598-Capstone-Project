@@ -9,6 +9,8 @@ The pipeline's effectiveness is validated independently across three historicall
 - Cohort B: LGBTQIA+ Histories
 - Cohort C: Indigenous Populations
 
+An in-depth description, as well as justification, methodology, and discussion of results is located in the main branch of this repository: `DSA598_capstoneProjectDocumentation_Grover`.
+
 ## DEPENDENCIES
 The pipeline is designed to run within Google Colab (Python 3) utilizing its cloud-hosted environment for access to GPU hardware and persistent, version-controlled serialization. All necessary libraries can be found at (pipeline/requirements.txt).
 
