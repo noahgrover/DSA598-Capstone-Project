@@ -6,7 +6,7 @@ Full project documentation, including justification, methodology, and discussion
 
 Video presentation at ("insert_yt_link_here").
 
-Daashboard deployed at (https://dsa598-capstone-project-d8soukzysjbyhykbut9zdp.streamlit.app/).
+Dashboard deployed at (https://dsa598-capstone-project-d8soukzysjbyhykbut9zdp.streamlit.app/).
 
 ## DESCRIPTION
 This project provides an equity-informed, open-source Python pipeline designed to automate the enrichment of legacy metadata. By integrating domain-customized Named Entity Recognition (NER) and a Large Language Model (LLM) candidate disambiguation layer, the pipeline translates flat-text archival descriptions into discoverable, machine-readable Linked Open Data (LOD). The system extracts key historical entities and grounds them to persistent global identifiers (Wikidata QIDs) while avoiding the algorithmic bias and high hallucination rates common in out-of-the-box generative models.
