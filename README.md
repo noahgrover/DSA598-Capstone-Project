@@ -4,7 +4,7 @@ This repository contains Noah Grover's DSA 598 capstone project, submitted on Ju
 ## DOCUMENTATION
 Full project documentation, including justification, methodology, and discussion of results is located at (pipeline/`DSA598_capstoneProjectDocumentation_Grover.pdf`).
 
-Video presentation at ("insert_yt_link_here").
+Video presentation at (https://youtu.be/mOfLjcT2z8E).
 
 Dashboard deployed at (https://dsa598-capstone-project-d8soukzysjbyhykbut9zdp.streamlit.app/).
 
